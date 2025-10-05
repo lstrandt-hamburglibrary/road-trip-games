@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.3.0';</script>
+    <script>window.APP_VERSION = '1.2.1';</script>
 
     <style>
         * {
@@ -237,13 +237,6 @@
                     </div>
                 </div>
 
-                <!-- Interactive Map -->
-                <div style="background: #f8f9fa; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
-                    <h3 style="color: #333; margin-bottom: 1rem; text-align: center;">Interactive Map</h3>
-                    <p style="text-align: center; color: #666; margin-bottom: 1.5rem; font-size: 0.9rem;">Click any state or province to mark it as collected</p>
-                    <div id="interactiveMap" style="overflow-x: auto;"></div>
-                </div>
-
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
                     <!-- US States Section -->
                     <div>
@@ -418,81 +411,6 @@
             document.querySelector('.roadmap').style.display = 'none';
             document.getElementById('plateTracker').style.display = 'block';
             loadPlateTracker();
-            renderInteractiveMap();
-        }
-
-        function renderInteractiveMap() {
-            // Simplified geographic layout - Canada on top, US states below
-            const mapLayout = [
-                // Canada row
-                ['YT', 'NT', 'NU', '', '', '', '', '', '', '', '', 'NL'],
-                ['BC', 'AB', 'SK', 'MB', 'ON', 'QC', 'NB', 'PE', 'NS', '', '', ''],
-                // US rows (simplified geographic positions)
-                ['', '', '', '', '', 'ME', '', '', '', '', '', ''],
-                ['WA', 'MT', 'ND', 'MN', 'WI', 'MI', 'NY', 'VT', 'NH', 'MA', 'RI', 'CT'],
-                ['OR', 'ID', 'WY', 'SD', 'IA', 'IL', 'IN', 'OH', 'PA', 'NJ', 'DE', 'MD'],
-                ['CA', 'NV', 'UT', 'CO', 'NE', 'MO', 'KY', 'WV', 'VA', 'DC', '', ''],
-                ['', 'AZ', 'NM', 'KS', 'AR', 'TN', 'NC', 'SC', '', '', '', ''],
-                ['', '', '', 'OK', 'LA', 'MS', 'AL', 'GA', '', '', '', ''],
-                ['', '', '', 'TX', '', '', '', 'FL', '', '', '', ''],
-                ['AK', '', '', '', '', '', 'HI', '', '', '', '', '']
-            ];
-
-            const stateMap = {};
-            US_STATES.forEach(s => stateMap[s.abbr] = s.name);
-            CANADA_PROVINCES.forEach(p => stateMap[p.abbr] = p.name);
-
-            const mapContainer = document.getElementById('interactiveMap');
-            mapContainer.innerHTML = `
-                <div style="display: inline-block; min-width: 600px;">
-                    ${mapLayout.map(row => `
-                        <div style="display: flex; justify-content: center; gap: 2px; margin-bottom: 2px;">
-                            ${row.map(abbr => {
-                                if (!abbr) {
-                                    return '<div style="width: 45px; height: 35px;"></div>';
-                                }
-                                const name = stateMap[abbr];
-                                const isChecked = collectedPlates[name] || false;
-                                return `
-                                    <div
-                                        onclick="togglePlateFromMap('${name}')"
-                                        style="
-                                            width: 45px;
-                                            height: 35px;
-                                            background: ${isChecked ? '#28a745' : '#e9ecef'};
-                                            border: 1px solid ${isChecked ? '#1e7e34' : '#adb5bd'};
-                                            border-radius: 4px;
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            font-size: 10px;
-                                            font-weight: bold;
-                                            color: ${isChecked ? 'white' : '#495057'};
-                                            cursor: pointer;
-                                            transition: all 0.2s;
-                                        "
-                                        onmouseover="this.style.transform='scale(1.1)'; this.style.zIndex='10'"
-                                        onmouseout="this.style.transform='scale(1)'; this.style.zIndex='1'"
-                                        title="${name}"
-                                    >
-                                        ${abbr}
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function togglePlateFromMap(name) {
-            collectedPlates[name] = !collectedPlates[name];
-            if (!collectedPlates[name]) {
-                delete collectedPlates[name];
-            }
-            localStorage.setItem('collectedPlates', JSON.stringify(collectedPlates));
-            loadPlateTracker();
-            renderInteractiveMap();
         }
 
         function loadPlateTracker() {
