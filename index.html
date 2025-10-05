@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.6.4';</script>
+    <script>window.APP_VERSION = '1.6.5';</script>
 
     <style>
         * {
@@ -640,6 +640,8 @@
             battleshipState = {
                 phase: 'setup',
                 currentPlayer: 1,
+                player1Name: '',
+                player2Name: '',
                 player1: {
                     grid: Array(10).fill(null).map(() => Array(10).fill(null)),
                     ships: [],
@@ -689,17 +691,63 @@
                     </div>
                     <h3 style="margin-bottom: 1rem;">Choose Game Mode:</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 600px; margin: 0 auto;">
-                        <button onclick="startPassAndPlay()" style="background: white; color: #667eea; border: none; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                        <button onclick="selectPassAndPlay()" style="background: white; color: #667eea; border: none; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                             👥 Pass & Play<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">2 Players</span>
                         </button>
-                        <button onclick="startVsAI()" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                        <button onclick="selectVsAI()" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                             🤖 vs Computer<br>
                             <span style="font-size: 0.9rem; font-weight: normal;">Single Player</span>
                         </button>
                     </div>
                 </div>
             `;
+        }
+
+        function selectPassAndPlay() {
+            battleshipState.isAI = false;
+            showPlayerNames();
+        }
+
+        function selectVsAI() {
+            battleshipState.isAI = true;
+            showPlayerNames();
+        }
+
+        function showPlayerNames() {
+            const content = document.getElementById('battleshipContent');
+            content.innerHTML = `
+                <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">⚓ Player Names</h2>
+                    <div style="background: rgba(255,255,255,0.2); padding: 2rem; border-radius: 10px; max-width: 400px; margin: 0 auto;">
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">Player 1 Name:</label>
+                            <input type="text" id="player1Name" placeholder="Enter name" value="${battleshipState.player1Name || ''}"
+                                   style="width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                        ${!battleshipState.isAI ? `
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">Player 2 Name:</label>
+                            <input type="text" id="player2Name" placeholder="Enter name" value="${battleshipState.player2Name || ''}"
+                                   style="width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem;">
+                        </div>
+                        ` : ''}
+                        <button onclick="startWithNames()" style="background: white; color: #667eea; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; width: 100%;">
+                            Start Game
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startWithNames() {
+            const player1Input = document.getElementById('player1Name').value.trim();
+            const player2Input = battleshipState.isAI ? 'Computer' : document.getElementById('player2Name').value.trim();
+
+            battleshipState.player1Name = player1Input || 'Player 1';
+            battleshipState.player2Name = player2Input || 'Player 2';
+
+            startPlayer1Setup();
         }
 
         function startPassAndPlay() {
@@ -721,12 +769,13 @@
         function showShipPlacement(player) {
             const ship = battleshipState.ships[battleshipState.currentShipIndex];
             const content = document.getElementById('battleshipContent');
+            const playerName = player === 1 ? battleshipState.player1Name : battleshipState.player2Name;
 
             const canUndo = battleshipState.currentShipIndex > 0;
 
             content.innerHTML = `
                 <div style="background: #f8f9fa; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
-                    <h3>Player ${player} - Place Your Ships</h3>
+                    <h3>${playerName} - Place Your Ships</h3>
                     <p>Placing: <strong>${ship.name}</strong> (${ship.size} squares)</p>
                     <p>Ship ${battleshipState.currentShipIndex + 1} of 5</p>
                     <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
@@ -867,12 +916,15 @@
                 return;
             }
 
+            const fromPlayerName = toPlayer === 2 ? battleshipState.player1Name : battleshipState.player2Name;
+            const toPlayerName = toPlayer === 2 ? battleshipState.player2Name : battleshipState.player1Name;
+
             const content = document.getElementById('battleshipContent');
             content.innerHTML = `
                 <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
                     <h2 style="font-size: 3rem; margin-bottom: 2rem;">📱 Pass the Phone!</h2>
-                    <p style="font-size: 1.5rem; margin-bottom: 3rem;">Player ${toPlayer - 1} look away!<br>Give phone to Player ${toPlayer}</p>
-                    <button onclick="${toPlayer === 2 ? 'startPlayer2Setup()' : 'startBattlePhase()'}" style="background: white; color: #f5576c; border: none; padding: 1.5rem 3rem; border-radius: 10px; cursor: pointer; font-size: 1.3rem; font-weight: bold;">Player ${toPlayer} Ready!</button>
+                    <p style="font-size: 1.5rem; margin-bottom: 3rem;">${fromPlayerName} look away!<br>Give phone to ${toPlayerName}</p>
+                    <button onclick="${toPlayer === 2 ? 'startPlayer2Setup()' : 'startBattlePhase()'}" style="background: white; color: #f5576c; border: none; padding: 1.5rem 3rem; border-radius: 10px; cursor: pointer; font-size: 1.3rem; font-weight: bold;">${toPlayerName} Ready!</button>
                 </div>
             `;
         }
@@ -952,8 +1004,8 @@
             const opponent = currentPlayer === 1 ? 2 : 1;
             const opponentData = opponent === 1 ? battleshipState.player1 : battleshipState.player2;
 
-            const playerName = battleshipState.isAI && currentPlayer === 2 ? 'Computer' : `Player ${currentPlayer}`;
-            const opponentName = battleshipState.isAI && opponent === 2 ? 'Computer' : `Player ${opponent}`;
+            const playerName = currentPlayer === 1 ? battleshipState.player1Name : battleshipState.player2Name;
+            const opponentName = opponent === 1 ? battleshipState.player1Name : battleshipState.player2Name;
 
             content.innerHTML = `
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
@@ -1178,12 +1230,15 @@
             }
 
             // Pass and play mode - show pass phone screen
+            const currentPlayerName = battleshipState.currentPlayer === 1 ? battleshipState.player1Name : battleshipState.player2Name;
+            const nextPlayerName = nextPlayer === 1 ? battleshipState.player1Name : battleshipState.player2Name;
+
             const content = document.getElementById('battleshipContent');
             content.innerHTML = `
                 <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
                     <h2 style="font-size: 3rem; margin-bottom: 2rem;">📱 Pass the Phone!</h2>
-                    <p style="font-size: 1.5rem; margin-bottom: 3rem;">Player ${battleshipState.currentPlayer} look away!<br>Give phone to Player ${nextPlayer}</p>
-                    <button onclick="continueToNextTurn()" style="background: white; color: #f5576c; border: none; padding: 1.5rem 3rem; border-radius: 10px; cursor: pointer; font-size: 1.3rem; font-weight: bold;">Player ${nextPlayer} Ready!</button>
+                    <p style="font-size: 1.5rem; margin-bottom: 3rem;">${currentPlayerName} look away!<br>Give phone to ${nextPlayerName}</p>
+                    <button onclick="continueToNextTurn()" style="background: white; color: #f5576c; border: none; padding: 1.5rem 3rem; border-radius: 10px; cursor: pointer; font-size: 1.3rem; font-weight: bold;">${nextPlayerName} Ready!</button>
                 </div>
             `;
         }
@@ -1300,7 +1355,7 @@
         function showWinner() {
             const winner = battleshipState.currentPlayer;
             const content = document.getElementById('battleshipContent');
-            const winnerName = battleshipState.isAI && winner === 2 ? 'Computer' : `Player ${winner}`;
+            const winnerName = winner === 1 ? battleshipState.player1Name : battleshipState.player2Name;
 
             content.innerHTML = `
                 <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
