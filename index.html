@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.2.1';</script>
+    <script>window.APP_VERSION = '1.2.2';</script>
 
     <style>
         * {
@@ -229,11 +229,24 @@
                     <button onclick="showHome()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Home</button>
                 </div>
 
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
-                    <h3 style="font-size: 2rem; margin-bottom: 0.5rem;" id="plateProgress">0 / 64</h3>
-                    <p style="font-size: 1.1rem;">Plates Collected</p>
-                    <div style="background: white; height: 20px; border-radius: 10px; overflow: hidden; margin-top: 1rem;">
-                        <div id="plateProgressBar" style="background: #28a745; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;" id="plateProgress">0 / 64</h3>
+                        <p style="font-size: 1.1rem;">Total Plates Collected</p>
+                        <div style="background: white; height: 20px; border-radius: 10px; overflow: hidden; margin-top: 1rem;">
+                            <div id="plateProgressBar" style="background: #28a745; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid rgba(255,255,255,0.3);">
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold;" id="usProgress">0 / 51</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem;">🇺🇸 United States</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: bold;" id="canadaProgress">0 / 13</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem;">🇨🇦 Canada</div>
+                        </div>
                     </div>
                 </div>
 
@@ -459,12 +472,24 @@
         }
 
         function updateProgress() {
-            const total = US_STATES.length + CANADA_PROVINCES.length;
-            const collected = Object.keys(collectedPlates).length;
+            // Calculate US states collected
+            const usCollected = US_STATES.filter(s => collectedPlates[s.name]).length;
+            const usTotal = US_STATES.length;
+
+            // Calculate Canada provinces collected
+            const canadaCollected = CANADA_PROVINCES.filter(p => collectedPlates[p.name]).length;
+            const canadaTotal = CANADA_PROVINCES.length;
+
+            // Calculate total
+            const total = usTotal + canadaTotal;
+            const collected = usCollected + canadaCollected;
             const percentage = (collected / total * 100).toFixed(1);
 
+            // Update displays
             document.getElementById('plateProgress').textContent = `${collected} / ${total}`;
             document.getElementById('plateProgressBar').style.width = `${percentage}%`;
+            document.getElementById('usProgress').textContent = `${usCollected} / ${usTotal}`;
+            document.getElementById('canadaProgress').textContent = `${canadaCollected} / ${canadaTotal}`;
         }
 
         // Register service worker for PWA functionality
