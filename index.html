@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.8.0';</script>
+    <script>window.APP_VERSION = '1.8.1';</script>
 
     <style>
         * {
@@ -1902,8 +1902,8 @@
         }
 
         function renderMinesweeperBoard() {
-            const cellSize = minesweeperState.cols > 16 ? '25px' : '30px';
-            let html = `<div style="display: grid; grid-template-columns: repeat(${minesweeperState.cols}, ${cellSize}); gap: 0;">`;
+            const cellSize = minesweeperState.cols > 16 ? '28px' : '35px';
+            let html = `<div style="display: grid; grid-template-columns: repeat(${minesweeperState.cols}, ${cellSize}); gap: 1px; background: #808080;">`;
 
             for (let row = 0; row < minesweeperState.rows; row++) {
                 for (let col = 0; col < minesweeperState.cols; col++) {
@@ -1912,10 +1912,10 @@
                     const value = minesweeperState.board[row][col];
 
                     let content = '';
-                    let style = `width: ${cellSize}; height: ${cellSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; cursor: pointer; user-select: none;`;
+                    let style = `width: ${cellSize}; height: ${cellSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; cursor: pointer; user-select: none; touch-action: manipulation;`;
 
                     if (revealed) {
-                        style += 'border: 1px solid #808080; background: #bdbdbd;';
+                        style += 'border: 1px solid #7a7a7a; background: #bdbdbd;';
                         if (value === -1) {
                             content = '💣';
                             if (minesweeperState.gameOver) {
@@ -1927,14 +1927,14 @@
                             style += `color: ${colors[value]};`;
                         }
                     } else {
-                        style += 'border: 2px outset #808080; background: #c0c0c0;';
+                        style += 'border: 3px outset #dfdfdf; background: #c0c0c0;';
                         if (flagged) {
                             content = '🚩';
                         }
                     }
 
                     html += `
-                        <div onclick="revealCell(${row}, ${col})"
+                        <div onmousedown="revealCell(${row}, ${col})"
                              oncontextmenu="toggleFlag(${row}, ${col}); return false;"
                              ontouchstart="handleTouchStart(event, ${row}, ${col})"
                              ontouchend="handleTouchEnd(event)"
