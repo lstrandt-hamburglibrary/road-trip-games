@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.4.0';</script>
+    <script>window.APP_VERSION = '1.4.1';</script>
 
     <style>
         * {
@@ -681,14 +681,21 @@
             const ship = battleshipState.ships[battleshipState.currentShipIndex];
             const content = document.getElementById('battleshipContent');
 
+            const canUndo = battleshipState.currentShipIndex > 0;
+
             content.innerHTML = `
                 <div style="background: #f8f9fa; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
                     <h3>Player ${player} - Place Your Ships</h3>
                     <p>Placing: <strong>${ship.name}</strong> (${ship.size} squares)</p>
                     <p>Ship ${battleshipState.currentShipIndex + 1} of 5</p>
-                    <button onclick="toggleOrientation()" style="background: #667eea; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; margin-top: 0.5rem;">
-                        Orientation: ${battleshipState.orientation === 'horizontal' ? '→ Horizontal' : '↓ Vertical'}
-                    </button>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <button onclick="toggleOrientation()" style="background: #667eea; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                            Orientation: ${battleshipState.orientation === 'horizontal' ? '→ Horizontal' : '↓ Vertical'}
+                        </button>
+                        <button onclick="undoLastShip()" style="background: ${canUndo ? '#e74c3c' : '#ccc'}; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: ${canUndo ? 'pointer' : 'not-allowed'};" ${!canUndo ? 'disabled' : ''}>
+                            ↶ Undo Last Ship
+                        </button>
+                    </div>
                 </div>
                 <div style="display: inline-block; background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     ${renderPlacementGrid(player)}
@@ -731,6 +738,25 @@
         function toggleOrientation() {
             battleshipState.orientation = battleshipState.orientation === 'horizontal' ? 'vertical' : 'horizontal';
             showShipPlacement(battleshipState.phase === 'player1_place' ? 1 : 2);
+        }
+
+        function undoLastShip() {
+            if (battleshipState.currentShipIndex === 0) return;
+
+            const player = battleshipState.phase === 'player1_place' ? 1 : 2;
+            const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
+
+            // Remove the last ship from the ships array
+            const lastShip = playerData.ships.pop();
+
+            // Clear those positions from the grid
+            lastShip.positions.forEach(([r, c]) => {
+                playerData.grid[r][c] = null;
+            });
+
+            // Go back to placing the previous ship
+            battleshipState.currentShipIndex--;
+            showShipPlacement(player);
         }
 
         function placeShipAt(row, col) {
