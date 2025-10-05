@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.6.3';</script>
+    <script>window.APP_VERSION = '1.6.4';</script>
 
     <style>
         * {
@@ -746,19 +746,20 @@
 
         function renderPlacementGrid(player) {
             const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
             let html = '<div style="display: inline-block;">';
 
-            // Column headers
+            // Column headers (1-10)
             html += '<div style="display: flex; margin-bottom: 5px; margin-left: 30px;">';
-            for (let i = 0; i < 10; i++) {
+            for (let i = 1; i <= 10; i++) {
                 html += `<div style="width: 35px; text-align: center; font-weight: bold; color: #667eea;">${i}</div>`;
             }
             html += '</div>';
 
-            // Grid with row headers
+            // Grid with row headers (A-J)
             for (let row = 0; row < 10; row++) {
                 html += '<div style="display: flex; margin-bottom: 3px;">';
-                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea;">${row}</div>`;
+                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea;">${letters[row]}</div>`;
                 for (let col = 0; col < 10; col++) {
                     const hasShip = playerData.grid[row][col] !== null;
                     html += `
@@ -995,20 +996,21 @@
         function renderAttackGrid(opponentPlayer) {
             const opponentData = opponentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
             const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
             let html = '<div style="display: inline-block;">';
 
-            // Column headers
+            // Column headers (1-10)
             html += '<div style="display: flex; margin-bottom: 5px; margin-left: 30px;">';
-            for (let i = 0; i < 10; i++) {
+            for (let i = 1; i <= 10; i++) {
                 html += `<div style="width: 35px; text-align: center; font-weight: bold; color: #e74c3c;">${i}</div>`;
             }
             html += '</div>';
 
-            // Grid with row headers
+            // Grid with row headers (A-J)
             for (let row = 0; row < 10; row++) {
                 html += '<div style="display: flex; margin-bottom: 3px;">';
-                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #e74c3c;">${row}</div>`;
+                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #e74c3c;">${letters[row]}</div>`;
                 for (let col = 0; col < 10; col++) {
                     const coord = `${row},${col}`;
                     const hasShip = opponentData.grid[row][col] !== null;
@@ -1046,20 +1048,21 @@
         function renderDefenseGrid(player) {
             const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
             const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
             let html = '<div style="display: inline-block;">';
 
-            // Column headers
+            // Column headers (1-10)
             html += '<div style="display: flex; margin-bottom: 5px; margin-left: 30px;">';
-            for (let i = 0; i < 10; i++) {
+            for (let i = 1; i <= 10; i++) {
                 html += `<div style="width: 35px; text-align: center; font-weight: bold; color: #667eea;">${i}</div>`;
             }
             html += '</div>';
 
-            // Grid with row headers
+            // Grid with row headers (A-J)
             for (let row = 0; row < 10; row++) {
                 html += '<div style="display: flex; margin-bottom: 3px;">';
-                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea;">${row}</div>`;
+                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea;">${letters[row]}</div>`;
                 for (let col = 0; col < 10; col++) {
                     const hasShip = playerData.grid[row][col] !== null;
                     const wasHitByOpponent = opponentData.hits && opponentData.hits.some(h => h[0] === row && h[1] === col);
