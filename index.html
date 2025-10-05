@@ -1504,7 +1504,7 @@
                         <p>Click a column to drop your disc!</p>
                     </div>
 
-                    <div style="display: inline-block; background: #0066cc; padding: 1rem; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
+                    <div style="display: inline-block; background: #0066cc; padding: 0.75rem; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
                         ${renderConnect4Board()}
                     </div>
                 </div>
@@ -1512,7 +1512,7 @@
         }
 
         function renderConnect4Board() {
-            let html = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; max-width: min(90vw, 500px);">';
+            let html = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; max-width: min(90vw, 500px);">';
 
             // Render board from top to bottom (row 0 is top)
             for (let row = 0; row < 6; row++) {
