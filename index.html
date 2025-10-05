@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.3.0';</script>
+    <script>window.APP_VERSION = '1.3.1';</script>
 
     <style>
         * {
@@ -278,17 +278,47 @@
                         <p>Pass-and-play naval combat game</p>
                     </div>
 
-                    <div class="feature-card" onclick="launchISpy()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="feature-card" onclick="launchConnectFour()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <h3>🔴 Connect 4</h3>
+                        <p>Drop discs and connect four in a row</p>
+                    </div>
+
+                    <div class="feature-card" onclick="launchWar()" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <h3>🃏 War</h3>
+                        <p>Classic card battle game</p>
+                    </div>
+
+                    <div class="feature-card" onclick="launchGuessWho()" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <h3>🕵️ Guess Who</h3>
+                        <p>Figure out the mystery person</p>
+                    </div>
+
+                    <div class="feature-card" onclick="launchDotsAndBoxes()" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <h3>📦 Dots and Boxes</h3>
+                        <p>Connect dots to capture boxes</p>
+                    </div>
+
+                    <div class="feature-card" onclick="launchTicTacToe()" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                        <h3>⭕ Tic Tac Toe</h3>
+                        <p>Classic X's and O's strategy</p>
+                    </div>
+
+                    <div class="feature-card" onclick="launchTrash()" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                        <h3>🗑️ Trash</h3>
+                        <p>Fast-paced card game</p>
+                    </div>
+
+                    <div class="feature-card" onclick="launchISpy()" style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);">
                         <h3>👀 I Spy</h3>
                         <p>Classic observation game</p>
                     </div>
 
-                    <div class="feature-card" onclick="launchTwentyQuestions()" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="feature-card" onclick="launchTwentyQuestions()" style="background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%);">
                         <h3>❓ 20 Questions</h3>
                         <p>Guess what I'm thinking!</p>
                     </div>
 
-                    <div class="feature-card" onclick="launchWouldYouRather()" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <div class="feature-card" onclick="launchWouldYouRather()" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
                         <h3>🤔 Would You Rather</h3>
                         <p>Funny and tough choices</p>
                     </div>
@@ -534,6 +564,30 @@
         // Game launcher functions
         function launchBattleship() {
             alert('Battleship - Coming Soon!\n\nPass-and-play naval combat game where you take turns trying to sink each other\'s fleet.');
+        }
+
+        function launchConnectFour() {
+            alert('Connect 4 - Coming Soon!\n\nDrop discs and try to connect four in a row before your opponent!');
+        }
+
+        function launchWar() {
+            alert('War - Coming Soon!\n\nClassic card game where highest card wins the battle!');
+        }
+
+        function launchGuessWho() {
+            alert('Guess Who - Coming Soon!\n\nAsk yes/no questions to figure out the mystery person!');
+        }
+
+        function launchDotsAndBoxes() {
+            alert('Dots and Boxes - Coming Soon!\n\nConnect dots to capture boxes and score points!');
+        }
+
+        function launchTicTacToe() {
+            alert('Tic Tac Toe - Coming Soon!\n\nClassic X\'s and O\'s - get three in a row to win!');
+        }
+
+        function launchTrash() {
+            alert('Trash - Coming Soon!\n\nFast-paced card game where you race to get rid of all your cards!');
         }
 
         function launchISpy() {
