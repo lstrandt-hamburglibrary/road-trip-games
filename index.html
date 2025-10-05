@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.5.1';</script>
+    <script>window.APP_VERSION = '1.6.0';</script>
 
     <style>
         * {
@@ -656,19 +656,38 @@
             content.innerHTML = `
                 <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
                     <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">⚓ Welcome to Battleship!</h2>
-                    <p style="font-size: 1.2rem; margin-bottom: 2rem;">A classic naval combat game for 2 players</p>
+                    <p style="font-size: 1.2rem; margin-bottom: 2rem;">Classic naval combat game</p>
                     <div style="background: rgba(255,255,255,0.2); padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
                         <h3 style="margin-bottom: 1rem;">How to Play:</h3>
                         <p style="text-align: left; max-width: 500px; margin: 0 auto; line-height: 1.6;">
-                            1. Each player places 5 ships on a 10x10 grid<br>
-                            2. Pass the phone between turns<br>
-                            3. Take turns guessing where enemy ships are<br>
-                            4. First to sink all opponent's ships wins!
+                            1. Place 5 ships on a 10x10 grid<br>
+                            2. Take turns attacking enemy positions<br>
+                            3. First to sink all opponent's ships wins!
                         </p>
                     </div>
-                    <button onclick="startPlayer1Setup()" style="background: white; color: #667eea; border: none; padding: 1rem 3rem; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">Start Game</button>
+                    <h3 style="margin-bottom: 1rem;">Choose Game Mode:</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 600px; margin: 0 auto;">
+                        <button onclick="startPassAndPlay()" style="background: white; color: #667eea; border: none; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                            👥 Pass & Play<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">2 Players</span>
+                        </button>
+                        <button onclick="startVsAI()" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                            🤖 vs Computer<br>
+                            <span style="font-size: 0.9rem; font-weight: normal;">Single Player</span>
+                        </button>
+                    </div>
                 </div>
             `;
+        }
+
+        function startPassAndPlay() {
+            battleshipState.isAI = false;
+            startPlayer1Setup();
+        }
+
+        function startVsAI() {
+            battleshipState.isAI = true;
+            startPlayer1Setup();
         }
 
         function startPlayer1Setup() {
@@ -803,6 +822,13 @@
         }
 
         function showPassPhone(toPlayer) {
+            // If AI mode, skip pass phone and auto-place AI ships
+            if (battleshipState.isAI && toPlayer === 2) {
+                placeAIShips();
+                startBattlePhase();
+                return;
+            }
+
             const content = document.getElementById('battleshipContent');
             content.innerHTML = `
                 <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
@@ -811,6 +837,46 @@
                     <button onclick="${toPlayer === 2 ? 'startPlayer2Setup()' : 'startBattlePhase()'}" style="background: white; color: #f5576c; border: none; padding: 1.5rem 3rem; border-radius: 10px; cursor: pointer; font-size: 1.3rem; font-weight: bold;">Player ${toPlayer} Ready!</button>
                 </div>
             `;
+        }
+
+        function placeAIShips() {
+            battleshipState.ships.forEach(shipType => {
+                let placed = false;
+                while (!placed) {
+                    const row = Math.floor(Math.random() * 10);
+                    const col = Math.floor(Math.random() * 10);
+                    const orientation = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+
+                    // Check if valid placement
+                    const positions = [];
+                    let valid = true;
+
+                    for (let i = 0; i < shipType.size; i++) {
+                        const r = orientation === 'horizontal' ? row : row + i;
+                        const c = orientation === 'horizontal' ? col + i : col;
+
+                        if (r >= 10 || c >= 10 || battleshipState.player2.grid[r][c] !== null) {
+                            valid = false;
+                            break;
+                        }
+                        positions.push([r, c]);
+                    }
+
+                    if (valid) {
+                        positions.forEach(([r, c]) => {
+                            battleshipState.player2.grid[r][c] = shipType.name;
+                        });
+
+                        battleshipState.player2.ships.push({
+                            name: shipType.name,
+                            positions: positions,
+                            hits: []
+                        });
+
+                        placed = true;
+                    }
+                }
+            });
         }
 
         function startPlayer2Setup() {
@@ -831,10 +897,13 @@
             const opponent = currentPlayer === 1 ? 2 : 1;
             const opponentData = opponent === 1 ? battleshipState.player1 : battleshipState.player2;
 
+            const playerName = battleshipState.isAI && currentPlayer === 2 ? 'Computer' : `Player ${currentPlayer}`;
+            const opponentName = battleshipState.isAI && opponent === 2 ? 'Computer' : `Player ${opponent}`;
+
             content.innerHTML = `
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
-                    <h2 style="margin-bottom: 1rem;">Player ${currentPlayer}'s Turn</h2>
-                    <p style="font-size: 1.1rem;">Attack Player ${opponent}'s fleet!</p>
+                    <h2 style="margin-bottom: 1rem;">${playerName}'s Turn</h2>
+                    <p style="font-size: 1.1rem;">Attack ${opponentName}'s fleet!</p>
                     <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 1rem;">
                         <div>
                             <div style="font-size: 2rem; font-weight: bold;">${opponentData.ships.filter(s => s.hits.length === s.positions.length).length}</div>
@@ -1035,9 +1104,17 @@
         }
 
         function switchTurn() {
-            const content = document.getElementById('battleshipContent');
             const nextPlayer = battleshipState.currentPlayer === 1 ? 2 : 1;
 
+            // If AI mode and it's AI's turn (player 2), make AI attack immediately
+            if (battleshipState.isAI && nextPlayer === 2) {
+                battleshipState.currentPlayer = 2;
+                setTimeout(() => makeAIAttack(), 800);
+                return;
+            }
+
+            // Pass and play mode - show pass phone screen
+            const content = document.getElementById('battleshipContent');
             content.innerHTML = `
                 <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
                     <h2 style="font-size: 3rem; margin-bottom: 2rem;">📱 Pass the Phone!</h2>
@@ -1052,14 +1129,119 @@
             showBattleTurn();
         }
 
+        function makeAIAttack() {
+            // Initialize AI state if needed
+            if (!battleshipState.aiState) {
+                battleshipState.aiState = {
+                    mode: 'hunt', // 'hunt' or 'target'
+                    lastHit: null,
+                    targetQueue: []
+                };
+            }
+
+            let row, col;
+            const aiData = battleshipState.player2;
+            const playerData = battleshipState.player1;
+
+            // Target mode: AI hit a ship and is trying to sink it
+            if (battleshipState.aiState.mode === 'target' && battleshipState.aiState.targetQueue.length > 0) {
+                [row, col] = battleshipState.aiState.targetQueue.shift();
+            } else {
+                // Hunt mode: Random attack
+                let found = false;
+                while (!found) {
+                    row = Math.floor(Math.random() * 10);
+                    col = Math.floor(Math.random() * 10);
+
+                    const alreadyHit = aiData.hits && aiData.hits.some(h => h[0] === row && h[1] === col);
+                    const alreadyMiss = aiData.misses && aiData.misses.some(m => m[0] === row && m[1] === col);
+
+                    if (!alreadyHit && !alreadyMiss) {
+                        found = true;
+                    }
+                }
+                battleshipState.aiState.mode = 'hunt';
+            }
+
+            // Execute the attack
+            const hasShip = playerData.grid[row][col] !== null;
+
+            if (hasShip) {
+                // HIT!
+                if (!aiData.hits) aiData.hits = [];
+                aiData.hits.push([row, col]);
+
+                const shipName = playerData.grid[row][col];
+                const ship = playerData.ships.find(s => s.name === shipName);
+                if (ship && !ship.hits.some(h => h[0] === row && h[1] === col)) {
+                    ship.hits.push([row, col]);
+                }
+
+                // Add adjacent squares to target queue
+                if (ship.hits.length < ship.positions.length) {
+                    battleshipState.aiState.mode = 'target';
+                    battleshipState.aiState.lastHit = [row, col];
+
+                    // Add adjacent squares to queue (up, down, left, right)
+                    [[row-1, col], [row+1, col], [row, col-1], [row, col+1]].forEach(([r, c]) => {
+                        if (r >= 0 && r < 10 && c >= 0 && c < 10) {
+                            const alreadyQueued = battleshipState.aiState.targetQueue.some(t => t[0] === r && t[1] === c);
+                            const alreadyHit = aiData.hits && aiData.hits.some(h => h[0] === r && h[1] === c);
+                            const alreadyMiss = aiData.misses && aiData.misses.some(m => m[0] === r && m[1] === c);
+
+                            if (!alreadyQueued && !alreadyHit && !alreadyMiss) {
+                                battleshipState.aiState.targetQueue.push([r, c]);
+                            }
+                        }
+                    });
+                }
+
+                // Check if ship sunk
+                if (ship && ship.hits.length === ship.positions.length) {
+                    battleshipState.aiState.mode = 'hunt';
+                    battleshipState.aiState.targetQueue = [];
+
+                    setTimeout(() => {
+                        alert(`💥 Computer HIT! Computer sunk your ${ship.name}!`);
+                        checkForWinAI();
+                    }, 500);
+                } else {
+                    setTimeout(() => {
+                        alert('💥 Computer HIT!');
+                        switchTurn();
+                    }, 500);
+                }
+            } else {
+                // MISS!
+                if (!aiData.misses) aiData.misses = [];
+                aiData.misses.push([row, col]);
+
+                setTimeout(() => {
+                    alert('💧 Computer missed!');
+                    switchTurn();
+                }, 500);
+            }
+        }
+
+        function checkForWinAI() {
+            const allShipsSunk = battleshipState.player1.ships.every(ship => ship.hits.length === ship.positions.length);
+
+            if (allShipsSunk) {
+                showWinner();
+            } else {
+                switchTurn();
+            }
+        }
+
         function showWinner() {
             const winner = battleshipState.currentPlayer;
             const content = document.getElementById('battleshipContent');
+            const winnerName = battleshipState.isAI && winner === 2 ? 'Computer' : `Player ${winner}`;
 
             content.innerHTML = `
                 <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
-                    <h2 style="font-size: 4rem; margin-bottom: 1rem;">🎉 Victory!</h2>
-                    <p style="font-size: 2rem; margin-bottom: 3rem;">Player ${winner} Wins!</p>
+                    <h2 style="font-size: 4rem; margin-bottom: 1rem;">${winner === 2 && battleshipState.isAI ? '😔' : '🎉'} ${winner === 2 && battleshipState.isAI ? 'Game Over' : 'Victory!'}</h2>
+                    <p style="font-size: 2rem; margin-bottom: 3rem;">${winnerName} Wins!</p>
                     <p style="font-size: 1.2rem; margin-bottom: 3rem;">All enemy ships have been sunk!</p>
                     <div style="display: flex; gap: 1rem; justify-content: center;">
                         <button onclick="launchBattleship()" style="background: white; color: #667eea; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">🔄 Play Again</button>
