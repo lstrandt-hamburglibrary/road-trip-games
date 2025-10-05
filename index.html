@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.6.2';</script>
+    <script>window.APP_VERSION = '1.6.3';</script>
 
     <style>
         * {
@@ -815,6 +815,21 @@
                     alert('Invalid placement! Ship goes off grid or overlaps another ship.');
                     return;
                 }
+
+                // Check adjacent squares for other ships (no touching allowed)
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const checkR = r + dr;
+                        const checkC = c + dc;
+                        if (checkR >= 0 && checkR < 10 && checkC >= 0 && checkC < 10) {
+                            if (playerData.grid[checkR][checkC] !== null) {
+                                alert('Invalid placement! Ships cannot touch each other (including diagonally).');
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 positions.push([r, c]);
             }
 
@@ -881,6 +896,23 @@
                             valid = false;
                             break;
                         }
+
+                        // Check adjacent squares for other ships (no touching allowed)
+                        for (let dr = -1; dr <= 1; dr++) {
+                            for (let dc = -1; dc <= 1; dc++) {
+                                const checkR = r + dr;
+                                const checkC = c + dc;
+                                if (checkR >= 0 && checkR < 10 && checkC >= 0 && checkC < 10) {
+                                    if (battleshipState.player2.grid[checkR][checkC] !== null) {
+                                        valid = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!valid) break;
+                        }
+                        if (!valid) break;
+
                         positions.push([r, c]);
                     }
 
