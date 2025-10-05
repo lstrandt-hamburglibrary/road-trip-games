@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.9.2';</script>
+    <script>window.APP_VERSION = '1.9.3';</script>
 
     <style>
         * {
@@ -1550,8 +1550,11 @@
         }
 
         function renderConnect4Board() {
-            const cellSize = Math.min(50, Math.floor((window.innerWidth * 0.78) / 8));
-            const gap = 5;
+            // Account for: body padding (40px), blue container padding (20px), gaps (6 gaps * 4px)
+            const availableWidth = window.innerWidth - 100;
+            const gap = 4;
+            const totalGapWidth = gap * 6; // 6 gaps between 7 columns
+            const cellSize = Math.floor((availableWidth - totalGapWidth) / 7);
 
             let html = `<div style="display: grid; grid-template-columns: repeat(7, ${cellSize}px); gap: ${gap}px;">`;
 
