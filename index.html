@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.6.1';</script>
+    <script>window.APP_VERSION = '1.6.2';</script>
 
     <style>
         * {
@@ -104,6 +104,27 @@
             line-height: 1.6;
         }
 
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4caf50;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .roadmap {
             margin-top: 3rem;
             padding: 2rem;
@@ -188,6 +209,7 @@
     </style>
 </head>
 <body>
+    <div id="updateToast" class="toast"></div>
     <div class="app-container">
         <div class="header">
             <h1>🚗 Road Trip Games</h1>
@@ -1306,12 +1328,30 @@
             alert('Minesweeper - Coming Soon!\n\nUse logic to clear the grid without hitting any mines!');
         }
 
+        // Show toast notification
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('updateToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
         // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
                     .then(reg => console.log('Service Worker registered'))
                     .catch(err => console.log('Service Worker registration failed:', err));
+
+                // Listen for update messages from service worker
+                navigator.serviceWorker.addEventListener('message', event => {
+                    if (event.data.type === 'UPDATE_AVAILABLE') {
+                        showToast(`App updated to v${event.data.version}!`);
+                    }
+                });
             });
         }
     </script>
