@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.4.1';</script>
+    <script>window.APP_VERSION = '1.5.0';</script>
 
     <style>
         * {
@@ -822,12 +822,251 @@
         function startBattlePhase() {
             battleshipState.phase = 'battle';
             battleshipState.currentPlayer = 1;
-            showBattleGrid();
+            showBattleTurn();
         }
 
-        function showBattleGrid() {
-            alert('Battle phase coming in next update! Game structure is working.');
-            exitBattleship();
+        function showBattleTurn() {
+            const content = document.getElementById('battleshipContent');
+            const currentPlayer = battleshipState.currentPlayer;
+            const opponent = currentPlayer === 1 ? 2 : 1;
+            const opponentData = opponent === 1 ? battleshipState.player1 : battleshipState.player2;
+
+            content.innerHTML = `
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                    <h2 style="margin-bottom: 1rem;">Player ${currentPlayer}'s Turn</h2>
+                    <p style="font-size: 1.1rem;">Attack Player ${opponent}'s fleet!</p>
+                    <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 1rem;">
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold;">${opponentData.ships.filter(s => s.hits.length === s.positions.length).length}</div>
+                            <div style="font-size: 0.9rem;">Ships Sunk</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold;">${5 - opponentData.ships.filter(s => s.hits.length === s.positions.length).length}</div>
+                            <div style="font-size: 0.9rem;">Ships Remaining</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                    <!-- Attack Grid (opponent's grid - hidden ships) -->
+                    <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 1rem; color: #e74c3c;">🎯 Attack Grid</h3>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Click to attack!</p>
+                        <div style="display: inline-block;">
+                            ${renderAttackGrid(opponent)}
+                        </div>
+                    </div>
+
+                    <!-- Your Grid (show your ships and where you've been hit) -->
+                    <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 1rem; color: #667eea;">🚢 Your Fleet</h3>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Defend your ships!</p>
+                        <div style="display: inline-block;">
+                            ${renderDefenseGrid(currentPlayer)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAttackGrid(opponentPlayer) {
+            const opponentData = opponentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
+            const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
+
+            let html = '<div style="display: inline-block;">';
+
+            // Column headers
+            html += '<div style="display: flex; margin-bottom: 5px; margin-left: 30px;">';
+            for (let i = 0; i < 10; i++) {
+                html += `<div style="width: 35px; text-align: center; font-weight: bold; color: #e74c3c;">${i}</div>`;
+            }
+            html += '</div>';
+
+            // Grid with row headers
+            for (let row = 0; row < 10; row++) {
+                html += '<div style="display: flex; margin-bottom: 3px;">';
+                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #e74c3c;">${row}</div>`;
+                for (let col = 0; col < 10; col++) {
+                    const coord = `${row},${col}`;
+                    const hasShip = opponentData.grid[row][col] !== null;
+                    const wasHit = currentPlayerData.hits && currentPlayerData.hits.some(h => h[0] === row && h[1] === col);
+                    const wasMiss = currentPlayerData.misses && currentPlayerData.misses.some(m => m[0] === row && m[1] === col);
+
+                    let bg = '#e9ecef';
+                    let content = '';
+                    let clickable = true;
+
+                    if (wasHit) {
+                        bg = '#e74c3c';
+                        content = '💥';
+                        clickable = false;
+                    } else if (wasMiss) {
+                        bg = '#3498db';
+                        content = '💧';
+                        clickable = false;
+                    }
+
+                    html += `
+                        <div onclick="${clickable ? `makeAttack(${row}, ${col})` : ''}"
+                             style="width: 35px; height: 35px; border: 1px solid #ddd; background: ${bg}; cursor: ${clickable ? 'pointer' : 'not-allowed'}; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s;"
+                             ${clickable ? `onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='${bg}'"` : ''}>
+                            ${content}
+                        </div>
+                    `;
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function renderDefenseGrid(player) {
+            const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
+            const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
+
+            let html = '<div style="display: inline-block;">';
+
+            // Column headers
+            html += '<div style="display: flex; margin-bottom: 5px; margin-left: 30px;">';
+            for (let i = 0; i < 10; i++) {
+                html += `<div style="width: 35px; text-align: center; font-weight: bold; color: #667eea;">${i}</div>`;
+            }
+            html += '</div>';
+
+            // Grid with row headers
+            for (let row = 0; row < 10; row++) {
+                html += '<div style="display: flex; margin-bottom: 3px;">';
+                html += `<div style="width: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea;">${row}</div>`;
+                for (let col = 0; col < 10; col++) {
+                    const hasShip = playerData.grid[row][col] !== null;
+                    const wasHitByOpponent = opponentData.hits && opponentData.hits.some(h => h[0] === row && h[1] === col);
+                    const wasMissedByOpponent = opponentData.misses && opponentData.misses.some(m => m[0] === row && m[1] === col);
+
+                    let bg = hasShip ? '#667eea' : '#e9ecef';
+                    let content = hasShip ? '🚢' : '';
+
+                    if (wasHitByOpponent) {
+                        bg = '#e74c3c';
+                        content = '💥';
+                    } else if (wasMissedByOpponent) {
+                        bg = '#3498db';
+                        content = '💧';
+                    }
+
+                    html += `
+                        <div style="width: 35px; height: 35px; border: 1px solid #ddd; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: ${hasShip && !wasHitByOpponent ? '0.8rem' : '1.2rem'}; color: white;">
+                            ${content}
+                        </div>
+                    `;
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function makeAttack(row, col) {
+            const currentPlayer = battleshipState.currentPlayer;
+            const opponent = currentPlayer === 1 ? 2 : 1;
+            const currentPlayerData = currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
+            const opponentData = opponent === 1 ? battleshipState.player1 : battleshipState.player2;
+
+            // Check if already attacked
+            const alreadyHit = currentPlayerData.hits && currentPlayerData.hits.some(h => h[0] === row && h[1] === col);
+            const alreadyMiss = currentPlayerData.misses && currentPlayerData.misses.some(m => m[0] === row && m[1] === col);
+
+            if (alreadyHit || alreadyMiss) {
+                alert('You already attacked this spot!');
+                return;
+            }
+
+            // Check if hit or miss
+            const hasShip = opponentData.grid[row][col] !== null;
+
+            if (hasShip) {
+                // HIT!
+                if (!currentPlayerData.hits) currentPlayerData.hits = [];
+                currentPlayerData.hits.push([row, col]);
+
+                // Find which ship was hit and mark it
+                const shipName = opponentData.grid[row][col];
+                const ship = opponentData.ships.find(s => s.name === shipName);
+                if (ship && !ship.hits.some(h => h[0] === row && h[1] === col)) {
+                    ship.hits.push([row, col]);
+                }
+
+                // Check if ship is sunk
+                if (ship && ship.hits.length === ship.positions.length) {
+                    setTimeout(() => {
+                        alert(`💥 HIT! You sunk their ${ship.name}!`);
+                        checkForWin();
+                    }, 100);
+                } else {
+                    setTimeout(() => {
+                        alert('💥 HIT!');
+                        showBattleTurn();
+                    }, 100);
+                    return;
+                }
+            } else {
+                // MISS!
+                if (!currentPlayerData.misses) currentPlayerData.misses = [];
+                currentPlayerData.misses.push([row, col]);
+
+                setTimeout(() => {
+                    alert('💧 Miss!');
+                    switchTurn();
+                }, 100);
+                return;
+            }
+        }
+
+        function checkForWin() {
+            const opponent = battleshipState.currentPlayer === 1 ? 2 : 1;
+            const opponentData = opponent === 1 ? battleshipState.player1 : battleshipState.player2;
+
+            const allShipsSunk = opponentData.ships.every(ship => ship.hits.length === ship.positions.length);
+
+            if (allShipsSunk) {
+                showWinner();
+            } else {
+                switchTurn();
+            }
+        }
+
+        function switchTurn() {
+            const content = document.getElementById('battleshipContent');
+            const nextPlayer = battleshipState.currentPlayer === 1 ? 2 : 1;
+
+            content.innerHTML = `
+                <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
+                    <h2 style="font-size: 3rem; margin-bottom: 2rem;">📱 Pass the Phone!</h2>
+                    <p style="font-size: 1.5rem; margin-bottom: 3rem;">Player ${battleshipState.currentPlayer} look away!<br>Give phone to Player ${nextPlayer}</p>
+                    <button onclick="continueToNextTurn()" style="background: white; color: #f5576c; border: none; padding: 1.5rem 3rem; border-radius: 10px; cursor: pointer; font-size: 1.3rem; font-weight: bold;">Player ${nextPlayer} Ready!</button>
+                </div>
+            `;
+        }
+
+        function continueToNextTurn() {
+            battleshipState.currentPlayer = battleshipState.currentPlayer === 1 ? 2 : 1;
+            showBattleTurn();
+        }
+
+        function showWinner() {
+            const winner = battleshipState.currentPlayer;
+            const content = document.getElementById('battleshipContent');
+
+            content.innerHTML = `
+                <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+                    <h2 style="font-size: 4rem; margin-bottom: 1rem;">🎉 Victory!</h2>
+                    <p style="font-size: 2rem; margin-bottom: 3rem;">Player ${winner} Wins!</p>
+                    <p style="font-size: 1.2rem; margin-bottom: 3rem;">All enemy ships have been sunk!</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button onclick="launchBattleship()" style="background: white; color: #667eea; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">🔄 Play Again</button>
+                        <button onclick="exitBattleship()" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">← Back to Games</button>
+                    </div>
+                </div>
+            `;
         }
 
         function launchConnectFour() {
