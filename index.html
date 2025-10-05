@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.8.2';</script>
+    <script>window.APP_VERSION = '1.9.0';</script>
 
     <style>
         * {
@@ -125,6 +125,41 @@
             pointer-events: auto;
         }
 
+        .pull-to-refresh {
+            position: fixed;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: top 0.3s ease;
+            z-index: 9999;
+        }
+
+        .pull-to-refresh.visible {
+            top: 20px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff6b35;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .roadmap {
             margin-top: 3rem;
             padding: 2rem;
@@ -210,6 +245,9 @@
 </head>
 <body>
     <div id="updateToast" class="toast"></div>
+    <div id="pullToRefresh" class="pull-to-refresh">
+        <div class="spinner"></div>
+    </div>
     <div class="app-container">
         <div class="header">
             <h1>🚗 Road Trip Games</h1>
@@ -2072,6 +2110,37 @@
                 toast.classList.remove('show');
             }, duration);
         }
+
+        // Pull to refresh functionality
+        let pullStartY = 0;
+        let pulling = false;
+
+        document.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                pullStartY = e.touches[0].clientY;
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (window.scrollY === 0 && pullStartY > 0) {
+                const pullDistance = e.touches[0].clientY - pullStartY;
+                if (pullDistance > 50 && !pulling) {
+                    pulling = true;
+                    document.getElementById('pullToRefresh').classList.add('visible');
+                }
+            }
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (pulling) {
+                window.location.reload();
+            }
+            pulling = false;
+            pullStartY = 0;
+            setTimeout(() => {
+                document.getElementById('pullToRefresh').classList.remove('visible');
+            }, 300);
+        });
 
         // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
