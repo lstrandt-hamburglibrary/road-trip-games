@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.9.0';</script>
+    <script>window.APP_VERSION = '1.9.1';</script>
 
     <style>
         * {
@@ -1542,7 +1542,7 @@
                         <p>Click a column to drop your disc!</p>
                     </div>
 
-                    <div style="display: inline-block; background: #0066cc; padding: 0.75rem; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
+                    <div style="display: inline-block; background: #0066cc; padding: 10px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
                         ${renderConnect4Board()}
                     </div>
                 </div>
@@ -1550,7 +1550,10 @@
         }
 
         function renderConnect4Board() {
-            let html = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; max-width: min(85vw, 420px); width: 100%;">';
+            const cellSize = Math.min(50, Math.floor((window.innerWidth * 0.85) / 8));
+            const gap = 6;
+
+            let html = `<div style="display: grid; grid-template-columns: repeat(7, ${cellSize}px); gap: ${gap}px;">`;
 
             // Render board from top to bottom (row 0 is top)
             for (let row = 0; row < 6; row++) {
@@ -1571,7 +1574,7 @@
 
                     html += `
                         <div onclick="${clickable ? `dropDisc(${col})` : ''}"
-                             style="width: 100%; aspect-ratio: 1; background: ${bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: clamp(1.2rem, 3.5vw, 1.8rem); cursor: ${clickable ? 'pointer' : 'default'}; transition: all 0.2s; border: 2px solid #004999; box-sizing: border-box;"
+                             style="width: ${cellSize}px; height: ${cellSize}px; background: ${bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: ${Math.floor(cellSize * 0.6)}px; cursor: ${clickable ? 'pointer' : 'default'}; transition: all 0.2s; border: 2px solid #004999; box-sizing: border-box;"
                              ${clickable ? `onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"` : ''}>
                             ${content}
                         </div>
