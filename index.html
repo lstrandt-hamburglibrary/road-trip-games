@@ -1512,7 +1512,7 @@
         }
 
         function renderConnect4Board() {
-            let html = '<div style="display: grid; grid-template-columns: repeat(7, 60px); gap: 8px;">';
+            let html = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; max-width: min(90vw, 500px);">';
 
             // Render board from top to bottom (row 0 is top)
             for (let row = 0; row < 6; row++) {
@@ -1533,7 +1533,7 @@
 
                     html += `
                         <div onclick="${clickable ? `dropDisc(${col})` : ''}"
-                             style="width: 60px; height: 60px; background: ${bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: ${clickable ? 'pointer' : 'default'}; transition: all 0.2s; border: 3px solid #004999;"
+                             style="aspect-ratio: 1; background: ${bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: clamp(1.5rem, 4vw, 2rem); cursor: ${clickable ? 'pointer' : 'default'}; transition: all 0.2s; border: 2px solid #004999;"
                              ${clickable ? `onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"` : ''}>
                             ${content}
                         </div>
