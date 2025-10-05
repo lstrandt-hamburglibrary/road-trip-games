@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.0.0';</script>
+    <script>window.APP_VERSION = '1.1.0';</script>
 
     <style>
         * {
@@ -104,6 +104,78 @@
             line-height: 1.6;
         }
 
+        .roadmap {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .roadmap h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .roadmap-section {
+            margin-bottom: 2rem;
+        }
+
+        .roadmap-section h3 {
+            color: #ff6b35;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .roadmap-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .roadmap-list li {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .roadmap-list li.completed {
+            border-left-color: #28a745;
+            opacity: 0.7;
+        }
+
+        .roadmap-list li.in-progress {
+            border-left-color: #f7931e;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            margin-left: auto;
+            font-weight: bold;
+        }
+
+        .status-badge.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.in-progress {
+            background: #f7931e;
+            color: white;
+        }
+
+        .status-badge.planned {
+            background: #6c757d;
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -147,6 +219,64 @@
                 <div class="feature-card" onclick="alert('Trip Bingo - Coming Soon!')">
                     <h3>🎯 Travel Bingo</h3>
                     <p>Spot common road trip sights and win!</p>
+                </div>
+            </div>
+
+            <div class="roadmap">
+                <h2>🗺️ Development Roadmap</h2>
+
+                <div class="roadmap-section">
+                    <h3>✅ Completed</h3>
+                    <ul class="roadmap-list">
+                        <li class="completed">
+                            <span>🚀 Initial PWA setup with offline support</span>
+                            <span class="status-badge completed">Done</span>
+                        </li>
+                        <li class="completed">
+                            <span>📱 Mobile-responsive design</span>
+                            <span class="status-badge completed">Done</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="roadmap-section">
+                    <h3>🎯 Up Next</h3>
+                    <ul class="roadmap-list">
+                        <li class="planned">
+                            <span>🚙 License Plate Tracker - Track all 50 states + DC</span>
+                            <span class="status-badge planned">Planned</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="roadmap-section">
+                    <h3>💡 Future Features</h3>
+                    <ul class="roadmap-list">
+                        <li class="planned">
+                            <span>🎮 Classic Road Trip Games (I Spy, 20 Questions, Would You Rather)</span>
+                            <span class="status-badge planned">Planned</span>
+                        </li>
+                        <li class="planned">
+                            <span>🎯 Travel Bingo (Spot cows, water towers, bridges, etc.)</span>
+                            <span class="status-badge planned">Planned</span>
+                        </li>
+                        <li class="planned">
+                            <span>📍 GPS-Based Location Facts</span>
+                            <span class="status-badge planned">Planned</span>
+                        </li>
+                        <li class="planned">
+                            <span>📊 Trip Statistics & Mileage Tracker</span>
+                            <span class="status-badge planned">Planned</span>
+                        </li>
+                        <li class="planned">
+                            <span>📸 Trip Photo Journal</span>
+                            <span class="status-badge planned">Planned</span>
+                        </li>
+                        <li class="planned">
+                            <span>🗺️ Interactive Trip Map</span>
+                            <span class="status-badge planned">Planned</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
