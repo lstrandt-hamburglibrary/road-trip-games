@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.9.3';</script>
+    <script>window.APP_VERSION = '1.9.4';</script>
 
     <style>
         * {
@@ -1542,7 +1542,7 @@
                         <p>Click a column to drop your disc!</p>
                     </div>
 
-                    <div style="display: inline-block; background: #0066cc; padding: 10px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
+                    <div style="display: inline-block; background: #0066cc; padding: 8px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); max-width: calc(100vw - 60px);">
                         ${renderConnect4Board()}
                     </div>
                 </div>
@@ -1550,13 +1550,13 @@
         }
 
         function renderConnect4Board() {
-            // Account for: body padding (40px), blue container padding (20px), gaps (6 gaps * 4px)
-            const availableWidth = window.innerWidth - 100;
-            const gap = 4;
+            // Much more conservative calculation - leave plenty of room
+            const availableWidth = window.innerWidth - 120; // Extra margin for safety
+            const gap = 3;
             const totalGapWidth = gap * 6; // 6 gaps between 7 columns
             const cellSize = Math.floor((availableWidth - totalGapWidth) / 7);
 
-            let html = `<div style="display: grid; grid-template-columns: repeat(7, ${cellSize}px); gap: ${gap}px;">`;
+            let html = `<div style="display: grid; grid-template-columns: repeat(7, ${cellSize}px); gap: ${gap}px; max-width: 100%;">`;
 
             // Render board from top to bottom (row 0 is top)
             for (let row = 0; row < 6; row++) {
@@ -1577,8 +1577,8 @@
 
                     html += `
                         <div onclick="${clickable ? `dropDisc(${col})` : ''}"
-                             style="width: ${cellSize}px; height: ${cellSize}px; background: ${bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: ${Math.floor(cellSize * 0.6)}px; cursor: ${clickable ? 'pointer' : 'default'}; transition: all 0.2s; border: 2px solid #004999; box-sizing: border-box;"
-                             ${clickable ? `onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"` : ''}>
+                             style="width: ${cellSize}px; height: ${cellSize}px; min-width: 0; background: ${bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: ${Math.floor(cellSize * 0.55)}px; cursor: ${clickable ? 'pointer' : 'default'}; transition: all 0.2s; border: 2px solid #004999; box-sizing: border-box;"
+                             ${clickable ? `onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'"` : ''}>
                             ${content}
                         </div>
                     `;
