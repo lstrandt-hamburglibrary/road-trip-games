@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.6.0';</script>
+    <script>window.APP_VERSION = '1.6.1';</script>
 
     <style>
         * {
@@ -1106,10 +1106,17 @@
         function switchTurn() {
             const nextPlayer = battleshipState.currentPlayer === 1 ? 2 : 1;
 
-            // If AI mode and it's AI's turn (player 2), make AI attack immediately
-            if (battleshipState.isAI && nextPlayer === 2) {
-                battleshipState.currentPlayer = 2;
-                setTimeout(() => makeAIAttack(), 800);
+            // If AI mode
+            if (battleshipState.isAI) {
+                if (nextPlayer === 2) {
+                    // AI's turn - make AI attack immediately
+                    battleshipState.currentPlayer = 2;
+                    setTimeout(() => makeAIAttack(), 800);
+                } else {
+                    // Player 1's turn in AI mode - go straight to battle screen
+                    battleshipState.currentPlayer = 1;
+                    showBattleTurn();
+                }
                 return;
             }
 
