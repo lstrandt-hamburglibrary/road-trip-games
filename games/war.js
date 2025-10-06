@@ -68,76 +68,75 @@
         const content = document.getElementById('warContent');
 
         const playerCardHTML = warState.playerCard
-            ? `<div style="width: 120px; height: 160px; background: white; border: 2px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 3rem; color: ${warState.playerCard.suit === '♥' || warState.playerCard.suit === '♦' ? 'red' : 'black'};">
+            ? `<div style="width: 90px; height: 120px; background: white; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 2rem; color: ${warState.playerCard.suit === '♥' || warState.playerCard.suit === '♦' ? 'red' : 'black'};">
                 <div>${warState.playerCard.rank}</div>
-                <div style="font-size: 2rem;">${warState.playerCard.suit}</div>
+                <div style="font-size: 1.5rem;">${warState.playerCard.suit}</div>
             </div>`
-            : `<div style="width: 120px; height: 160px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">Your Card</div>`;
+            : `<div style="width: 90px; height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem;">You</div>`;
 
         const computerCardHTML = warState.computerCard
-            ? `<div style="width: 120px; height: 160px; background: white; border: 2px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 3rem; color: ${warState.computerCard.suit === '♥' || warState.computerCard.suit === '♦' ? 'red' : 'black'};">
+            ? `<div style="width: 90px; height: 120px; background: white; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 2rem; color: ${warState.computerCard.suit === '♥' || warState.computerCard.suit === '♦' ? 'red' : 'black'};">
                 <div>${warState.computerCard.rank}</div>
-                <div style="font-size: 2rem;">${warState.computerCard.suit}</div>
+                <div style="font-size: 1.5rem;">${warState.computerCard.suit}</div>
             </div>`
-            : `<div style="width: 120px; height: 160px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">Computer</div>`;
+            : `<div style="width: 90px; height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem;">CPU</div>`;
 
         content.innerHTML = `
-            <div style="padding: 2rem; text-align: center;">
-                <h2 style="margin-bottom: 1rem;">🎴 War Card Game</h2>
+            <div style="padding: 1rem; text-align: center;">
+                <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">🎴 War Card Game</h2>
 
-                <div style="display: flex; justify-content: space-around; margin-bottom: 2rem; padding: 1rem; background: rgba(0,0,0,0.1); border-radius: 10px;">
+                <div style="display: flex; justify-content: space-around; margin-bottom: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.1); border-radius: 8px;">
                     <div>
-                        <div style="font-size: 0.9rem; color: #666;">You</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;">${warState.playerScore} cards</div>
+                        <div style="font-size: 0.75rem; color: #666;">You</div>
+                        <div style="font-size: 1.1rem; font-weight: bold;">${warState.playerScore}</div>
                     </div>
                     <div>
-                        <div style="font-size: 0.9rem; color: #666;">Computer</div>
-                        <div style="font-size: 1.5rem; font-weight: bold;">${warState.computerScore} cards</div>
+                        <div style="font-size: 0.75rem; color: #666;">Computer</div>
+                        <div style="font-size: 1.1rem; font-weight: bold;">${warState.computerScore}</div>
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: space-around; align-items: center; margin: 2rem 0;">
+                <div style="display: flex; justify-content: space-around; align-items: center; margin: 1rem 0;">
                     ${playerCardHTML}
-                    <div style="font-size: 2rem;">VS</div>
+                    <div style="font-size: 1.5rem;">VS</div>
                     ${computerCardHTML}
                 </div>
 
-                <div style="min-height: 60px; margin: 1.5rem 0; padding: 1rem; background: ${warState.message.includes('Win') ? '#d4edda' : warState.message.includes('Lose') ? '#f8d7da' : '#d1ecf1'}; border-radius: 10px; font-size: 1.1rem; font-weight: bold;">
+                <div style="min-height: 45px; margin: 0.75rem 0; padding: 0.75rem; background: ${warState.message.includes('Win') ? '#d4edda' : warState.message.includes('Lose') ? '#f8d7da' : '#d1ecf1'}; border-radius: 8px; font-size: 0.9rem; font-weight: bold;">
                     ${warState.message}
                 </div>
 
                 ${!warState.gameOver ? `
-                    <div style="margin: 1rem 0;">
-                        <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Risk Level (win more, but lose more!):</div>
-                        <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                            <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#e0e0e0'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                                No Risk
+                    <div style="margin: 0.5rem 0;">
+                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 0.3rem;">Risk Level:</div>
+                        <div style="display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap;">
+                            <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#e0e0e0'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                                0
                             </button>
-                            <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#e0e0e0'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                                Risk 1 🔥
+                            <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#e0e0e0'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                                1🔥
                             </button>
-                            <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#e0e0e0'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                                Risk 2 🔥🔥
+                            <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#e0e0e0'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                                2🔥
                             </button>
-                            <button onclick="setRiskLevel(3)" style="background: ${warState.riskLevel === 3 ? '#e74c3c' : '#e0e0e0'}; color: ${warState.riskLevel === 3 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                                Risk 3 🔥🔥🔥
+                            <button onclick="setRiskLevel(3)" style="background: ${warState.riskLevel === 3 ? '#e74c3c' : '#e0e0e0'}; color: ${warState.riskLevel === 3 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                                3🔥
                             </button>
                         </div>
                     </div>
 
-                    <div id="deckSwipeArea" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="margin: 2rem auto; width: 140px; height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid #333; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-size: 1rem; text-align: center; cursor: pointer; touch-action: none; position: relative; transform: translateY(0); transition: transform 0.2s;">
-                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👆</div>
-                        <div style="font-weight: bold;">Swipe Up</div>
-                        <div style="font-size: 0.8rem;">to Flip!</div>
+                    <div id="deckSwipeArea" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="margin: 1rem auto; width: 120px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid #333; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-size: 0.9rem; text-align: center; cursor: pointer; touch-action: none; position: relative; transform: translateY(0); transition: transform 0.2s;">
+                        <div style="font-size: 2rem; margin-bottom: 0.3rem;">👆</div>
+                        <div style="font-weight: bold; font-size: 0.95rem;">Swipe Up</div>
                     </div>
                 ` : `
-                    <button onclick="initializeGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 3rem; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin: 0.5rem;">
+                    <button onclick="initializeGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin: 0.5rem;">
                         🔄 Play Again
                     </button>
                 `}
 
-                <button onclick="exitWar()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; margin: 0.5rem;">
-                    ← Back to Games
+                <button onclick="exitWar()" style="background: #6c757d; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; margin: 0.5rem;">
+                    ← Back
                 </button>
             </div>
         `;
