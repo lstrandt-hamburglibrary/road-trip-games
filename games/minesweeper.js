@@ -143,8 +143,10 @@
                     </div>
                 </div>
 
-                <div style="display: inline-block; background: #c0c0c0; padding: 0.5rem; border: 3px solid #808080;">
-                    ${renderMinesweeperBoard()}
+                <div style="width: 100%; max-width: 100vw; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 0.5rem;">
+                    <div style="display: inline-block; background: #c0c0c0; padding: 0.5rem; border: 3px solid #808080;">
+                        ${renderMinesweeperBoard()}
+                    </div>
                 </div>
             </div>
         `;
@@ -158,8 +160,8 @@
         const gap = minesweeperState.cols - 1; // 1px gap between cells
         const calculatedSize = Math.floor((availableWidth - gap) / minesweeperState.cols);
 
-        // Set min 15px, max 35px
-        const cellSize = Math.min(35, Math.max(15, calculatedSize)) + 'px';
+        // Set max 35px only, no minimum - let it shrink to fit
+        const cellSize = Math.min(35, calculatedSize) + 'px';
 
         let html = `<div style="display: grid; grid-template-columns: repeat(${minesweeperState.cols}, ${cellSize}); gap: 1px; background: #808080;">`;
 
