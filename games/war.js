@@ -108,19 +108,19 @@
 
                 ${!warState.gameOver ? `
                     <div style="margin: 0.5rem 0;">
-                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 0.3rem;">Risk Level:</div>
+                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 0.3rem;">Risk Extra Cards (win/lose more!):</div>
                         <div style="display: flex; gap: 0.3rem; justify-content: center; flex-wrap: wrap;">
                             <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#e0e0e0'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                                0
+                                0<br><span style="font-size: 0.7rem;">Safe</span>
                             </button>
                             <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#e0e0e0'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                                1🔥
+                                +2🔥<br><span style="font-size: 0.7rem;">cards</span>
                             </button>
                             <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#e0e0e0'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                                2🔥
+                                +4🔥<br><span style="font-size: 0.7rem;">cards</span>
                             </button>
                             <button onclick="setRiskLevel(3)" style="background: ${warState.riskLevel === 3 ? '#e74c3c' : '#e0e0e0'}; color: ${warState.riskLevel === 3 ? 'white' : '#333'}; border: none; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                                3🔥
+                                +6🔥<br><span style="font-size: 0.7rem;">cards</span>
                             </button>
                         </div>
                     </div>
