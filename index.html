@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Road Trip">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.11.2';</script>
+    <script>window.APP_VERSION = '1.12.0';</script>
 
     <style>
         * {
@@ -397,6 +397,11 @@
                         <h3>💣 Minesweeper</h3>
                         <p>Clear the grid without hitting mines</p>
                     </div>
+
+                    <div class="feature-card" onclick="launchWar()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                        <h3>🎴 War</h3>
+                        <p>Classic card battle - highest card wins!</p>
+                    </div>
                 </div>
             </div>
 
@@ -423,6 +428,10 @@
                     <button onclick="exitMinesweeper()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
                 </div>
                 <div id="minesweeperContent"></div>
+            </div>
+
+            <div id="warGame" style="display: none;">
+                <div id="warContent"></div>
             </div>
 
             <div class="roadmap">
@@ -721,8 +730,9 @@
             });
         }
     </script>
-    <script src="games/battleship.js?v=1.11.2"></script>
-    <script src="games/connect4.js?v=1.11.2"></script>
-    <script src="games/minesweeper.js?v=1.11.2"></script>
+    <script src="games/battleship.js?v=1.12.0"></script>
+    <script src="games/connect4.js?v=1.12.0"></script>
+    <script src="games/minesweeper.js?v=1.12.0"></script>
+    <script src="games/war.js?v=1.12.0"></script>
 </body>
 </html>
