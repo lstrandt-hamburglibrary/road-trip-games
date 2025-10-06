@@ -1,5 +1,5 @@
 // Service Worker for Road Trip Games
-const VERSION = '1.9.11';
+const VERSION = '1.10.0';
 const CACHE_NAME = `roadtrip-v${VERSION}`;
 const BYPASS_CACHE = true; // Always bypass cache to ensure updates are seen
 
@@ -8,7 +8,10 @@ const urlsToCache = [
   './index.html',
   './manifest.json',
   './icon-192.svg',
-  './icon-512.svg'
+  './icon-512.svg',
+  './games/battleship.js',
+  './games/connect4.js',
+  './games/minesweeper.js'
 ];
 
 // Install service worker
@@ -28,8 +31,8 @@ self.addEventListener('install', event => {
 
 // Fetch from cache when offline
 self.addEventListener('fetch', event => {
-  // For HTML files, always fetch fresh to check for updates
-  if (event.request.url.includes('.html') || event.request.url.endsWith('/')) {
+  // For HTML and JS files, always fetch fresh to check for updates
+  if (event.request.url.includes('.html') || event.request.url.includes('.js') || event.request.url.endsWith('/')) {
     event.respondWith(
       fetch(event.request).catch(() => {
         // Only use cache as fallback when offline
