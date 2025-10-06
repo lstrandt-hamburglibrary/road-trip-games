@@ -1,6 +1,7 @@
 // War Card Game
 (function() {
     'use strict';
+    console.log('War game loaded!');
 
     let warState = {
         playerDeck: [],
