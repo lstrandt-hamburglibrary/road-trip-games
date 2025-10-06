@@ -19,6 +19,8 @@
 
     let touchTimer = null;
     let touchedCell = null;
+    let touchStartPos = null;
+    let isScrolling = false;
 
     function launchMinesweeper() {
         // Reset game state
@@ -197,6 +199,7 @@
                     <div onmousedown="revealCell(${row}, ${col})"
                          oncontextmenu="toggleFlag(${row}, ${col}); return false;"
                          ontouchstart="handleTouchStart(event, ${row}, ${col})"
+                         ontouchmove="handleTouchMove(event)"
                          ontouchend="handleTouchEnd(event)"
                          style="${style}">
                         ${content}
@@ -211,21 +214,44 @@
 
     function handleTouchStart(e, row, col) {
         touchedCell = { row, col };
+        touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        isScrolling = false;
+
         touchTimer = setTimeout(() => {
-            toggleFlag(row, col);
+            if (!isScrolling) {
+                toggleFlag(row, col);
+            }
             touchTimer = null;
         }, 500);
+    }
+
+    function handleTouchMove(e) {
+        if (touchStartPos && e.touches[0]) {
+            const moveX = Math.abs(e.touches[0].clientX - touchStartPos.x);
+            const moveY = Math.abs(e.touches[0].clientY - touchStartPos.y);
+
+            // If moved more than 10px, consider it scrolling
+            if (moveX > 10 || moveY > 10) {
+                isScrolling = true;
+                if (touchTimer) {
+                    clearTimeout(touchTimer);
+                    touchTimer = null;
+                }
+            }
+        }
     }
 
     function handleTouchEnd(e) {
         if (touchTimer) {
             clearTimeout(touchTimer);
             touchTimer = null;
-            if (touchedCell) {
+            if (touchedCell && !isScrolling) {
                 revealCell(touchedCell.row, touchedCell.col);
             }
         }
         touchedCell = null;
+        touchStartPos = null;
+        isScrolling = false;
     }
 
     function revealCell(row, col) {
@@ -326,6 +352,7 @@
     window.revealCell = revealCell;
     window.toggleFlag = toggleFlag;
     window.handleTouchStart = handleTouchStart;
+    window.handleTouchMove = handleTouchMove;
     window.handleTouchEnd = handleTouchEnd;
     window.resetMinesweeper = resetMinesweeper;
 
