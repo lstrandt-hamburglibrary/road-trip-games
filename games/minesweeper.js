@@ -143,17 +143,24 @@
                     </div>
                 </div>
 
-                <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-                    <div style="display: inline-block; background: #c0c0c0; padding: 0.5rem; border: 3px solid #808080;">
-                        ${renderMinesweeperBoard()}
-                    </div>
+                <div style="display: inline-block; background: #c0c0c0; padding: 0.5rem; border: 3px solid #808080;">
+                    ${renderMinesweeperBoard()}
                 </div>
             </div>
         `;
     }
 
     function renderMinesweeperBoard() {
-        const cellSize = minesweeperState.cols > 16 ? '28px' : '35px';
+        // Calculate responsive cell size to fit screen
+        const screenWidth = window.innerWidth;
+        const padding = 40; // Account for container padding and margins
+        const availableWidth = screenWidth - padding;
+        const gap = minesweeperState.cols - 1; // 1px gap between cells
+        const calculatedSize = Math.floor((availableWidth - gap) / minesweeperState.cols);
+
+        // Set min 18px, max 35px
+        const cellSize = Math.min(35, Math.max(18, calculatedSize)) + 'px';
+
         let html = `<div style="display: grid; grid-template-columns: repeat(${minesweeperState.cols}, ${cellSize}); gap: 1px; background: #808080;">`;
 
         for (let row = 0; row < minesweeperState.rows; row++) {
@@ -163,7 +170,7 @@
                 const value = minesweeperState.board[row][col];
 
                 let content = '';
-                let style = `width: ${cellSize}; height: ${cellSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; cursor: pointer; user-select: none; touch-action: manipulation;`;
+                let style = `width: ${cellSize}; height: ${cellSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; cursor: pointer; user-select: none; touch-action: manipulation;`;
 
                 if (revealed) {
                     style += 'border: 1px solid #7a7a7a; background: #bdbdbd;';
