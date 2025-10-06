@@ -853,21 +853,21 @@
             let html = '<div style="display: inline-block;">';
 
             // Column headers (1-10)
-            html += '<div style="display: flex; margin-bottom: 5px; margin-left: min(30px, 7vw);">';
+            html += '<div style="display: flex; margin-bottom: 5px; margin-left: min(30px, 6vw);">';
             for (let i = 1; i <= 10; i++) {
-                html += `<div style="width: min(35px, 8vw); text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${i}</div>`;
+                html += `<div style="width: min(35px, 7.5vw); text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${i}</div>`;
             }
             html += '</div>';
 
             // Grid with row headers (A-J)
             for (let row = 0; row < 10; row++) {
                 html += '<div style="display: flex; margin-bottom: 3px;">';
-                html += `<div style="width: min(30px, 7vw); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${letters[row]}</div>`;
+                html += `<div style="width: min(30px, 6vw); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${letters[row]}</div>`;
                 for (let col = 0; col < 10; col++) {
                     const hasShip = playerData.grid[row][col] !== null;
                     html += `
                         <div onclick="placeShipAt(${row}, ${col})"
-                             style="width: min(35px, 8vw); height: min(35px, 8vw); border: 1px solid #ddd; background: ${hasShip ? '#667eea' : '#e9ecef'}; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: clamp(0.6rem, 1.5vw, 0.8rem); color: white; font-weight: bold; transition: all 0.2s;"
+                             style="width: min(35px, 7.5vw); height: min(35px, 7.5vw); border: 1px solid #ddd; background: ${hasShip ? '#667eea' : '#e9ecef'}; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: clamp(0.6rem, 1.5vw, 0.8rem); color: white; font-weight: bold; transition: all 0.2s;"
                              onmouseover="this.style.background='${hasShip ? '#764ba2' : '#d4d4d4'}'"
                              onmouseout="this.style.background='${hasShip ? '#667eea' : '#e9ecef'}'">
                             ${hasShip ? '🚢' : ''}
@@ -1107,16 +1107,16 @@
             let html = '<div style="display: inline-block;">';
 
             // Column headers (1-10)
-            html += '<div style="display: flex; margin-bottom: 5px; margin-left: min(30px, 7vw);">';
+            html += '<div style="display: flex; margin-bottom: 5px; margin-left: min(30px, 6vw);">';
             for (let i = 1; i <= 10; i++) {
-                html += `<div style="width: min(35px, 8vw); text-align: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.7rem, 2vw, 1rem);">${i}</div>`;
+                html += `<div style="width: min(35px, 7.5vw); text-align: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.7rem, 2vw, 1rem);">${i}</div>`;
             }
             html += '</div>';
 
             // Grid with row headers (A-J)
             for (let row = 0; row < 10; row++) {
                 html += '<div style="display: flex; margin-bottom: 3px;">';
-                html += `<div style="width: min(30px, 7vw); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.7rem, 2vw, 1rem);">${letters[row]}</div>`;
+                html += `<div style="width: min(30px, 6vw); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.7rem, 2vw, 1rem);">${letters[row]}</div>`;
                 for (let col = 0; col < 10; col++) {
                     const coord = `${row},${col}`;
                     const hasShip = opponentData.grid[row][col] !== null;
@@ -1139,7 +1139,7 @@
 
                     html += `
                         <div onclick="${clickable ? `makeAttack(${row}, ${col})` : ''}"
-                             style="width: min(35px, 8vw); height: min(35px, 8vw); border: 1px solid #ddd; background: ${bg}; cursor: ${clickable ? 'pointer' : 'not-allowed'}; display: flex; align-items: center; justify-content: center; font-size: clamp(0.8rem, 2vw, 1.2rem); transition: all 0.2s;"
+                             style="width: min(35px, 7.5vw); height: min(35px, 7.5vw); border: 1px solid #ddd; background: ${bg}; cursor: ${clickable ? 'pointer' : 'not-allowed'}; display: flex; align-items: center; justify-content: center; font-size: clamp(0.8rem, 2vw, 1.2rem); transition: all 0.2s;"
                              ${clickable ? `onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='${bg}'"` : ''}>
                             ${content}
                         </div>
@@ -1159,16 +1159,16 @@
             let html = '<div style="display: inline-block;">';
 
             // Column headers (1-10)
-            html += '<div style="display: flex; margin-bottom: 5px; margin-left: min(30px, 7vw);">';
+            html += '<div style="display: flex; margin-bottom: 5px; margin-left: min(30px, 6vw);">';
             for (let i = 1; i <= 10; i++) {
-                html += `<div style="width: min(35px, 8vw); text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${i}</div>`;
+                html += `<div style="width: min(35px, 7.5vw); text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${i}</div>`;
             }
             html += '</div>';
 
             // Grid with row headers (A-J)
             for (let row = 0; row < 10; row++) {
                 html += '<div style="display: flex; margin-bottom: 3px;">';
-                html += `<div style="width: min(30px, 7vw); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${letters[row]}</div>`;
+                html += `<div style="width: min(30px, 6vw); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.7rem, 2vw, 1rem);">${letters[row]}</div>`;
                 for (let col = 0; col < 10; col++) {
                     const hasShip = playerData.grid[row][col] !== null;
                     const wasHitByOpponent = opponentData.hits && opponentData.hits.some(h => h[0] === row && h[1] === col);
@@ -1186,7 +1186,7 @@
                     }
 
                     html += `
-                        <div style="width: min(35px, 8vw); height: min(35px, 8vw); border: 1px solid #ddd; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: ${hasShip && !wasHitByOpponent ? 'clamp(0.6rem, 1.5vw, 0.8rem)' : 'clamp(0.8rem, 2vw, 1.2rem)'}; color: white;">
+                        <div style="width: min(35px, 7.5vw); height: min(35px, 7.5vw); border: 1px solid #ddd; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: ${hasShip && !wasHitByOpponent ? 'clamp(0.6rem, 1.5vw, 0.8rem)' : 'clamp(0.8rem, 2vw, 1.2rem)'}; color: white;">
                             ${content}
                         </div>
                     `;
