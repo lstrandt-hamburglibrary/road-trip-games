@@ -72,13 +72,13 @@
                         😊 Beginner<br>
                         <span style="font-size: 0.9rem; font-weight: normal;">9×9, 10 mines</span>
                     </button>
-                    <button onclick="startMinesweeper(16, 16, 40)" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                    <button onclick="startMinesweeper(20, 12, 40)" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                         😐 Intermediate<br>
-                        <span style="font-size: 0.9rem; font-weight: normal;">16×16, 40 mines</span>
+                        <span style="font-size: 0.9rem; font-weight: normal;">20×12, 40 mines</span>
                     </button>
-                    <button onclick="startMinesweeper(16, 30, 99)" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                    <button onclick="startMinesweeper(30, 16, 99)" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                         😰 Expert<br>
-                        <span style="font-size: 0.9rem; font-weight: normal;">16×30, 99 mines</span>
+                        <span style="font-size: 0.9rem; font-weight: normal;">30×16, 99 mines</span>
                     </button>
                 </div>
             </div>
@@ -174,7 +174,9 @@
                 const value = minesweeperState.board[row][col];
 
                 let content = '';
-                let style = `width: ${cellSize}; height: ${cellSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; cursor: pointer; user-select: none; touch-action: manipulation;`;
+                // Calculate font size based on cell size (make numbers readable)
+                const fontSize = Math.max(10, Math.min(16, calculatedSize * 0.6));
+                let style = `width: ${cellSize}; height: ${cellSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: ${fontSize}px; cursor: pointer; user-select: none; touch-action: manipulation;`;
 
                 if (revealed) {
                     style += 'border: 1px solid #7a7a7a; background: #bdbdbd;';
