@@ -12,8 +12,12 @@
         computerCard: null,
         warPile: [],
         gameOver: false,
-        message: ''
+        message: '',
+        riskLevel: 0 // 0 = no risk, 1-3 = extra cards at stake
     };
+
+    let swipeStartY = 0;
+    let isSwiping = false;
 
     const suits = ['♠', '♥', '♦', '♣'];
     const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
@@ -54,7 +58,8 @@
         warState.computerCard = null;
         warState.warPile = [];
         warState.gameOver = false;
-        warState.message = 'Tap "Flip Card" to play!';
+        warState.riskLevel = 0;
+        warState.message = 'Choose your risk level, then swipe up to flip!';
 
         showWarBoard();
     }
@@ -102,9 +107,29 @@
                 </div>
 
                 ${!warState.gameOver ? `
-                    <button onclick="flipCard()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 3rem; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin: 0.5rem;">
-                        🎴 Flip Card
-                    </button>
+                    <div style="margin: 1rem 0;">
+                        <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Risk Level (win more, but lose more!):</div>
+                        <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                            <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#e0e0e0'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                No Risk
+                            </button>
+                            <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#e0e0e0'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                Risk 1 🔥
+                            </button>
+                            <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#e0e0e0'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                Risk 2 🔥🔥
+                            </button>
+                            <button onclick="setRiskLevel(3)" style="background: ${warState.riskLevel === 3 ? '#e74c3c' : '#e0e0e0'}; color: ${warState.riskLevel === 3 ? 'white' : '#333'}; border: none; padding: 0.75rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                                Risk 3 🔥🔥🔥
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="deckSwipeArea" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="margin: 2rem auto; width: 140px; height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid #333; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-size: 1rem; text-align: center; cursor: pointer; touch-action: none; position: relative; transform: translateY(0); transition: transform 0.2s;">
+                        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👆</div>
+                        <div style="font-weight: bold;">Swipe Up</div>
+                        <div style="font-size: 0.8rem;">to Flip!</div>
+                    </div>
                 ` : `
                     <button onclick="initializeGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 3rem; border-radius: 10px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin: 0.5rem;">
                         🔄 Play Again
@@ -116,6 +141,49 @@
                 </button>
             </div>
         `;
+    }
+
+    function setRiskLevel(level) {
+        warState.riskLevel = level;
+        showWarBoard();
+    }
+
+    function handleSwipeStart(e) {
+        swipeStartY = e.touches[0].clientY;
+        isSwiping = true;
+    }
+
+    function handleSwipeMove(e) {
+        if (!isSwiping) return;
+
+        const currentY = e.touches[0].clientY;
+        const deltaY = swipeStartY - currentY;
+
+        // Visual feedback - move card up as user swipes
+        const deckArea = document.getElementById('deckSwipeArea');
+        if (deckArea && deltaY > 0) {
+            deckArea.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+        }
+    }
+
+    function handleSwipeEnd(e) {
+        if (!isSwiping) return;
+
+        const endY = e.changedTouches[0].clientY;
+        const deltaY = swipeStartY - endY;
+
+        // Reset deck position
+        const deckArea = document.getElementById('deckSwipeArea');
+        if (deckArea) {
+            deckArea.style.transform = 'translateY(0)';
+        }
+
+        // If swiped up more than 50px, flip card
+        if (deltaY > 50) {
+            flipCard();
+        }
+
+        isSwiping = false;
     }
 
     function flipCard() {
@@ -131,21 +199,39 @@
         // Add to war pile
         warState.warPile.push(warState.playerCard, warState.computerCard);
 
+        // Add risk cards to pile
+        for (let i = 0; i < warState.riskLevel; i++) {
+            if (warState.playerDeck.length > 0) {
+                warState.warPile.push(warState.playerDeck.shift());
+            }
+            if (warState.computerDeck.length > 0) {
+                warState.warPile.push(warState.computerDeck.shift());
+            }
+        }
+
         // Compare cards
         if (warState.playerCard.value > warState.computerCard.value) {
             // Player wins
+            const cardsWon = warState.warPile.length;
             warState.playerDeck.push(...warState.warPile);
             warState.playerScore = warState.playerDeck.length;
             warState.computerScore = warState.computerDeck.length;
-            warState.message = `You Win! ${warState.playerCard.rank}${warState.playerCard.suit} beats ${warState.computerCard.rank}${warState.computerCard.suit}`;
+
+            const riskBonus = warState.riskLevel > 0 ? ` (+${warState.riskLevel * 2} risk cards!)` : '';
+            warState.message = `You Win ${cardsWon} cards! ${warState.playerCard.rank}${warState.playerCard.suit} beats ${warState.computerCard.rank}${warState.computerCard.suit}${riskBonus}`;
             warState.warPile = [];
+            warState.riskLevel = 0; // Reset risk
         } else if (warState.computerCard.value > warState.playerCard.value) {
             // Computer wins
+            const cardsLost = warState.warPile.length;
             warState.computerDeck.push(...warState.warPile);
             warState.playerScore = warState.playerDeck.length;
             warState.computerScore = warState.computerDeck.length;
-            warState.message = `You Lose! ${warState.computerCard.rank}${warState.computerCard.suit} beats ${warState.playerCard.rank}${warState.playerCard.suit}`;
+
+            const riskPenalty = warState.riskLevel > 0 ? ` (lost ${warState.riskLevel * 2} risk cards!)` : '';
+            warState.message = `You Lose ${cardsLost} cards! ${warState.computerCard.rank}${warState.computerCard.suit} beats ${warState.playerCard.rank}${warState.playerCard.suit}${riskPenalty}`;
             warState.warPile = [];
+            warState.riskLevel = 0; // Reset risk
         } else {
             // War!
             warState.message = `⚔️ WAR! Both played ${warState.playerCard.rank}${warState.playerCard.suit}! Flip again!`;
@@ -159,6 +245,7 @@
                     warState.warPile.push(warState.computerDeck.shift());
                 }
             }
+            warState.riskLevel = 0; // Reset risk for war
         }
 
         // Check for game over
@@ -186,5 +273,9 @@
     window.exitWar = exitWar;
     window.flipCard = flipCard;
     window.initializeGame = initializeGame;
+    window.setRiskLevel = setRiskLevel;
+    window.handleSwipeStart = handleSwipeStart;
+    window.handleSwipeMove = handleSwipeMove;
+    window.handleSwipeEnd = handleSwipeEnd;
 
 })();
