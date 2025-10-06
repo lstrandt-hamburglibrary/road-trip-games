@@ -841,7 +841,7 @@
                         </button>
                     </div>
                 </div>
-                <div style="display: inline-block; background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="display: inline-block; background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 95vw; box-sizing: border-box; overflow-x: auto;">
                     ${renderPlacementGrid(player)}
                 </div>
             `;
@@ -1077,9 +1077,9 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 95vw; margin: 0 auto;">
                     <!-- Attack Grid (opponent's grid - hidden ships) -->
-                    <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-x: auto; box-sizing: border-box;">
                         <h3 style="margin-bottom: 1rem; color: #e74c3c;">🎯 Attack Grid</h3>
                         <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Click to attack!</p>
                         <div style="display: inline-block;">
@@ -1088,7 +1088,7 @@
                     </div>
 
                     <!-- Your Grid (show your ships and where you've been hit) -->
-                    <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-x: auto; box-sizing: border-box;">
                         <h3 style="margin-bottom: 1rem; color: #667eea;">🚢 Your Fleet</h3>
                         <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Defend your ships!</p>
                         <div style="display: inline-block;">
