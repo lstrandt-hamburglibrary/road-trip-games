@@ -153,13 +153,13 @@
     function renderMinesweeperBoard() {
         // Calculate responsive cell size to fit screen
         const screenWidth = window.innerWidth;
-        const padding = 40; // Account for container padding and margins
+        const padding = 60; // Account for container padding, borders, margins (conservative)
         const availableWidth = screenWidth - padding;
         const gap = minesweeperState.cols - 1; // 1px gap between cells
         const calculatedSize = Math.floor((availableWidth - gap) / minesweeperState.cols);
 
-        // Set min 18px, max 35px
-        const cellSize = Math.min(35, Math.max(18, calculatedSize)) + 'px';
+        // Set min 15px, max 35px
+        const cellSize = Math.min(35, Math.max(15, calculatedSize)) + 'px';
 
         let html = `<div style="display: grid; grid-template-columns: repeat(${minesweeperState.cols}, ${cellSize}); gap: 1px; background: #808080;">`;
 
