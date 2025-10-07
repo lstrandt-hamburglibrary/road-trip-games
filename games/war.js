@@ -403,14 +403,16 @@
 
                 console.log('Ready status - P1:', warState.player1Ready, 'P2:', warState.player2Ready);
 
-                // When both players are ready, resolve the round
+                // Update display to show card that was just drawn
+                showWarBoard();
+
+                // When both players are ready, wait a moment then resolve the round
                 if (warState.player1Ready && warState.player2Ready) {
-                    console.log('Both ready! Resolving round...');
-                    resolveRound();
-                } else {
-                    // Update display to show card that was just drawn
-                    console.log('One player ready, updating display');
-                    showWarBoard();
+                    console.log('Both ready! Showing cards before resolving...');
+                    setTimeout(() => {
+                        resolveRound();
+                        showWarBoard();
+                    }, 1000); // 1 second delay to see both cards
                 }
             } else {
                 console.log('Swipe not valid. deltaY:', deltaY, 'swipeSource:', swipeSource);
