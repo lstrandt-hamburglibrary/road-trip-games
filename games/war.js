@@ -318,7 +318,14 @@
     function handleSwipeStart(e) {
         swipeStartY = e.touches[0].clientY;
         isSwiping = true;
-        swipeSource = e.target.id || e.target.closest('[id^="swipeArea"]')?.id;
+
+        // Find which swipe area was touched
+        let element = e.target;
+        while (element && !element.id?.startsWith('swipeArea')) {
+            element = element.parentElement;
+        }
+        swipeSource = element?.id;
+        console.log('Swipe started on:', swipeSource, 'at Y:', swipeStartY);
     }
 
     function handleSwipeMove(e) {
@@ -350,6 +357,8 @@
         const endY = e.changedTouches[0].clientY;
         const deltaY = swipeStartY - endY;
 
+        console.log('Swipe ended. deltaY:', deltaY, 'source:', swipeSource);
+
         if (warState.mode === 'faceToFace') {
             // Reset both swipe areas
             const area1 = document.getElementById('swipeArea1');
@@ -359,22 +368,31 @@
 
             // If swiped up more than 50px, mark player as ready
             if (deltaY > 50 && swipeSource) {
+                console.log('Valid swipe detected on', swipeSource);
                 // Determine which player swiped based on swipe source
                 if (swipeSource === 'swipeArea1') {
                     // Player 1 (bottom)
+                    console.log('Setting player1Ready to true');
                     warState.player1Ready = true;
                 } else if (swipeSource === 'swipeArea2') {
                     // Player 2 (top)
+                    console.log('Setting player2Ready to true');
                     warState.player2Ready = true;
                 }
 
+                console.log('Ready status - P1:', warState.player1Ready, 'P2:', warState.player2Ready);
+
                 // Only flip when both players are ready
                 if (warState.player1Ready && warState.player2Ready) {
+                    console.log('Both ready! Flipping cards...');
                     flipCard();
                 } else {
                     // Update display to show ready status
+                    console.log('One player ready, updating display');
                     showWarBoard();
                 }
+            } else {
+                console.log('Swipe not valid. deltaY:', deltaY, 'swipeSource:', swipeSource);
             }
         } else {
             // Reset deck position
