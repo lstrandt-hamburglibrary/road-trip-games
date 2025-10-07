@@ -32,6 +32,59 @@
         showModeSelection();
     }
 
+    function showTrashRules() {
+        const content = document.getElementById('trashContent');
+        content.innerHTML = `
+            <div style="padding: 2rem; max-width: 600px; margin: 0 auto;">
+                <h2 style="margin-bottom: 1.5rem;">📖 How to Play Trash</h2>
+
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">🎯 Objective</h3>
+                    <p>Be the first player to fill all 10 spots (Ace through 10) with the correct cards, face-up.</p>
+                </div>
+
+                <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">🎴 Setup</h3>
+                    <ul style="margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Each player gets 10 cards arranged face-down in 2 rows of 5</li>
+                        <li>Positions are numbered 1-10 (Ace = 1, 2-10 = face value)</li>
+                    </ul>
+                </div>
+
+                <div style="background: #fff3cd; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">▶️ How to Play</h3>
+                    <ol style="margin-left: 1.5rem; line-height: 1.8;">
+                        <li><strong>Draw a card</strong> from the deck or discard pile</li>
+                        <li><strong>If it's Ace-10:</strong> Place it in the correct spot and flip the card that was there</li>
+                        <li><strong>If it's a Jack:</strong> Wild card! Place it in any empty spot</li>
+                        <li><strong>If it's a Queen or King:</strong> Unplayable - your turn ends</li>
+                        <li><strong>Chain placement:</strong> Keep placing revealed cards in their spots</li>
+                        <li><strong>Turn ends when:</strong>
+                            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                                <li>You draw/reveal a Queen or King</li>
+                                <li>You reveal a card whose spot is already filled</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+
+                <div style="background: #d4edda; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">🏆 Winning</h3>
+                    <p>First player to get all 10 spots filled with correct face-up cards wins!</p>
+                </div>
+
+                <div style="text-align: center;">
+                    <button onclick="showTrashBoard()" style="background: #17a2b8; color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-right: 0.5rem;">
+                        ← Back to Game
+                    </button>
+                    <button onclick="showModeSelection()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;">
+                        New Game
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
     function showModeSelection() {
         const content = document.getElementById('trashContent');
         content.innerHTML = `
@@ -114,30 +167,35 @@
     function showTrashBoard() {
         const content = document.getElementById('trashContent');
         const isTwoPlayer = trashState.mode === 'twoPlayer';
-        const isPlayer1Turn = trashState.currentPlayer === 1;
+        const canDraw = !trashState.drawnCard && !trashState.gameOver && (trashState.mode === 'vsComputer' ? trashState.currentPlayer === 1 : true);
 
         content.innerHTML = `
             <div style="padding: 1rem; min-height: 100vh;">
                 <div style="text-align: center; margin-bottom: 1rem;">
-                    <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">🗑️ Trash</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <h2 style="font-size: 1.5rem; margin: 0;">🗑️ Trash</h2>
+                        <button onclick="showTrashRules()" style="background: #17a2b8; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            📖 How to Play
+                        </button>
+                    </div>
                     <div style="padding: 0.5rem; background: ${trashState.message.includes('wins') || trashState.message.includes('Win') ? '#d4edda' : '#d1ecf1'}; border-radius: 8px; font-size: 0.9rem; font-weight: bold; margin-bottom: 1rem;">
                         ${trashState.message}
                     </div>
                 </div>
 
                 <!-- Opponent's Board (Computer or Player 2) -->
-                <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 10px;">
-                    <div style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; color: #666;">
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: ${trashState.currentPlayer === 2 && isTwoPlayer ? '#e3f2fd' : '#f8f9fa'}; border-radius: 10px;">
+                    <div style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; color: ${trashState.currentPlayer === 2 && isTwoPlayer ? '#1976d2' : '#666'};">
                         ${isTwoPlayer ? 'Player 2' : 'Computer'}
                     </div>
-                    ${renderPlayerCards(trashState.player2Cards, false, 2)}
+                    ${renderPlayerCards(trashState.player2Cards, trashState.currentPlayer === 2, 2)}
                 </div>
 
                 <!-- Draw and Discard Piles -->
                 <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 1.5rem;">
                     <div style="text-align: center;">
                         <div style="font-size: 0.8rem; color: #666; margin-bottom: 0.3rem;">Deck</div>
-                        ${trashState.deck.length > 0 && isPlayer1Turn && !trashState.drawnCard && !trashState.gameOver
+                        ${trashState.deck.length > 0 && canDraw
                             ? `<button onclick="drawFromDeck()" style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 8px; color: white; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">🎴</button>`
                             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 8px; color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center;">🎴</div>`
                         }
@@ -145,7 +203,7 @@
                     </div>
                     <div style="text-align: center;">
                         <div style="font-size: 0.8rem; color: #666; margin-bottom: 0.3rem;">Discard</div>
-                        ${trashState.discardPile.length > 0 && isPlayer1Turn && !trashState.drawnCard && !trashState.gameOver
+                        ${trashState.discardPile.length > 0 && canDraw
                             ? `<button onclick="drawFromDiscard()" style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${(trashState.discardPile[trashState.discardPile.length - 1].suit === '♥' || trashState.discardPile[trashState.discardPile.length - 1].suit === '♦') ? 'red' : 'black'};">
                                 <div>${trashState.discardPile[trashState.discardPile.length - 1].rank}</div>
                                 <div style="font-size: 1.2rem;">${trashState.discardPile[trashState.discardPile.length - 1].suit}</div>
@@ -167,11 +225,11 @@
                 </div>
 
                 <!-- Player's Board (You or Player 1) -->
-                <div style="padding: 1rem; background: #e3f2fd; border-radius: 10px;">
-                    <div style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; color: #1976d2;">
+                <div style="padding: 1rem; background: ${trashState.currentPlayer === 1 ? '#e3f2fd' : '#f8f9fa'}; border-radius: 10px;">
+                    <div style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; color: ${trashState.currentPlayer === 1 ? '#1976d2' : '#666'};">
                         ${isTwoPlayer ? 'Player 1' : 'You'}
                     </div>
-                    ${renderPlayerCards(trashState.player1Cards, true, 1)}
+                    ${renderPlayerCards(trashState.player1Cards, trashState.currentPlayer === 1, 1)}
                 </div>
 
                 ${trashState.gameOver ? `
@@ -444,5 +502,7 @@
     window.drawFromDeck = drawFromDeck;
     window.drawFromDiscard = drawFromDiscard;
     window.placeCard = placeCard;
+    window.showTrashRules = showTrashRules;
+    window.showTrashBoard = showTrashBoard;
 
 })();
