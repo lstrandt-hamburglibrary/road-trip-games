@@ -220,6 +220,9 @@
                                 <div>${trashState.drawnCard.rank}</div>
                                 <div style="font-size: 1.2rem;">${trashState.drawnCard.suit}</div>
                             </div>
+                            <button onclick="discardAndEndTurn()" style="background: #dc3545; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.7rem; margin-top: 0.3rem; width: 70px;">
+                                Discard
+                            </button>
                         </div>
                     ` : ''}
                 </div>
@@ -405,6 +408,19 @@
         showTrashBoard();
     }
 
+    function discardAndEndTurn() {
+        if (!trashState.drawnCard) return;
+
+        trashState.message = `Discarded ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Turn ends.`;
+        trashState.discardPile.push(trashState.drawnCard);
+        trashState.drawnCard = null;
+        showTrashBoard();
+
+        setTimeout(() => {
+            endTurn();
+        }, 1500);
+    }
+
     function endTurn() {
         trashState.currentTurnActive = false;
         trashState.drawnCard = null;
@@ -518,6 +534,7 @@
     window.drawFromDeck = drawFromDeck;
     window.drawFromDiscard = drawFromDiscard;
     window.placeCard = placeCard;
+    window.discardAndEndTurn = discardAndEndTurn;
     window.showTrashRules = showTrashRules;
     window.showTrashBoard = showTrashBoard;
 
