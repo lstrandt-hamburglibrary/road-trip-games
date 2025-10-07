@@ -284,12 +284,8 @@
                 <div style="font-size: 0.9rem;">${card.suit}</div>
             </div>`;
         } else {
-            // Show face down card - all look the same regardless of whether they can be placed
-            const drawnValue = trashState.drawnCard ? getCardValue(trashState.drawnCard.rank) : 0;
-            const isWild = drawnValue === 11;
-            const canPlaceHere = canPlace && (drawnValue === positionLabel || isWild);
-
-            if (canPlaceHere) {
+            // Show face down card - all look the same, but clickable when player has drawn a card
+            if (canPlace) {
                 return `<button onclick="placeCard(${position})" style="width: 60px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: white;">
                     <div style="font-size: 1.2rem;">🎴</div>
                     <div>${positionLabel}</div>
@@ -343,6 +339,17 @@
         if (!trashState.drawnCard || !trashState.currentTurnActive) return;
 
         const playerCards = trashState.currentPlayer === 1 ? trashState.player1Cards : trashState.player2Cards;
+
+        // Check if this is a valid placement
+        const drawnValue = getCardValue(trashState.drawnCard.rank);
+        const isWild = drawnValue === 11;
+        const isValidPosition = (drawnValue === position + 1 || isWild) && !playerCards[position].faceUp;
+
+        if (!isValidPosition) {
+            trashState.message = `Can't place there! ${drawnValue === 11 ? 'Tap any face-down spot.' : 'Tap spot ' + drawnValue + '.'}`;
+            showTrashBoard();
+            return;
+        }
 
         // Place the drawn card
         const oldCard = playerCards[position];
