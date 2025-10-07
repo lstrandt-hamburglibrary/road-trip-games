@@ -235,27 +235,19 @@
     function showFaceToFaceBoard() {
         const content = document.getElementById('warContent');
 
-        // Show card if player has swiped (ready) OR if round is complete
-        const player1CardHTML = (warState.playerCard || warState.player1Ready)
-            ? (warState.player1Ready && !warState.playerCard)
-                ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem;">
-                    <div style="font-size: 1.2rem;">?</div>
-                </div>`
-                : `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.playerCard.suit === '♥' || warState.playerCard.suit === '♦' ? 'red' : 'black'};">
-                    <div>${warState.playerCard.rank}</div>
-                    <div style="font-size: 1.2rem;">${warState.playerCard.suit}</div>
-                </div>`
+        // Show actual card if drawn, otherwise show card back
+        const player1CardHTML = warState.playerCard
+            ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.playerCard.suit === '♥' || warState.playerCard.suit === '♦' ? 'red' : 'black'};">
+                <div>${warState.playerCard.rank}</div>
+                <div style="font-size: 1.2rem;">${warState.playerCard.suit}</div>
+            </div>`
             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
 
-        const player2CardHTML = (warState.computerCard || warState.player2Ready)
-            ? (warState.player2Ready && !warState.computerCard)
-                ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem;">
-                    <div style="font-size: 1.2rem;">?</div>
-                </div>`
-                : `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.computerCard.suit === '♥' || warState.computerCard.suit === '♦' ? 'red' : 'black'};">
-                    <div>${warState.computerCard.rank}</div>
-                    <div style="font-size: 1.2rem;">${warState.computerCard.suit}</div>
-                </div>`
+        const player2CardHTML = warState.computerCard
+            ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.computerCard.suit === '♥' || warState.computerCard.suit === '♦' ? 'red' : 'black'};">
+                <div>${warState.computerCard.rank}</div>
+                <div style="font-size: 1.2rem;">${warState.computerCard.suit}</div>
+            </div>`
             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
 
         content.innerHTML = `
@@ -392,25 +384,31 @@
 
             if (validSwipe) {
                 console.log('Valid swipe detected on', swipeSource);
-                // Determine which player swiped based on swipe source
-                if (swipeSource === 'swipeArea1') {
-                    // Player 1 (bottom)
-                    console.log('Setting player1Ready to true');
+                // Determine which player swiped and draw their card immediately
+                if (swipeSource === 'swipeArea1' && !warState.player1Ready) {
+                    // Player 1 (bottom) - draw their card
+                    console.log('Setting player1Ready to true and drawing card');
                     warState.player1Ready = true;
-                } else if (swipeSource === 'swipeArea2') {
-                    // Player 2 (top)
-                    console.log('Setting player2Ready to true');
+                    if (warState.playerDeck.length > 0) {
+                        warState.playerCard = warState.playerDeck.shift();
+                    }
+                } else if (swipeSource === 'swipeArea2' && !warState.player2Ready) {
+                    // Player 2 (top) - draw their card
+                    console.log('Setting player2Ready to true and drawing card');
                     warState.player2Ready = true;
+                    if (warState.computerDeck.length > 0) {
+                        warState.computerCard = warState.computerDeck.shift();
+                    }
                 }
 
                 console.log('Ready status - P1:', warState.player1Ready, 'P2:', warState.player2Ready);
 
-                // Only flip when both players are ready
+                // When both players are ready, resolve the round
                 if (warState.player1Ready && warState.player2Ready) {
-                    console.log('Both ready! Flipping cards...');
-                    flipCard();
+                    console.log('Both ready! Resolving round...');
+                    resolveRound();
                 } else {
-                    // Update display to show ready status
+                    // Update display to show card that was just drawn
                     console.log('One player ready, updating display');
                     showWarBoard();
                 }
@@ -435,6 +433,7 @@
     }
 
     function flipCard() {
+        // For non-faceToFace modes, draw cards immediately
         if (warState.playerDeck.length === 0 || warState.computerDeck.length === 0) {
             endGame();
             return;
@@ -443,6 +442,17 @@
         // Draw cards
         warState.playerCard = warState.playerDeck.shift();
         warState.computerCard = warState.computerDeck.shift();
+
+        // Resolve the round
+        resolveRound();
+    }
+
+    function resolveRound() {
+        // Cards already drawn when players swiped (faceToFace) or by flipCard (other modes)
+        if (!warState.playerCard || !warState.computerCard) {
+            endGame();
+            return;
+        }
 
         // Add to war pile
         warState.warPile.push(warState.playerCard, warState.computerCard);
@@ -484,6 +494,8 @@
             warState.riskLevel2 = 0;
             warState.player1Ready = false;
             warState.player2Ready = false;
+            warState.playerCard = null;
+            warState.computerCard = null;
         } else if (warState.computerCard.value > warState.playerCard.value) {
             // Player 2 wins
             const cardsWon = warState.warPile.length;
@@ -501,6 +513,8 @@
             warState.riskLevel2 = 0;
             warState.player1Ready = false;
             warState.player2Ready = false;
+            warState.playerCard = null;
+            warState.computerCard = null;
         } else {
             // War!
             warState.message = `⚔️ WAR! Both played ${warState.playerCard.rank}${warState.playerCard.suit}! Flip again!`;
@@ -518,6 +532,8 @@
             warState.riskLevel2 = 0;
             warState.player1Ready = false;
             warState.player2Ready = false;
+            warState.playerCard = null;
+            warState.computerCard = null;
         }
 
         // Check for game over
