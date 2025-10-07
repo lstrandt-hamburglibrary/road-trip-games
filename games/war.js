@@ -251,9 +251,9 @@
             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
 
         content.innerHTML = `
-            <div style="height: 100vh; display: flex; flex-direction: column; position: relative; background: white; overflow: hidden;">
+            <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; position: relative; background: white; overflow: hidden; padding: 0.5rem 0;">
                 <!-- Player 2 Section (Top, Rotated 180°) -->
-                <div style="transform: rotate(180deg); padding: 0.3rem 0.5rem; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);">
+                <div style="transform: rotate(180deg); padding: 0.3rem; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 8px; width: 90%;">
                     <div style="text-align: center;">
                         <div style="font-size: 0.7rem; color: #666; margin-bottom: 0.2rem;">Player 2: ${warState.computerScore} cards</div>
                         <div style="display: flex; gap: 0.15rem; justify-content: center; margin-bottom: 0.25rem;">
@@ -270,7 +270,7 @@
                 </div>
 
                 <!-- Middle Section (Cards) -->
-                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0.5rem; text-align: center; border-top: 2px solid #333; border-bottom: 2px solid #333;">
+                <div style="padding: 0.5rem; text-align: center; border: 2px solid #333; border-radius: 8px; background: white; width: 90%;">
                     <div style="display: flex; justify-content: space-around; align-items: center;">
                         ${player1CardHTML}
                         <div style="font-size: 1rem; font-weight: bold;">VS</div>
@@ -281,7 +281,7 @@
                 </div>
 
                 <!-- Player 1 Section (Bottom) -->
-                <div style="padding: 0.3rem 0.5rem; background: linear-gradient(0deg, #f5f5f5 0%, #e0e0e0 100%);">
+                <div style="padding: 0.3rem; background: linear-gradient(0deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 8px; width: 90%;">
                     <div style="text-align: center;">
                         <div id="swipeArea1" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 80px; height: 100px; margin: 0 auto; background: ${warState.player1Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
                             <div style="font-size: 1.3rem;">${warState.player1Ready ? '✓' : '👆'}</div>
