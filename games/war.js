@@ -256,6 +256,7 @@
                 <div style="transform: rotate(180deg); padding: 0.3rem; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 8px; width: 90%;">
                     <div style="text-align: center;">
                         <div style="font-size: 0.7rem; color: #666; margin-bottom: 0.2rem;">Player 2: ${warState.computerScore} cards</div>
+                        <div style="font-size: 0.6rem; color: #888; margin-bottom: 0.2rem;">Risk extra cards:</div>
                         <div style="display: flex; gap: 0.15rem; justify-content: center; margin-bottom: 0.25rem;">
                             <button onclick="setRiskLevel2(0)" style="background: ${warState.riskLevel2 === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel2 === 0 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">0</button>
                             <button onclick="setRiskLevel2(1)" style="background: ${warState.riskLevel2 === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel2 === 1 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+2</button>
@@ -287,7 +288,8 @@
                             <div style="font-size: 1.3rem;">${warState.player1Ready ? '✓' : '👆'}</div>
                             <div style="font-size: 0.7rem; font-weight: bold;">${warState.player1Ready ? 'Ready!' : 'Swipe'}</div>
                         </div>
-                        <div style="display: flex; gap: 0.15rem; justify-content: center; margin-top: 0.25rem; margin-bottom: 0.2rem;">
+                        <div style="font-size: 0.6rem; color: #888; margin-top: 0.25rem; margin-bottom: 0.2rem;">Risk extra cards:</div>
+                        <div style="display: flex; gap: 0.15rem; justify-content: center; margin-bottom: 0.2rem;">
                             <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">0</button>
                             <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+2</button>
                             <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+4</button>
