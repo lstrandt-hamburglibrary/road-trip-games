@@ -152,7 +152,7 @@
         trashState.drawnCard = null;
         trashState.gameOver = false;
         trashState.currentTurnActive = false;
-        trashState.message = trashState.mode === 'twoPlayer' ? 'Player 1: Draw a card to start!' : 'Your turn! Draw a card to start!';
+        trashState.message = trashState.mode === 'twoPlayer' ? 'Player 1: Tap the Deck or Discard pile to draw!' : 'Your turn! Tap the Deck or Discard pile to draw!';
 
         showTrashBoard();
     }
@@ -170,6 +170,12 @@
         const canDraw = !trashState.drawnCard && !trashState.gameOver && (trashState.mode === 'vsComputer' ? trashState.currentPlayer === 1 : true);
 
         content.innerHTML = `
+            <style>
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.05); }
+                }
+            </style>
             <div style="padding: 1rem; min-height: 100vh;">
                 <div style="text-align: center; margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -178,8 +184,8 @@
                             📖 How to Play
                         </button>
                     </div>
-                    <div style="padding: 0.5rem; background: ${trashState.message.includes('wins') || trashState.message.includes('Win') ? '#d4edda' : '#d1ecf1'}; border-radius: 8px; font-size: 0.9rem; font-weight: bold; margin-bottom: 1rem;">
-                        ${trashState.message}
+                    <div style="padding: 0.75rem; background: ${trashState.message.includes('wins') || trashState.message.includes('Win') ? '#d4edda' : trashState.drawnCard ? '#fff3cd' : '#d1ecf1'}; border-radius: 8px; font-size: 1rem; font-weight: bold; margin-bottom: 1rem; border: ${trashState.drawnCard ? '2px solid #f39c12' : 'none'};">
+                        ${trashState.drawnCard ? '👉 ' : ''}${trashState.message}
                     </div>
                 </div>
 
@@ -290,9 +296,9 @@
             const canPlaceHere = canPlace && (drawnValue === positionLabel || isWild);
 
             if (canPlaceHere) {
-                return `<button onclick="placeCard(${position})" style="width: 60px; height: 80px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border: 2px solid #f39c12; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: #333; font-weight: bold;">
-                    <div style="font-size: 1.5rem;">📍</div>
-                    <div>${positionLabel}</div>
+                return `<button onclick="placeCard(${position})" style="width: 60px; height: 80px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border: 3px solid #f39c12; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: #333; font-weight: bold; animation: pulse 1s infinite; box-shadow: 0 0 15px rgba(243, 156, 18, 0.6);">
+                    <div style="font-size: 2rem;">⬇️</div>
+                    <div style="font-size: 1rem;">TAP HERE</div>
                 </button>`;
             } else {
                 return `<div style="width: 60px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: white;">
@@ -312,17 +318,18 @@
         if (value === 0) {
             // Queen or King - unplayable, turn ends
             trashState.message = `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Unplayable! Turn ends.`;
+            trashState.discardPile.push(trashState.drawnCard);
+            trashState.drawnCard = null;
+            showTrashBoard(); // Show the discarded card
             setTimeout(() => {
-                trashState.discardPile.push(trashState.drawnCard);
                 endTurn();
             }, 1500);
         } else {
             trashState.message = value === 11
-                ? `Drew a Jack (Wild)! Click any face-down spot.`
-                : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Click spot ${value} to place it.`;
+                ? `Drew a Jack (Wild)! Tap any yellow spot to place it.`
+                : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Tap the yellow spot to place it!`;
+            showTrashBoard();
         }
-
-        showTrashBoard();
     }
 
     function drawFromDiscard() {
@@ -332,8 +339,8 @@
 
         const value = getCardValue(trashState.drawnCard.rank);
         trashState.message = value === 11
-            ? `Drew a Jack (Wild)! Click any face-down spot.`
-            : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Click spot ${value} to place it.`;
+            ? `Drew a Jack (Wild)! Tap any yellow spot to place it.`
+            : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Tap the yellow spot to place it!`;
 
         showTrashBoard();
     }
@@ -357,11 +364,15 @@
                 // Queen or King - turn ends
                 trashState.message = `Revealed ${oldCard.rank}${oldCard.suit} - Turn ends!`;
                 trashState.discardPile.push(oldCard);
-                setTimeout(endTurn, 1500);
+                showTrashBoard(); // Show the discarded card
+                setTimeout(() => {
+                    endTurn();
+                }, 1500);
+                return; // Exit early so we don't call showTrashBoard again
             } else if (oldValue === 11) {
                 // Jack (wild) - can place anywhere
                 trashState.drawnCard = oldCard;
-                trashState.message = `Revealed a Jack (Wild)! Click any face-down spot.`;
+                trashState.message = `Revealed a Jack (Wild)! Tap any yellow spot to place it.`;
             } else {
                 // Check if spot is available
                 const targetPosition = oldValue - 1;
@@ -369,11 +380,15 @@
                     // Spot already filled - turn ends
                     trashState.message = `Revealed ${oldCard.rank}${oldCard.suit} - Spot ${oldValue} already filled! Turn ends.`;
                     trashState.discardPile.push(oldCard);
-                    setTimeout(endTurn, 1500);
+                    showTrashBoard(); // Show the discarded card
+                    setTimeout(() => {
+                        endTurn();
+                    }, 1500);
+                    return; // Exit early so we don't call showTrashBoard again
                 } else {
                     // Continue placing
                     trashState.drawnCard = oldCard;
-                    trashState.message = `Revealed ${oldCard.rank}${oldCard.suit} - Click spot ${oldValue} to place it.`;
+                    trashState.message = `Revealed ${oldCard.rank}${oldCard.suit} - Tap the yellow spot to place it!`;
                 }
             }
         }
@@ -400,8 +415,8 @@
             setTimeout(computerTurn, 1000);
         } else {
             trashState.message = trashState.mode === 'twoPlayer'
-                ? `Player ${trashState.currentPlayer}: Draw a card!`
-                : 'Your turn! Draw a card!';
+                ? `Player ${trashState.currentPlayer}: Tap the Deck or Discard pile to draw!`
+                : 'Your turn! Tap the Deck or Discard pile to draw!';
             showTrashBoard();
         }
     }
