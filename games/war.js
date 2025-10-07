@@ -50,8 +50,16 @@
                     <button onclick="startWarMode('twoPlayer')" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 1.5rem; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 1rem;">
                         <span style="font-size: 2rem;">👥</span>
                         <div style="text-align: left;">
-                            <div>2 Player</div>
-                            <div style="font-size: 0.85rem; font-weight: normal; opacity: 0.9;">Both players on same screen</div>
+                            <div>2 Player (Same View)</div>
+                            <div style="font-size: 0.85rem; font-weight: normal; opacity: 0.9;">Both see same screen</div>
+                        </div>
+                    </button>
+
+                    <button onclick="startWarMode('faceToFace')" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border: none; padding: 1.5rem; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                        <span style="font-size: 2rem;">🔄</span>
+                        <div style="text-align: left;">
+                            <div>Face-to-Face</div>
+                            <div style="font-size: 0.85rem; font-weight: normal; opacity: 0.9;">Device between players</div>
                         </div>
                     </button>
                 </div>
@@ -100,7 +108,7 @@
         warState.riskLevel = 0;
         warState.riskLevel2 = 0;
 
-        if (warState.mode === 'twoPlayer') {
+        if (warState.mode === 'twoPlayer' || warState.mode === 'faceToFace') {
             warState.message = 'Choose risk levels, then swipe up to flip!';
         } else {
             warState.message = 'Choose your risk level, then swipe up to flip!';
@@ -110,6 +118,11 @@
     }
 
     function showWarBoard() {
+        if (warState.mode === 'faceToFace') {
+            showFaceToFaceBoard();
+            return;
+        }
+
         const content = document.getElementById('warContent');
 
         const isTwoPlayer = warState.mode === 'twoPlayer';
@@ -214,6 +227,79 @@
         `;
     }
 
+    function showFaceToFaceBoard() {
+        const content = document.getElementById('warContent');
+
+        const player1CardHTML = warState.playerCard
+            ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.playerCard.suit === '♥' || warState.playerCard.suit === '♦' ? 'red' : 'black'};">
+                <div>${warState.playerCard.rank}</div>
+                <div style="font-size: 1.2rem;">${warState.playerCard.suit}</div>
+            </div>`
+            : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
+
+        const player2CardHTML = warState.computerCard
+            ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.computerCard.suit === '♥' || warState.computerCard.suit === '♦' ? 'red' : 'black'};">
+                <div>${warState.computerCard.rank}</div>
+                <div style="font-size: 1.2rem;">${warState.computerCard.suit}</div>
+            </div>`
+            : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
+
+        content.innerHTML = `
+            <div style="height: 100vh; display: flex; flex-direction: column; position: relative;">
+                <!-- Player 2 Section (Top, Rotated 180°) -->
+                <div style="flex: 1; transform: rotate(180deg); display: flex; flex-direction: column; justify-content: flex-end; padding: 0.5rem; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.8rem; color: #666; margin-bottom: 0.3rem;">Player 2: ${warState.computerScore} cards</div>
+                        <div style="display: flex; gap: 0.2rem; justify-content: center; margin-bottom: 0.5rem;">
+                            <button onclick="setRiskLevel2(0)" style="background: ${warState.riskLevel2 === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel2 === 0 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">0</button>
+                            <button onclick="setRiskLevel2(1)" style="background: ${warState.riskLevel2 === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel2 === 1 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+2</button>
+                            <button onclick="setRiskLevel2(2)" style="background: ${warState.riskLevel2 === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel2 === 2 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+4</button>
+                            <button onclick="setRiskLevel2(3)" style="background: ${warState.riskLevel2 === 3 ? '#e74c3c' : '#ddd'}; color: ${warState.riskLevel2 === 3 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+6</button>
+                        </div>
+                        <div id="swipeArea2" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 100px; height: 120px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
+                            <div style="font-size: 1.8rem;">👆</div>
+                            <div style="font-size: 0.8rem; font-weight: bold;">Swipe Up</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Section (Cards) -->
+                <div style="padding: 1rem; text-align: center; background: white; border-top: 3px solid #333; border-bottom: 3px solid #333;">
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        ${player1CardHTML}
+                        <div style="font-size: 1.2rem; font-weight: bold;">VS</div>
+                        ${player2CardHTML}
+                    </div>
+                    ${warState.message ? `<div style="margin-top: 0.5rem; padding: 0.5rem; background: ${warState.message.includes('Win') || warState.message.includes('Wins') ? '#d4edda' : warState.message.includes('Lose') ? '#f8d7da' : '#d1ecf1'}; border-radius: 6px; font-size: 0.8rem; font-weight: bold;">${warState.message}</div>` : ''}
+                    ${warState.gameOver ? `<button onclick="initializeGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-size: 0.9rem; font-weight: bold; cursor: pointer; margin-top: 0.5rem;">Play Again</button>` : ''}
+                </div>
+
+                <!-- Player 1 Section (Bottom) -->
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding: 0.5rem; background: linear-gradient(0deg, #f5f5f5 0%, #e0e0e0 100%);">
+                    <div style="text-align: center;">
+                        <div id="swipeArea1" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 100px; height: 120px; margin: 0 auto; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
+                            <div style="font-size: 1.8rem;">👆</div>
+                            <div style="font-size: 0.8rem; font-weight: bold;">Swipe Up</div>
+                        </div>
+                        <div style="display: flex; gap: 0.2rem; justify-content: center; margin-top: 0.5rem; margin-bottom: 0.3rem;">
+                            <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">0</button>
+                            <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+2</button>
+                            <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+4</button>
+                            <button onclick="setRiskLevel(3)" style="background: ${warState.riskLevel === 3 ? '#e74c3c' : '#ddd'}; color: ${warState.riskLevel === 3 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+6</button>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #666;">Player 1: ${warState.playerScore} cards</div>
+                    </div>
+                </div>
+
+                ${!warState.gameOver ? `
+                    <button onclick="exitWar()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(108, 117, 125, 0.9); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; z-index: 10;">
+                        ← Exit
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    }
+
     function setRiskLevel(level) {
         warState.riskLevel = level;
         showWarBoard();
@@ -235,10 +321,23 @@
         const currentY = e.touches[0].clientY;
         const deltaY = swipeStartY - currentY;
 
-        // Visual feedback - move card up as user swipes
-        const deckArea = document.getElementById('deckSwipeArea');
-        if (deckArea && deltaY > 0) {
-            deckArea.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+        if (warState.mode === 'faceToFace') {
+            // Check which swipe area is active
+            const area1 = document.getElementById('swipeArea1');
+            const area2 = document.getElementById('swipeArea2');
+
+            if (area1 && deltaY > 0 && swipeStartY > window.innerHeight / 2) {
+                area1.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+            }
+            if (area2 && deltaY > 0 && swipeStartY < window.innerHeight / 2) {
+                area2.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+            }
+        } else {
+            // Visual feedback - move card up as user swipes
+            const deckArea = document.getElementById('deckSwipeArea');
+            if (deckArea && deltaY > 0) {
+                deckArea.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+            }
         }
     }
 
@@ -248,10 +347,18 @@
         const endY = e.changedTouches[0].clientY;
         const deltaY = swipeStartY - endY;
 
-        // Reset deck position
-        const deckArea = document.getElementById('deckSwipeArea');
-        if (deckArea) {
-            deckArea.style.transform = 'translateY(0)';
+        if (warState.mode === 'faceToFace') {
+            // Reset both swipe areas
+            const area1 = document.getElementById('swipeArea1');
+            const area2 = document.getElementById('swipeArea2');
+            if (area1) area1.style.transform = 'translateY(0)';
+            if (area2) area2.style.transform = 'translateY(0)';
+        } else {
+            // Reset deck position
+            const deckArea = document.getElementById('deckSwipeArea');
+            if (deckArea) {
+                deckArea.style.transform = 'translateY(0)';
+            }
         }
 
         // If swiped up more than 50px, flip card
@@ -276,7 +383,7 @@
         warState.warPile.push(warState.playerCard, warState.computerCard);
 
         // Add risk cards to pile
-        const isTwoPlayer = warState.mode === 'twoPlayer';
+        const isTwoPlayer = warState.mode === 'twoPlayer' || warState.mode === 'faceToFace';
 
         // Player 1's risk
         for (let i = 0; i < warState.riskLevel; i++) {
@@ -352,7 +459,7 @@
 
     function endGame() {
         warState.gameOver = true;
-        const isTwoPlayer = warState.mode === 'twoPlayer';
+        const isTwoPlayer = warState.mode === 'twoPlayer' || warState.mode === 'faceToFace';
 
         if (warState.playerDeck.length > warState.computerDeck.length) {
             warState.message = isTwoPlayer ? '🎉 Player 1 Wins the Game!' : '🎉 You Win the Game!';
