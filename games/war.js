@@ -251,49 +251,49 @@
             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
 
         content.innerHTML = `
-            <div style="height: 100vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; background: white;">
+            <div style="height: 100vh; display: flex; flex-direction: column; position: relative; background: white; overflow: hidden;">
                 <!-- Player 2 Section (Top, Rotated 180°) -->
-                <div style="transform: rotate(180deg); padding: 0.5rem; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);">
+                <div style="transform: rotate(180deg); padding: 0.3rem 0.5rem; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);">
                     <div style="text-align: center;">
-                        <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.3rem;">Player 2: ${warState.computerScore} cards</div>
-                        <div style="display: flex; gap: 0.2rem; justify-content: center; margin-bottom: 0.4rem;">
-                            <button onclick="setRiskLevel2(0)" style="background: ${warState.riskLevel2 === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel2 === 0 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">0</button>
-                            <button onclick="setRiskLevel2(1)" style="background: ${warState.riskLevel2 === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel2 === 1 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+2</button>
-                            <button onclick="setRiskLevel2(2)" style="background: ${warState.riskLevel2 === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel2 === 2 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+4</button>
-                            <button onclick="setRiskLevel2(3)" style="background: ${warState.riskLevel2 === 3 ? '#e74c3c' : '#ddd'}; color: ${warState.riskLevel2 === 3 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+6</button>
+                        <div style="font-size: 0.7rem; color: #666; margin-bottom: 0.2rem;">Player 2: ${warState.computerScore} cards</div>
+                        <div style="display: flex; gap: 0.15rem; justify-content: center; margin-bottom: 0.25rem;">
+                            <button onclick="setRiskLevel2(0)" style="background: ${warState.riskLevel2 === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel2 === 0 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">0</button>
+                            <button onclick="setRiskLevel2(1)" style="background: ${warState.riskLevel2 === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel2 === 1 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+2</button>
+                            <button onclick="setRiskLevel2(2)" style="background: ${warState.riskLevel2 === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel2 === 2 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+4</button>
+                            <button onclick="setRiskLevel2(3)" style="background: ${warState.riskLevel2 === 3 ? '#e74c3c' : '#ddd'}; color: ${warState.riskLevel2 === 3 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+6</button>
                         </div>
-                        <div id="swipeArea2" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 90px; height: 110px; margin: 0 auto; background: ${warState.player2Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 3px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
-                            <div style="font-size: 1.5rem;">${warState.player2Ready ? '✓' : '👆'}</div>
-                            <div style="font-size: 0.75rem; font-weight: bold;">${warState.player2Ready ? 'Ready!' : 'Swipe Up'}</div>
+                        <div id="swipeArea2" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 80px; height: 100px; margin: 0 auto; background: ${warState.player2Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
+                            <div style="font-size: 1.3rem;">${warState.player2Ready ? '✓' : '👆'}</div>
+                            <div style="font-size: 0.7rem; font-weight: bold;">${warState.player2Ready ? 'Ready!' : 'Swipe'}</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Middle Section (Cards) -->
-                <div style="padding: 1rem; text-align: center; border-top: 3px solid #333; border-bottom: 3px solid #333;">
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0.5rem; text-align: center; border-top: 2px solid #333; border-bottom: 2px solid #333;">
                     <div style="display: flex; justify-content: space-around; align-items: center;">
                         ${player1CardHTML}
-                        <div style="font-size: 1.2rem; font-weight: bold;">VS</div>
+                        <div style="font-size: 1rem; font-weight: bold;">VS</div>
                         ${player2CardHTML}
                     </div>
-                    ${warState.message ? `<div style="margin-top: 0.5rem; padding: 0.5rem; background: ${warState.message.includes('Win') || warState.message.includes('Wins') ? '#d4edda' : warState.message.includes('Lose') ? '#f8d7da' : '#d1ecf1'}; border-radius: 6px; font-size: 0.75rem; font-weight: bold;">${warState.message}</div>` : ''}
-                    ${warState.gameOver ? `<button onclick="initializeGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-size: 0.9rem; font-weight: bold; cursor: pointer; margin-top: 0.5rem;">Play Again</button>` : ''}
+                    ${warState.message ? `<div style="margin-top: 0.4rem; padding: 0.4rem; background: ${warState.message.includes('Win') || warState.message.includes('Wins') ? '#d4edda' : warState.message.includes('Lose') ? '#f8d7da' : '#d1ecf1'}; border-radius: 5px; font-size: 0.7rem; font-weight: bold;">${warState.message}</div>` : ''}
+                    ${warState.gameOver ? `<button onclick="initializeGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.4rem 1.2rem; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; margin-top: 0.4rem;">Play Again</button>` : ''}
                 </div>
 
                 <!-- Player 1 Section (Bottom) -->
-                <div style="padding: 0.5rem; background: linear-gradient(0deg, #f5f5f5 0%, #e0e0e0 100%);">
+                <div style="padding: 0.3rem 0.5rem; background: linear-gradient(0deg, #f5f5f5 0%, #e0e0e0 100%);">
                     <div style="text-align: center;">
-                        <div id="swipeArea1" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 90px; height: 110px; margin: 0 auto; background: ${warState.player1Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 3px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
-                            <div style="font-size: 1.5rem;">${warState.player1Ready ? '✓' : '👆'}</div>
-                            <div style="font-size: 0.75rem; font-weight: bold;">${warState.player1Ready ? 'Ready!' : 'Swipe Up'}</div>
+                        <div id="swipeArea1" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 80px; height: 100px; margin: 0 auto; background: ${warState.player1Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
+                            <div style="font-size: 1.3rem;">${warState.player1Ready ? '✓' : '👆'}</div>
+                            <div style="font-size: 0.7rem; font-weight: bold;">${warState.player1Ready ? 'Ready!' : 'Swipe'}</div>
                         </div>
-                        <div style="display: flex; gap: 0.2rem; justify-content: center; margin-top: 0.4rem; margin-bottom: 0.3rem;">
-                            <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">0</button>
-                            <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+2</button>
-                            <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+4</button>
-                            <button onclick="setRiskLevel(3)" style="background: ${warState.riskLevel === 3 ? '#e74c3c' : '#ddd'}; color: ${warState.riskLevel === 3 ? 'white' : '#333'}; border: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.7rem; min-width: 30px;">+6</button>
+                        <div style="display: flex; gap: 0.15rem; justify-content: center; margin-top: 0.25rem; margin-bottom: 0.2rem;">
+                            <button onclick="setRiskLevel(0)" style="background: ${warState.riskLevel === 0 ? '#667eea' : '#ddd'}; color: ${warState.riskLevel === 0 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">0</button>
+                            <button onclick="setRiskLevel(1)" style="background: ${warState.riskLevel === 1 ? '#f39c12' : '#ddd'}; color: ${warState.riskLevel === 1 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+2</button>
+                            <button onclick="setRiskLevel(2)" style="background: ${warState.riskLevel === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel === 2 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+4</button>
+                            <button onclick="setRiskLevel(3)" style="background: ${warState.riskLevel === 3 ? '#e74c3c' : '#ddd'}; color: ${warState.riskLevel === 3 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+6</button>
                         </div>
-                        <div style="font-size: 0.75rem; color: #666;">Player 1: ${warState.playerScore} cards</div>
+                        <div style="font-size: 0.7rem; color: #666;">Player 1: ${warState.playerScore} cards</div>
                     </div>
                 </div>
 
