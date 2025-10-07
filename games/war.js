@@ -251,7 +251,7 @@
             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
 
         content.innerHTML = `
-            <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; position: relative; background: white; overflow: hidden; padding: 0.5rem 0;">
+            <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1rem; position: relative; background: white; overflow: hidden; padding: 0.5rem 0;">
                 <!-- Player 2 Section (Top, Rotated 180°) -->
                 <div style="transform: rotate(180deg); padding: 0.3rem; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 8px; width: 90%;">
                     <div style="text-align: center;">
