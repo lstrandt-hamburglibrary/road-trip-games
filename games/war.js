@@ -336,10 +336,15 @@
 
         if (warState.mode === 'faceToFace') {
             // Move the specific area that was swiped
-            if (swipeSource && deltaY > 0) {
+            if (swipeSource) {
                 const area = document.getElementById(swipeSource);
                 if (area) {
-                    area.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+                    // Player 2 is rotated, so they swipe down (negative deltaY) from their perspective
+                    if (swipeSource === 'swipeArea2' && deltaY < 0) {
+                        area.style.transform = `translateY(${Math.min(Math.abs(deltaY), 50)}px)`;
+                    } else if (swipeSource === 'swipeArea1' && deltaY > 0) {
+                        area.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+                    }
                 }
             }
         } else {
@@ -366,8 +371,17 @@
             if (area1) area1.style.transform = 'translateY(0)';
             if (area2) area2.style.transform = 'translateY(0)';
 
-            // If swiped up more than 50px, mark player as ready
-            if (deltaY > 50 && swipeSource) {
+            // Check for valid swipe based on player
+            let validSwipe = false;
+            if (swipeSource === 'swipeArea1' && deltaY > 50) {
+                // Player 1 swipes up (positive deltaY)
+                validSwipe = true;
+            } else if (swipeSource === 'swipeArea2' && deltaY < -50) {
+                // Player 2 swipes down in screen coords (negative deltaY) which is up for them
+                validSwipe = true;
+            }
+
+            if (validSwipe) {
                 console.log('Valid swipe detected on', swipeSource);
                 // Determine which player swiped based on swipe source
                 if (swipeSource === 'swipeArea1') {
