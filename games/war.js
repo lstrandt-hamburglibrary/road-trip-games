@@ -300,8 +300,8 @@
                 </div>
 
                 ${!warState.gameOver ? `
-                    <button onclick="exitWar()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(108, 117, 125, 0.9); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; z-index: 10;">
-                        ← Exit
+                    <button onclick="exitWar()" style="position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(108, 117, 125, 0.9); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem; z-index: 10;">
+                        ✕
                     </button>
                 ` : ''}
             </div>
