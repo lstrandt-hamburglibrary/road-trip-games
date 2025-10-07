@@ -170,12 +170,6 @@
         const canDraw = !trashState.drawnCard && !trashState.gameOver && (trashState.mode === 'vsComputer' ? trashState.currentPlayer === 1 : true);
 
         content.innerHTML = `
-            <style>
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                }
-            </style>
             <div style="padding: 1rem; min-height: 100vh;">
                 <div style="text-align: center; margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -184,8 +178,8 @@
                             📖 How to Play
                         </button>
                     </div>
-                    <div style="padding: 0.75rem; background: ${trashState.message.includes('wins') || trashState.message.includes('Win') ? '#d4edda' : trashState.drawnCard ? '#fff3cd' : '#d1ecf1'}; border-radius: 8px; font-size: 1rem; font-weight: bold; margin-bottom: 1rem; border: ${trashState.drawnCard ? '2px solid #f39c12' : 'none'};">
-                        ${trashState.drawnCard ? '👉 ' : ''}${trashState.message}
+                    <div style="padding: 0.75rem; background: ${trashState.message.includes('wins') || trashState.message.includes('Win') ? '#d4edda' : '#d1ecf1'}; border-radius: 8px; font-size: 1rem; font-weight: bold; margin-bottom: 1rem;">
+                        ${trashState.message}
                     </div>
                 </div>
 
@@ -290,15 +284,15 @@
                 <div style="font-size: 0.9rem;">${card.suit}</div>
             </div>`;
         } else {
-            // Show face down card with position number and click handler if applicable
+            // Show face down card - all look the same regardless of whether they can be placed
             const drawnValue = trashState.drawnCard ? getCardValue(trashState.drawnCard.rank) : 0;
             const isWild = drawnValue === 11;
             const canPlaceHere = canPlace && (drawnValue === positionLabel || isWild);
 
             if (canPlaceHere) {
-                return `<button onclick="placeCard(${position})" style="width: 60px; height: 80px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border: 3px solid #f39c12; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: #333; font-weight: bold; animation: pulse 1s infinite; box-shadow: 0 0 15px rgba(243, 156, 18, 0.6);">
-                    <div style="font-size: 2rem;">⬇️</div>
-                    <div style="font-size: 1rem;">TAP HERE</div>
+                return `<button onclick="placeCard(${position})" style="width: 60px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: white;">
+                    <div style="font-size: 1.2rem;">🎴</div>
+                    <div>${positionLabel}</div>
                 </button>`;
             } else {
                 return `<div style="width: 60px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: white;">
@@ -326,8 +320,8 @@
             }, 1500);
         } else {
             trashState.message = value === 11
-                ? `Drew a Jack (Wild)! Tap any yellow spot to place it.`
-                : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Tap the yellow spot to place it!`;
+                ? `Drew a Jack (Wild)! Tap any face-down card to place it.`
+                : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Tap spot ${value} to place it.`;
             showTrashBoard();
         }
     }
@@ -339,8 +333,8 @@
 
         const value = getCardValue(trashState.drawnCard.rank);
         trashState.message = value === 11
-            ? `Drew a Jack (Wild)! Tap any yellow spot to place it.`
-            : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Tap the yellow spot to place it!`;
+            ? `Drew a Jack (Wild)! Tap any face-down card to place it.`
+            : `Drew ${trashState.drawnCard.rank}${trashState.drawnCard.suit} - Tap spot ${value} to place it.`;
 
         showTrashBoard();
     }
@@ -372,7 +366,7 @@
             } else if (oldValue === 11) {
                 // Jack (wild) - can place anywhere
                 trashState.drawnCard = oldCard;
-                trashState.message = `Revealed a Jack (Wild)! Tap any yellow spot to place it.`;
+                trashState.message = `Revealed a Jack (Wild)! Tap any face-down card to place it.`;
             } else {
                 // Check if spot is available
                 const targetPosition = oldValue - 1;
@@ -388,7 +382,7 @@
                 } else {
                     // Continue placing
                     trashState.drawnCard = oldCard;
-                    trashState.message = `Revealed ${oldCard.rank}${oldCard.suit} - Tap the yellow spot to place it!`;
+                    trashState.message = `Revealed ${oldCard.rank}${oldCard.suit} - Tap spot ${oldValue} to place it.`;
                 }
             }
         }
