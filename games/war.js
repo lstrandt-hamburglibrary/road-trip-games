@@ -235,18 +235,27 @@
     function showFaceToFaceBoard() {
         const content = document.getElementById('warContent');
 
-        const player1CardHTML = warState.playerCard
-            ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.playerCard.suit === '♥' || warState.playerCard.suit === '♦' ? 'red' : 'black'};">
-                <div>${warState.playerCard.rank}</div>
-                <div style="font-size: 1.2rem;">${warState.playerCard.suit}</div>
-            </div>`
+        // Show card if player has swiped (ready) OR if round is complete
+        const player1CardHTML = (warState.playerCard || warState.player1Ready)
+            ? (warState.player1Ready && !warState.playerCard)
+                ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    <div style="font-size: 1.2rem;">?</div>
+                </div>`
+                : `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.playerCard.suit === '♥' || warState.playerCard.suit === '♦' ? 'red' : 'black'};">
+                    <div>${warState.playerCard.rank}</div>
+                    <div style="font-size: 1.2rem;">${warState.playerCard.suit}</div>
+                </div>`
             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
 
-        const player2CardHTML = warState.computerCard
-            ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.computerCard.suit === '♥' || warState.computerCard.suit === '♦' ? 'red' : 'black'};">
-                <div>${warState.computerCard.rank}</div>
-                <div style="font-size: 1.2rem;">${warState.computerCard.suit}</div>
-            </div>`
+        const player2CardHTML = (warState.computerCard || warState.player2Ready)
+            ? (warState.player2Ready && !warState.computerCard)
+                ? `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    <div style="font-size: 1.2rem;">?</div>
+                </div>`
+                : `<div style="width: 70px; height: 95px; background: white; border: 2px solid #333; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; color: ${warState.computerCard.suit === '♥' || warState.computerCard.suit === '♦' ? 'red' : 'black'};">
+                    <div>${warState.computerCard.rank}</div>
+                    <div style="font-size: 1.2rem;">${warState.computerCard.suit}</div>
+                </div>`
             : `<div style="width: 70px; height: 95px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 2px solid #333; border-radius: 6px;"></div>`;
 
         content.innerHTML = `
