@@ -22,6 +22,7 @@
 
     let swipeStartY = 0;
     let isSwiping = false;
+    let swipeSource = null; // Track which element was swiped
 
     const suits = ['♠', '♥', '♦', '♣'];
     const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
@@ -317,6 +318,7 @@
     function handleSwipeStart(e) {
         swipeStartY = e.touches[0].clientY;
         isSwiping = true;
+        swipeSource = e.target.id || e.target.closest('[id^="swipeArea"]')?.id;
     }
 
     function handleSwipeMove(e) {
@@ -326,15 +328,12 @@
         const deltaY = swipeStartY - currentY;
 
         if (warState.mode === 'faceToFace') {
-            // Check which swipe area is active
-            const area1 = document.getElementById('swipeArea1');
-            const area2 = document.getElementById('swipeArea2');
-
-            if (area1 && deltaY > 0 && swipeStartY > window.innerHeight / 2) {
-                area1.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
-            }
-            if (area2 && deltaY > 0 && swipeStartY < window.innerHeight / 2) {
-                area2.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+            // Move the specific area that was swiped
+            if (swipeSource && deltaY > 0) {
+                const area = document.getElementById(swipeSource);
+                if (area) {
+                    area.style.transform = `translateY(-${Math.min(deltaY, 50)}px)`;
+                }
             }
         } else {
             // Visual feedback - move card up as user swipes
@@ -359,13 +358,13 @@
             if (area2) area2.style.transform = 'translateY(0)';
 
             // If swiped up more than 50px, mark player as ready
-            if (deltaY > 50) {
-                // Determine which player swiped based on Y position
-                if (swipeStartY > window.innerHeight / 2) {
-                    // Player 1 (bottom half)
+            if (deltaY > 50 && swipeSource) {
+                // Determine which player swiped based on swipe source
+                if (swipeSource === 'swipeArea1') {
+                    // Player 1 (bottom)
                     warState.player1Ready = true;
-                } else {
-                    // Player 2 (top half)
+                } else if (swipeSource === 'swipeArea2') {
+                    // Player 2 (top)
                     warState.player2Ready = true;
                 }
 
@@ -391,6 +390,7 @@
         }
 
         isSwiping = false;
+        swipeSource = null;
     }
 
     function flipCard() {
