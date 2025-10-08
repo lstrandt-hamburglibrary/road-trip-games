@@ -187,9 +187,10 @@
     function renderPlacementGrid(player) {
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: compact and square, with max size for larger screens
-        const cellSize = 'min(calc((80vw - 3vw) / 10), 25px)';
-        const headerSize = 'min(3vw, 15px)';
+        // Calculate cell size: full size on mobile, capped on desktop
+        const isDesktop = window.innerWidth > 768;
+        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 25px)' : 'calc((80vw - 3vw) / 10)';
+        const headerSize = isDesktop ? 'min(3vw, 15px)' : '3vw';
 
         let html = '<div>';
 
@@ -427,9 +428,10 @@
         const opponentData = opponentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: compact and square, with max size for larger screens
-        const cellSize = 'min(calc((80vw - 3vw) / 10), 25px)';
-        const headerSize = 'min(3vw, 15px)';
+        // Calculate cell size: full size on mobile, capped on desktop
+        const isDesktop = window.innerWidth > 768;
+        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 25px)' : 'calc((80vw - 3vw) / 10)';
+        const headerSize = isDesktop ? 'min(3vw, 15px)' : '3vw';
 
         let html = '<div>';
 
@@ -482,9 +484,10 @@
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: compact and square, with max size for larger screens
-        const cellSize = 'min(calc((80vw - 3vw) / 10), 25px)';
-        const headerSize = 'min(3vw, 15px)';
+        // Calculate cell size: full size on mobile, capped on desktop
+        const isDesktop = window.innerWidth > 768;
+        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 25px)' : 'calc((80vw - 3vw) / 10)';
+        const headerSize = isDesktop ? 'min(3vw, 15px)' : '3vw';
 
         let html = '<div>';
 
