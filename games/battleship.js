@@ -180,9 +180,7 @@
                     </button>
                 </div>
             </div>
-            <div style="display: inline-block; background: white; padding: 0.4rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 95vw; box-sizing: border-box; overflow-x: auto;">
-                ${renderPlacementGrid(player)}
-            </div>
+            ${renderPlacementGrid(player)}
         `;
     }
 
@@ -409,21 +407,17 @@
                 <h2 style="margin: 0; font-size: 1rem;">${playerName}'s Turn • ${opponentData.ships.filter(s => s.hits.length === s.positions.length).length}/5 Sunk</h2>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr; gap: 0.4rem; max-width: 95vw; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 0.3rem; max-width: 95vw; margin: 0 auto;">
                 <!-- Attack Grid (opponent's grid - hidden ships) -->
-                <div style="background: white; padding: 0.4rem; border-radius: 8px; box-sizing: border-box;">
-                    <h3 style="margin: 0 0 0.3rem 0; color: #e74c3c; font-size: 0.85rem;">🎯 Attack</h3>
-                    <div style="display: inline-block;">
-                        ${renderAttackGrid(opponent)}
-                    </div>
+                <div>
+                    <h3 style="margin: 0 0 0.2rem 0; color: #e74c3c; font-size: 0.85rem;">🎯 Attack</h3>
+                    ${renderAttackGrid(opponent)}
                 </div>
 
                 <!-- Your Grid (show your ships and where you've been hit) -->
-                <div style="background: white; padding: 0.4rem; border-radius: 8px; box-sizing: border-box;">
-                    <h3 style="margin: 0 0 0.3rem 0; color: #667eea; font-size: 0.85rem;">🚢 Defense</h3>
-                    <div style="display: inline-block;">
-                        ${renderDefenseGrid(currentPlayer)}
-                    </div>
+                <div>
+                    <h3 style="margin: 0 0 0.2rem 0; color: #667eea; font-size: 0.85rem;">🚢 Defense</h3>
+                    ${renderDefenseGrid(currentPlayer)}
                 </div>
             </div>
         `;
