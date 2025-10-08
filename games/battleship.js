@@ -187,9 +187,9 @@
     function renderPlacementGrid(player) {
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: compact and square
-        const cellSize = 'calc((80vw - 3vw) / 10)';
-        const headerSize = '3vw';
+        // Calculate cell size: compact and square, with max size for larger screens
+        const cellSize = 'min(calc((80vw - 3vw) / 10), 35px)';
+        const headerSize = 'min(3vw, 20px)';
 
         let html = '<div>';
 
@@ -427,9 +427,9 @@
         const opponentData = opponentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: compact and square
-        const cellSize = 'calc((80vw - 3vw) / 10)';
-        const headerSize = '3vw';
+        // Calculate cell size: compact and square, with max size for larger screens
+        const cellSize = 'min(calc((80vw - 3vw) / 10), 35px)';
+        const headerSize = 'min(3vw, 20px)';
 
         let html = '<div>';
 
@@ -482,9 +482,9 @@
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: compact and square
-        const cellSize = 'calc((80vw - 3vw) / 10)';
-        const headerSize = '3vw';
+        // Calculate cell size: compact and square, with max size for larger screens
+        const cellSize = 'min(calc((80vw - 3vw) / 10), 35px)';
+        const headerSize = 'min(3vw, 20px)';
 
         let html = '<div>';
 
