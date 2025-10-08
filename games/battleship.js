@@ -188,7 +188,7 @@
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: compact and square
-        const cellSize = 'calc((88vw - 3vw) / 10)';
+        const cellSize = 'calc((80vw - 3vw) / 10)';
         const headerSize = '3vw';
 
         let html = '<div>';
@@ -428,7 +428,7 @@
         const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: compact and square
-        const cellSize = 'calc((88vw - 3vw) / 10)';
+        const cellSize = 'calc((80vw - 3vw) / 10)';
         const headerSize = '3vw';
 
         let html = '<div>';
@@ -483,7 +483,7 @@
         const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: compact and square
-        const cellSize = 'calc((88vw - 3vw) / 10)';
+        const cellSize = 'calc((80vw - 3vw) / 10)';
         const headerSize = '3vw';
 
         let html = '<div>';
