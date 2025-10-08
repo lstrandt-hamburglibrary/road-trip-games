@@ -169,20 +169,19 @@
         const canUndo = battleshipState.currentShipIndex > 0;
 
         content.innerHTML = `
-            <div style="background: #f8f9fa; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
-                <h3>${playerName} - Place Your Ships</h3>
-                <p>Placing: <strong>${ship.name}</strong> (${ship.size} squares)</p>
-                <p>Ship ${battleshipState.currentShipIndex + 1} of 5</p>
-                <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                    <button onclick="toggleOrientation()" style="background: #667eea; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
-                        Orientation: ${battleshipState.orientation === 'horizontal' ? '→ Horizontal' : '↓ Vertical'}
+            <div style="background: #f8f9fa; padding: 0.75rem; border-radius: 10px; margin-bottom: 0.75rem;">
+                <h3 style="margin-bottom: 0.25rem; font-size: 1.1rem;">${playerName} - Place Your Ships</h3>
+                <p style="margin: 0.25rem 0; font-size: 0.9rem;">Placing: <strong>${ship.name}</strong> (${ship.size} squares) - Ship ${battleshipState.currentShipIndex + 1} of 5</p>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                    <button onclick="toggleOrientation()" style="background: #667eea; color: white; border: none; padding: 0.5rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                        ${battleshipState.orientation === 'horizontal' ? '→ Horizontal' : '↓ Vertical'}
                     </button>
-                    <button onclick="undoLastShip()" style="background: ${canUndo ? '#e74c3c' : '#ccc'}; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: ${canUndo ? 'pointer' : 'not-allowed'};" ${!canUndo ? 'disabled' : ''}>
-                        ↶ Undo Last Ship
+                    <button onclick="undoLastShip()" style="background: ${canUndo ? '#e74c3c' : '#ccc'}; color: white; border: none; padding: 0.5rem 0.75rem; border-radius: 8px; cursor: ${canUndo ? 'pointer' : 'not-allowed'}; font-size: 0.85rem;" ${!canUndo ? 'disabled' : ''}>
+                        ↶ Undo
                     </button>
                 </div>
             </div>
-            <div style="display: inline-block; background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 95vw; box-sizing: border-box; overflow-x: auto;">
+            <div style="display: inline-block; background: white; padding: 0.75rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 95vw; box-sizing: border-box; overflow-x: auto;">
                 ${renderPlacementGrid(player)}
             </div>
         `;
@@ -191,28 +190,28 @@
     function renderPlacementGrid(player) {
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: (90vw - header) / 10 columns
-        const cellSize = 'calc((90vw - 8vw) / 10)';
-        const headerSize = '8vw';
+        // Calculate cell size: smaller for better fit
+        const cellSize = 'calc((80vw - 5vw) / 10)';
+        const headerSize = '5vw';
 
-        let html = '<div style="display: inline-block; max-width: 90vw;">';
+        let html = '<div style="display: inline-block; max-width: 80vw;">';
 
         // Column headers (1-10)
-        html += `<div style="display: flex; margin-bottom: 5px; margin-left: ${headerSize};">`;
+        html += `<div style="display: flex; margin-bottom: 2px; margin-left: ${headerSize};">`;
         for (let i = 1; i <= 10; i++) {
-            html += `<div style="width: ${cellSize}; text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.6rem, 2vw, 0.9rem);">${i}</div>`;
+            html += `<div style="width: ${cellSize}; text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.5rem, 1.5vw, 0.75rem);">${i}</div>`;
         }
         html += '</div>';
 
         // Grid with row headers (A-J)
         for (let row = 0; row < 10; row++) {
-            html += '<div style="display: flex; margin-bottom: 3px;">';
-            html += `<div style="width: ${headerSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.6rem, 2vw, 0.9rem);">${letters[row]}</div>`;
+            html += '<div style="display: flex; margin-bottom: 1px;">';
+            html += `<div style="width: ${headerSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.5rem, 1.5vw, 0.75rem);">${letters[row]}</div>`;
             for (let col = 0; col < 10; col++) {
                 const hasShip = playerData.grid[row][col] !== null;
                 html += `
                     <div onclick="placeShipAt(${row}, ${col})"
-                         style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${hasShip ? '#667eea' : '#e9ecef'}; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: clamp(0.5rem, 1.2vw, 0.7rem); color: white; font-weight: bold; transition: all 0.2s; box-sizing: border-box;"
+                         style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${hasShip ? '#667eea' : '#e9ecef'}; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: clamp(0.4rem, 1vw, 0.6rem); color: white; font-weight: bold; transition: all 0.2s; box-sizing: border-box;"
                          onmouseover="this.style.background='${hasShip ? '#764ba2' : '#d4d4d4'}'"
                          onmouseout="this.style.background='${hasShip ? '#667eea' : '#e9ecef'}'">
                         ${hasShip ? '🚢' : ''}
@@ -407,35 +406,33 @@
         const opponentName = opponent === 1 ? battleshipState.player1Name : battleshipState.player2Name;
 
         content.innerHTML = `
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
-                <h2 style="margin-bottom: 1rem;">${playerName}'s Turn</h2>
-                <p style="font-size: 1.1rem;">Attack ${opponentName}'s fleet!</p>
-                <div style="display: flex; gap: 2rem; justify-content: center; margin-top: 1rem;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.75rem; border-radius: 10px; margin-bottom: 0.75rem;">
+                <h2 style="margin-bottom: 0.25rem; font-size: 1.3rem;">${playerName}'s Turn</h2>
+                <p style="font-size: 0.85rem; margin-bottom: 0.5rem;">Attack ${opponentName}'s fleet!</p>
+                <div style="display: flex; gap: 1.5rem; justify-content: center;">
                     <div>
-                        <div style="font-size: 2rem; font-weight: bold;">${opponentData.ships.filter(s => s.hits.length === s.positions.length).length}</div>
-                        <div style="font-size: 0.9rem;">Ships Sunk</div>
+                        <div style="font-size: 1.3rem; font-weight: bold;">${opponentData.ships.filter(s => s.hits.length === s.positions.length).length}</div>
+                        <div style="font-size: 0.7rem;">Sunk</div>
                     </div>
                     <div>
-                        <div style="font-size: 2rem; font-weight: bold;">${5 - opponentData.ships.filter(s => s.hits.length === s.positions.length).length}</div>
-                        <div style="font-size: 0.9rem;">Ships Remaining</div>
+                        <div style="font-size: 1.3rem; font-weight: bold;">${5 - opponentData.ships.filter(s => s.hits.length === s.positions.length).length}</div>
+                        <div style="font-size: 0.7rem;">Remaining</div>
                     </div>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 95vw; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem; max-width: 95vw; margin: 0 auto;">
                 <!-- Attack Grid (opponent's grid - hidden ships) -->
-                <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-x: auto; box-sizing: border-box;">
-                    <h3 style="margin-bottom: 1rem; color: #e74c3c;">🎯 Attack Grid</h3>
-                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Click to attack!</p>
+                <div style="background: white; padding: 0.75rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; box-sizing: border-box;">
+                    <h3 style="margin-bottom: 0.5rem; color: #e74c3c; font-size: 1rem;">🎯 Attack Grid</h3>
                     <div style="display: inline-block;">
                         ${renderAttackGrid(opponent)}
                     </div>
                 </div>
 
                 <!-- Your Grid (show your ships and where you've been hit) -->
-                <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-x: auto; box-sizing: border-box;">
-                    <h3 style="margin-bottom: 1rem; color: #667eea;">🚢 Your Fleet</h3>
-                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">Defend your ships!</p>
+                <div style="background: white; padding: 0.75rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; box-sizing: border-box;">
+                    <h3 style="margin-bottom: 0.5rem; color: #667eea; font-size: 1rem;">🚢 Your Fleet</h3>
                     <div style="display: inline-block;">
                         ${renderDefenseGrid(currentPlayer)}
                     </div>
@@ -448,23 +445,23 @@
         const opponentData = opponentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: (90vw - header) / 10 columns
-        const cellSize = 'calc((90vw - 8vw) / 10)';
-        const headerSize = '8vw';
+        // Calculate cell size: smaller for better fit
+        const cellSize = 'calc((80vw - 5vw) / 10)';
+        const headerSize = '5vw';
 
-        let html = '<div style="display: inline-block; max-width: 90vw;">';
+        let html = '<div style="display: inline-block; max-width: 80vw;">';
 
         // Column headers (1-10)
-        html += `<div style="display: flex; margin-bottom: 5px; margin-left: ${headerSize};">`;
+        html += `<div style="display: flex; margin-bottom: 2px; margin-left: ${headerSize};">`;
         for (let i = 1; i <= 10; i++) {
-            html += `<div style="width: ${cellSize}; text-align: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.6rem, 2vw, 0.9rem);">${i}</div>`;
+            html += `<div style="width: ${cellSize}; text-align: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.5rem, 1.5vw, 0.75rem);">${i}</div>`;
         }
         html += '</div>';
 
         // Grid with row headers (A-J)
         for (let row = 0; row < 10; row++) {
-            html += '<div style="display: flex; margin-bottom: 3px;">';
-            html += `<div style="width: ${headerSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.6rem, 2vw, 0.9rem);">${letters[row]}</div>`;
+            html += '<div style="display: flex; margin-bottom: 1px;">';
+            html += `<div style="width: ${headerSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #e74c3c; font-size: clamp(0.5rem, 1.5vw, 0.75rem);">${letters[row]}</div>`;
             for (let col = 0; col < 10; col++) {
                 const coord = `${row},${col}`;
                 const hasShip = opponentData.grid[row][col] !== null;
@@ -487,7 +484,7 @@
 
                 html += `
                     <div onclick="${clickable ? `makeAttack(${row}, ${col})` : ''}"
-                         style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${bg}; cursor: ${clickable ? 'pointer' : 'not-allowed'}; display: flex; align-items: center; justify-content: center; font-size: clamp(0.7rem, 1.8vw, 1rem); transition: all 0.2s; box-sizing: border-box;"
+                         style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${bg}; cursor: ${clickable ? 'pointer' : 'not-allowed'}; display: flex; align-items: center; justify-content: center; font-size: clamp(0.6rem, 1.5vw, 0.85rem); transition: all 0.2s; box-sizing: border-box;"
                          ${clickable ? `onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='${bg}'"` : ''}>
                         ${content}
                     </div>
@@ -503,23 +500,23 @@
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        // Calculate cell size: (90vw - header) / 10 columns
-        const cellSize = 'calc((90vw - 8vw) / 10)';
-        const headerSize = '8vw';
+        // Calculate cell size: smaller for better fit
+        const cellSize = 'calc((80vw - 5vw) / 10)';
+        const headerSize = '5vw';
 
-        let html = '<div style="display: inline-block; max-width: 90vw;">';
+        let html = '<div style="display: inline-block; max-width: 80vw;">';
 
         // Column headers (1-10)
-        html += `<div style="display: flex; margin-bottom: 5px; margin-left: ${headerSize};">`;
+        html += `<div style="display: flex; margin-bottom: 2px; margin-left: ${headerSize};">`;
         for (let i = 1; i <= 10; i++) {
-            html += `<div style="width: ${cellSize}; text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.6rem, 2vw, 0.9rem);">${i}</div>`;
+            html += `<div style="width: ${cellSize}; text-align: center; font-weight: bold; color: #667eea; font-size: clamp(0.5rem, 1.5vw, 0.75rem);">${i}</div>`;
         }
         html += '</div>';
 
         // Grid with row headers (A-J)
         for (let row = 0; row < 10; row++) {
-            html += '<div style="display: flex; margin-bottom: 3px;">';
-            html += `<div style="width: ${headerSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.6rem, 2vw, 0.9rem);">${letters[row]}</div>`;
+            html += '<div style="display: flex; margin-bottom: 1px;">';
+            html += `<div style="width: ${headerSize}; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #667eea; font-size: clamp(0.5rem, 1.5vw, 0.75rem);">${letters[row]}</div>`;
             for (let col = 0; col < 10; col++) {
                 const hasShip = playerData.grid[row][col] !== null;
                 const wasHitByOpponent = opponentData.hits && opponentData.hits.some(h => h[0] === row && h[1] === col);
@@ -537,7 +534,7 @@
                 }
 
                 html += `
-                    <div style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: ${hasShip && !wasHitByOpponent ? 'clamp(0.5rem, 1.2vw, 0.7rem)' : 'clamp(0.7rem, 1.8vw, 1rem)'}; color: white; box-sizing: border-box;">
+                    <div style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: ${hasShip && !wasHitByOpponent ? 'clamp(0.4rem, 1vw, 0.6rem)' : 'clamp(0.6rem, 1.5vw, 0.85rem)'}; color: white; box-sizing: border-box;">
                         ${content}
                     </div>
                 `;
