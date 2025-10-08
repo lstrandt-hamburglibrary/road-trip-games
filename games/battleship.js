@@ -189,8 +189,8 @@
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: full size on mobile, capped on desktop
         const isDesktop = window.innerWidth > 768;
-        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 25px)' : 'calc((80vw - 3vw) / 10)';
-        const headerSize = isDesktop ? 'min(3vw, 15px)' : '3vw';
+        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 50px)' : 'calc((80vw - 3vw) / 10)';
+        const headerSize = isDesktop ? 'min(3vw, 30px)' : '3vw';
 
         let html = '<div>';
 
@@ -430,8 +430,8 @@
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: full size on mobile, capped on desktop
         const isDesktop = window.innerWidth > 768;
-        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 25px)' : 'calc((80vw - 3vw) / 10)';
-        const headerSize = isDesktop ? 'min(3vw, 15px)' : '3vw';
+        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 50px)' : 'calc((80vw - 3vw) / 10)';
+        const headerSize = isDesktop ? 'min(3vw, 30px)' : '3vw';
 
         let html = '<div>';
 
@@ -486,8 +486,8 @@
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: full size on mobile, capped on desktop
         const isDesktop = window.innerWidth > 768;
-        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 25px)' : 'calc((80vw - 3vw) / 10)';
-        const headerSize = isDesktop ? 'min(3vw, 15px)' : '3vw';
+        const cellSize = isDesktop ? 'min(calc((80vw - 3vw) / 10), 50px)' : 'calc((80vw - 3vw) / 10)';
+        const headerSize = isDesktop ? 'min(3vw, 30px)' : '3vw';
 
         let html = '<div>';
 
