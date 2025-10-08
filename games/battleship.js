@@ -188,10 +188,10 @@
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: very compact to fit on screen
-        const cellSize = 'calc((85vw - 3.5vw) / 10)';
-        const headerSize = '3.5vw';
+        const cellSize = 'calc((95vw - 3vw) / 10)';
+        const headerSize = '3vw';
 
-        let html = '<div style="display: inline-block; max-width: 85vw;">';
+        let html = '<div>';
 
         // Column headers (1-10)
         html += `<div style="display: flex; margin-bottom: 1px; margin-left: ${headerSize};">`;
@@ -428,10 +428,10 @@
         const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: very compact to fit on screen
-        const cellSize = 'calc((85vw - 3.5vw) / 10)';
-        const headerSize = '3.5vw';
+        const cellSize = 'calc((95vw - 3vw) / 10)';
+        const headerSize = '3vw';
 
-        let html = '<div style="display: inline-block; max-width: 85vw;">';
+        let html = '<div>';
 
         // Column headers (1-10)
         html += `<div style="display: flex; margin-bottom: 1px; margin-left: ${headerSize};">`;
@@ -483,10 +483,10 @@
         const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: very compact to fit on screen
-        const cellSize = 'calc((85vw - 3.5vw) / 10)';
-        const headerSize = '3.5vw';
+        const cellSize = 'calc((95vw - 3vw) / 10)';
+        const headerSize = '3vw';
 
-        let html = '<div style="display: inline-block; max-width: 85vw;">';
+        let html = '<div>';
 
         // Column headers (1-10)
         html += `<div style="display: flex; margin-bottom: 1px; margin-left: ${headerSize};">`;
