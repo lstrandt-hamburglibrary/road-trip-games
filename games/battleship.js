@@ -188,8 +188,8 @@
         const playerData = player === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: compact and square, with max size for larger screens
-        const cellSize = 'min(calc((80vw - 3vw) / 10), 35px)';
-        const headerSize = 'min(3vw, 20px)';
+        const cellSize = 'min(calc((80vw - 3vw) / 10), 25px)';
+        const headerSize = 'min(3vw, 15px)';
 
         let html = '<div>';
 
@@ -428,8 +428,8 @@
         const currentPlayerData = battleshipState.currentPlayer === 1 ? battleshipState.player1 : battleshipState.player2;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: compact and square, with max size for larger screens
-        const cellSize = 'min(calc((80vw - 3vw) / 10), 35px)';
-        const headerSize = 'min(3vw, 20px)';
+        const cellSize = 'min(calc((80vw - 3vw) / 10), 25px)';
+        const headerSize = 'min(3vw, 15px)';
 
         let html = '<div>';
 
@@ -483,8 +483,8 @@
         const opponentData = player === 1 ? battleshipState.player2 : battleshipState.player1;
         const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         // Calculate cell size: compact and square, with max size for larger screens
-        const cellSize = 'min(calc((80vw - 3vw) / 10), 35px)';
-        const headerSize = 'min(3vw, 20px)';
+        const cellSize = 'min(calc((80vw - 3vw) / 10), 25px)';
+        const headerSize = 'min(3vw, 15px)';
 
         let html = '<div>';
 
