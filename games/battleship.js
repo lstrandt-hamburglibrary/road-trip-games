@@ -172,10 +172,10 @@
             <div style="background: #f8f9fa; padding: 0.4rem; border-radius: 8px; margin-bottom: 0.4rem;">
                 <h3 style="margin: 0 0 0.2rem 0; font-size: 0.95rem;">${playerName} - ${ship.name} (${ship.size}) - ${battleshipState.currentShipIndex + 1}/5</h3>
                 <div style="display: flex; gap: 0.4rem; margin-top: 0.3rem; flex-wrap: wrap;">
-                    <button onclick="toggleOrientation()" style="background: #667eea; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                        ${battleshipState.orientation === 'horizontal' ? '→ Horiz' : '↓ Vert'}
+                    <button onclick="toggleOrientation()" style="background: #667eea; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">
+                        ${battleshipState.orientation === 'horizontal' ? '→ Horizontal' : '↓ Vertical'}
                     </button>
-                    <button onclick="undoLastShip()" style="background: ${canUndo ? '#e74c3c' : '#ccc'}; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 6px; cursor: ${canUndo ? 'pointer' : 'not-allowed'}; font-size: 0.8rem;" ${!canUndo ? 'disabled' : ''}>
+                    <button onclick="undoLastShip()" style="background: ${canUndo ? '#e74c3c' : '#ccc'}; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 6px; cursor: ${canUndo ? 'pointer' : 'not-allowed'}; font-size: 0.75rem;" ${!canUndo ? 'disabled' : ''}>
                         ↶ Undo
                     </button>
                 </div>
@@ -208,7 +208,7 @@
                 const hasShip = playerData.grid[row][col] !== null;
                 html += `
                     <div onclick="placeShipAt(${row}, ${col})"
-                         style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${hasShip ? '#667eea' : '#e9ecef'}; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: clamp(0.35rem, 0.9vw, 0.55rem); color: white; font-weight: bold; transition: all 0.2s; box-sizing: border-box;"
+                         style="width: ${cellSize}; height: ${cellSize}; aspect-ratio: 1/1; border: 1px solid #ddd; background: ${hasShip ? '#667eea' : '#e9ecef'}; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: clamp(0.35rem, 0.9vw, 0.55rem); color: white; font-weight: bold; transition: all 0.2s; box-sizing: border-box;"
                          onmouseover="this.style.background='${hasShip ? '#764ba2' : '#d4d4d4'}'"
                          onmouseout="this.style.background='${hasShip ? '#667eea' : '#e9ecef'}'">
                         ${hasShip ? '🚢' : ''}
@@ -466,7 +466,7 @@
 
                 html += `
                     <div onclick="${clickable ? `makeAttack(${row}, ${col})` : ''}"
-                         style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${bg}; cursor: ${clickable ? 'pointer' : 'not-allowed'}; display: flex; align-items: center; justify-content: center; font-size: clamp(0.5rem, 1.3vw, 0.75rem); transition: all 0.2s; box-sizing: border-box;"
+                         style="width: ${cellSize}; height: ${cellSize}; aspect-ratio: 1/1; border: 1px solid #ddd; background: ${bg}; cursor: ${clickable ? 'pointer' : 'not-allowed'}; display: flex; align-items: center; justify-content: center; font-size: clamp(0.5rem, 1.3vw, 0.75rem); transition: all 0.2s; box-sizing: border-box;"
                          ${clickable ? `onmouseover="this.style.background='#d4d4d4'" onmouseout="this.style.background='${bg}'"` : ''}>
                         ${content}
                     </div>
@@ -516,7 +516,7 @@
                 }
 
                 html += `
-                    <div style="width: ${cellSize}; height: ${cellSize}; border: 1px solid #ddd; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: ${hasShip && !wasHitByOpponent ? 'clamp(0.35rem, 0.9vw, 0.55rem)' : 'clamp(0.5rem, 1.3vw, 0.75rem)'}; color: white; box-sizing: border-box;">
+                    <div style="width: ${cellSize}; height: ${cellSize}; aspect-ratio: 1/1; border: 1px solid #ddd; background: ${bg}; display: flex; align-items: center; justify-content: center; font-size: ${hasShip && !wasHitByOpponent ? 'clamp(0.35rem, 0.9vw, 0.55rem)' : 'clamp(0.5rem, 1.3vw, 0.75rem)'}; color: white; box-sizing: border-box;">
                         ${content}
                     </div>
                 `;
