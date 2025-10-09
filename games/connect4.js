@@ -201,7 +201,7 @@
 
         // If AI mode and now AI's turn
         if (connect4State.isAI && connect4State.currentPlayer === 2) {
-            setTimeout(() => makeAIMove(), 500);
+            setTimeout(() => makeAIMove(), 800);
         } else {
             showConnect4Board();
         }
