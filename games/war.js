@@ -447,8 +447,13 @@
         warState.playerCard = warState.playerDeck.shift();
         warState.computerCard = warState.computerDeck.shift();
 
-        // Resolve the round
-        resolveRound();
+        // Show the cards first
+        showWarBoard();
+
+        // Wait a moment to see the cards, then resolve
+        setTimeout(() => {
+            resolveRound();
+        }, 1000); // 1 second delay to see the cards
     }
 
     function resolveRound() {
