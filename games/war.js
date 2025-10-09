@@ -437,23 +437,26 @@
     }
 
     function flipCard() {
-        // For non-faceToFace modes, draw cards immediately
+        // For non-faceToFace modes, draw cards with staggered timing
         if (warState.playerDeck.length === 0 || warState.computerDeck.length === 0) {
             endGame();
             return;
         }
 
-        // Draw cards
+        // Draw player's card first
         warState.playerCard = warState.playerDeck.shift();
-        warState.computerCard = warState.computerDeck.shift();
-
-        // Show the cards first
         showWarBoard();
 
-        // Wait a moment to see the cards, then resolve
+        // Wait, then show computer's card
         setTimeout(() => {
-            resolveRound();
-        }, 1000); // 1 second delay to see the cards
+            warState.computerCard = warState.computerDeck.shift();
+            showWarBoard();
+
+            // Wait longer to see both cards, then resolve
+            setTimeout(() => {
+                resolveRound();
+            }, 1500); // 1.5 seconds to see both cards
+        }, 800); // 0.8 seconds before showing computer's card
     }
 
     function resolveRound() {
