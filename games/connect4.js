@@ -199,11 +199,12 @@
         // Switch player
         connect4State.currentPlayer = connect4State.currentPlayer === 1 ? 2 : 1;
 
-        // If AI mode and now AI's turn
+        // Show the board with the latest move
+        showConnect4Board();
+
+        // If AI mode and now AI's turn, wait before making AI move
         if (connect4State.isAI && connect4State.currentPlayer === 2) {
             setTimeout(() => makeAIMove(), 800);
-        } else {
-            showConnect4Board();
         }
     }
 
