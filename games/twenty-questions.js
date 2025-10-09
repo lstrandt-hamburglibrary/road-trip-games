@@ -262,7 +262,81 @@
     function selectBestAIQuestion() {
         // Filter out questions we've already asked
         const askedQuestions = questionHistory.map(q => q.question);
-        const availableQuestions = AI_QUESTIONS.filter(q => !askedQuestions.includes(q.question));
+        let availableQuestions = AI_QUESTIONS.filter(q => !askedQuestions.includes(q.question));
+
+        // Filter out contradictory questions based on what we know
+        availableQuestions = availableQuestions.filter(q => {
+            // If we know the category, filter out other category questions
+            if (aiKnowledge.category) {
+                if (q.property === 'category' && q.value !== aiKnowledge.category) {
+                    return false;
+                }
+            }
+
+            // If we know it's NOT a specific category, don't ask about that category
+            if (aiKnowledge.category && aiKnowledge.category.startsWith('not-')) {
+                const notCategory = aiKnowledge.category.substring(4);
+                if (q.property === 'category' && q.value === notCategory) {
+                    return false;
+                }
+            }
+
+            // If we know it's an object, filter out animal/living-specific questions
+            if (aiKnowledge.category === 'object') {
+                if (q.property === 'isLiving' || q.property === 'canFly' ||
+                    q.property === 'hasLegs' || q.property === 'isMammal' ||
+                    q.property === 'isPet') {
+                    return false;
+                }
+            }
+
+            // If we know it's an animal, filter out object-specific questions
+            if (aiKnowledge.category === 'animal') {
+                if (q.property === 'isElectronic' || q.property === 'isVehicle' ||
+                    q.property === 'usedDaily') {
+                    return false;
+                }
+            }
+
+            // If we know it's a place, filter out animal/object questions
+            if (aiKnowledge.category === 'place') {
+                if (q.property === 'isLiving' || q.property === 'canFly' ||
+                    q.property === 'hasLegs' || q.property === 'isElectronic' ||
+                    q.property === 'isVehicle' || q.property === 'isPet' ||
+                    q.property === 'isMammal' || q.property === 'usedDaily') {
+                    return false;
+                }
+            }
+
+            // If we know it's food, filter out animal/object questions
+            if (aiKnowledge.category === 'food') {
+                if (q.property === 'isLiving' || q.property === 'canFly' ||
+                    q.property === 'hasLegs' || q.property === 'isElectronic' ||
+                    q.property === 'isVehicle' || q.property === 'isPet' ||
+                    q.property === 'isMammal' || q.property === 'usedDaily' ||
+                    q.property === 'isIndoors' || q.property === 'isNatural') {
+                    return false;
+                }
+            }
+
+            // If we know it's a vehicle, filter out living thing questions
+            if (aiKnowledge.isVehicle === true) {
+                if (q.property === 'isLiving' || q.property === 'hasLegs' ||
+                    q.property === 'isMammal' || q.property === 'isPet') {
+                    return false;
+                }
+            }
+
+            // If we know it's NOT living, filter out living-specific questions
+            if (aiKnowledge.isLiving === false) {
+                if (q.property === 'hasLegs' || q.property === 'isMammal' ||
+                    q.property === 'isPet' || q.property === 'canFly') {
+                    return false;
+                }
+            }
+
+            return true;
+        });
 
         if (availableQuestions.length > 0) {
             // Prioritize category questions first if we don't know the category
@@ -313,10 +387,18 @@
         // Try to find a match in our database
         const possibleMatches = THINGS_DATABASE.filter(thing => {
             for (const [key, value] of Object.entries(aiKnowledge)) {
-                if (thing[key] !== undefined) {
-                    if (typeof value === 'string' && value.startsWith('not-')) {
-                        if (thing[key] === value.substring(4)) return false;
+                if (typeof value === 'string' && value.startsWith('not-')) {
+                    // For "not-X" values, exclude if thing HAS that value
+                    const unwantedValue = value.substring(4);
+                    if (thing[key] === unwantedValue) return false;
+                } else {
+                    // For positive values, thing must have matching property
+                    // If thing doesn't have the property at all, exclude it (unless it's a generic property)
+                    if (thing[key] === undefined && key !== 'generic') {
+                        // Property not in database for this item - exclude it
+                        return false;
                     } else if (thing[key] !== value) {
+                        // Property exists but doesn't match - exclude it
                         return false;
                     }
                 }
