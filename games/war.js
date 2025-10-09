@@ -114,9 +114,9 @@
         warState.player2Ready = false;
 
         if (warState.mode === 'twoPlayer' || warState.mode === 'faceToFace') {
-            warState.message = 'Choose risk levels, then swipe up to flip!';
+            warState.message = 'Choose risk levels, then click or swipe to flip!';
         } else {
-            warState.message = 'Choose your risk level, then swipe up to flip!';
+            warState.message = 'Choose your risk level, then click or swipe to flip!';
         }
 
         showWarBoard();
@@ -215,9 +215,9 @@
                         </div>
                     `}
 
-                    <div id="deckSwipeArea" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="margin: 1rem auto; width: 120px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid #333; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-size: 0.9rem; text-align: center; cursor: pointer; touch-action: none; position: relative; transform: translateY(0); transition: transform 0.2s;">
+                    <div id="deckSwipeArea" onclick="flipCard()" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="margin: 1rem auto; width: 120px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 3px solid #333; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-size: 0.9rem; text-align: center; cursor: pointer; touch-action: none; position: relative; transform: translateY(0); transition: transform 0.2s;">
                         <div style="font-size: 2rem; margin-bottom: 0.3rem;">👆</div>
-                        <div style="font-weight: bold; font-size: 0.95rem;">Swipe Up</div>
+                        <div style="font-weight: bold; font-size: 0.95rem;">Click/Swipe</div>
                     </div>
                 ` : `
                     <button onclick="initializeGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin: 0.5rem;">
@@ -263,9 +263,9 @@
                             <button onclick="setRiskLevel2(2)" style="background: ${warState.riskLevel2 === 2 ? '#e67e22' : '#ddd'}; color: ${warState.riskLevel2 === 2 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+4</button>
                             <button onclick="setRiskLevel2(3)" style="background: ${warState.riskLevel2 === 3 ? '#e74c3c' : '#ddd'}; color: ${warState.riskLevel2 === 3 ? 'white' : '#333'}; border: none; padding: 0.25rem 0.4rem; border-radius: 3px; cursor: pointer; font-size: 0.65rem; min-width: 28px;">+6</button>
                         </div>
-                        <div id="swipeArea2" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 80px; height: 100px; margin: 0 auto; background: ${warState.player2Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
+                        <div id="swipeArea2" onclick="handlePlayer2Click()" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 80px; height: 100px; margin: 0 auto; background: ${warState.player2Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
                             <div style="font-size: 1.3rem;">${warState.player2Ready ? '✓' : '👆'}</div>
-                            <div style="font-size: 0.7rem; font-weight: bold;">${warState.player2Ready ? 'Ready!' : 'Swipe'}</div>
+                            <div style="font-size: 0.7rem; font-weight: bold;">${warState.player2Ready ? 'Ready!' : 'Click'}</div>
                         </div>
                     </div>
                 </div>
@@ -284,9 +284,9 @@
                 <!-- Player 1 Section (Bottom) -->
                 <div style="padding: 0.3rem; background: linear-gradient(0deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 8px; width: 90%;">
                     <div style="text-align: center;">
-                        <div id="swipeArea1" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 80px; height: 100px; margin: 0 auto; background: ${warState.player1Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
+                        <div id="swipeArea1" onclick="handlePlayer1Click()" ontouchstart="handleSwipeStart(event)" ontouchmove="handleSwipeMove(event)" ontouchend="handleSwipeEnd(event)" style="width: 80px; height: 100px; margin: 0 auto; background: ${warState.player1Ready ? '#4caf50' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; touch-action: none; transform: translateY(0); transition: transform 0.2s;">
                             <div style="font-size: 1.3rem;">${warState.player1Ready ? '✓' : '👆'}</div>
-                            <div style="font-size: 0.7rem; font-weight: bold;">${warState.player1Ready ? 'Ready!' : 'Swipe'}</div>
+                            <div style="font-size: 0.7rem; font-weight: bold;">${warState.player1Ready ? 'Ready!' : 'Click'}</div>
                         </div>
                         <div style="font-size: 0.6rem; color: #888; margin-top: 0.25rem; margin-bottom: 0.2rem;">Risk extra cards:</div>
                         <div style="display: flex; gap: 0.15rem; justify-content: center; margin-bottom: 0.2rem;">
@@ -562,6 +562,49 @@
         showWarBoard();
     }
 
+    // Click handlers for face-to-face mode on desktop
+    function handlePlayer1Click() {
+        if (warState.player1Ready || warState.gameOver) return;
+
+        // Player 1 draws their card
+        warState.player1Ready = true;
+        if (warState.playerDeck.length > 0) {
+            warState.playerCard = warState.playerDeck.shift();
+        }
+
+        // Update display to show card that was just drawn
+        showWarBoard();
+
+        // When both players are ready, wait a moment then resolve the round
+        if (warState.player1Ready && warState.player2Ready) {
+            setTimeout(() => {
+                resolveRound();
+                showWarBoard();
+            }, 1000); // 1 second delay to see both cards
+        }
+    }
+
+    function handlePlayer2Click() {
+        if (warState.player2Ready || warState.gameOver) return;
+
+        // Player 2 draws their card
+        warState.player2Ready = true;
+        if (warState.computerDeck.length > 0) {
+            warState.computerCard = warState.computerDeck.shift();
+        }
+
+        // Update display to show card that was just drawn
+        showWarBoard();
+
+        // When both players are ready, wait a moment then resolve the round
+        if (warState.player1Ready && warState.player2Ready) {
+            setTimeout(() => {
+                resolveRound();
+                showWarBoard();
+            }, 1000); // 1 second delay to see both cards
+        }
+    }
+
     // Expose functions to global scope
     window.launchWar = launchWar;
     window.exitWar = exitWar;
@@ -573,5 +616,7 @@
     window.handleSwipeStart = handleSwipeStart;
     window.handleSwipeMove = handleSwipeMove;
     window.handleSwipeEnd = handleSwipeEnd;
+    window.handlePlayer1Click = handlePlayer1Click;
+    window.handlePlayer2Click = handlePlayer2Click;
 
 })();
