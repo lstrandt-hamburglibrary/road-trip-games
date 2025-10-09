@@ -78,13 +78,6 @@
         { question: "Is it a fruit?", property: 'isFruit' },
     ];
 
-    function startPlayerVsPlayer() {
-        gameMode = 'pvp';
-        questionsAsked = 0;
-        questionHistory = [];
-        renderPvPGame();
-    }
-
     function startPlayerVsAI() {
         gameMode = 'player-guessing';
         questionsAsked = 0;
@@ -99,84 +92,6 @@
         questionHistory = [];
         aiKnowledge = {};
         renderAIGuessingGame();
-    }
-
-    function renderPvPGame() {
-        const content = document.getElementById('twentyQuestionsContent');
-        content.innerHTML = `
-            <div style="max-width: 700px; margin: 0 auto;">
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; text-align: center; margin-bottom: 2rem;">
-                    <h3 style="font-size: 2rem; margin-bottom: 1rem;">Questions: ${questionsAsked} / ${maxQuestions}</h3>
-                    <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 10px;">
-                        <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">One player thinks of something...</p>
-                        <p style="font-size: 1rem; opacity: 0.9;">The other player asks yes/no questions to guess it!</p>
-                    </div>
-                </div>
-
-                <div id="questionsList" style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; min-height: 200px;">
-                    ${questionHistory.length === 0 ?
-                        '<p style="text-align: center; color: #999; padding: 3rem;">Questions asked will appear here...</p>' :
-                        questionHistory.map((q, i) => `
-                            <div style="background: white; padding: 1rem; margin-bottom: 0.75rem; border-radius: 8px; border-left: 4px solid ${q.answer === 'yes' ? '#28a745' : q.answer === 'no' ? '#dc3545' : '#6c757d'};">
-                                <div style="font-weight: bold; color: #333; margin-bottom: 0.25rem;">Q${i + 1}: ${q.question}</div>
-                                <div style="color: #666; text-transform: capitalize;">Answer: ${q.answer}</div>
-                            </div>
-                        `).join('')
-                    }
-                </div>
-
-                ${questionsAsked < maxQuestions ? `
-                    <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <label style="display: block; color: #333; font-weight: bold; margin-bottom: 1rem; font-size: 1.1rem;">
-                            Ask a Yes/No Question:
-                        </label>
-                        <input type="text" id="questionInput" placeholder="e.g., Is it an animal?"
-                            style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem; margin-bottom: 1rem;"
-                            onkeypress="if(event.key==='Enter') document.getElementById('yesBtn').click()">
-
-                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                            <button id="yesBtn" onclick="window.recordAnswer('yes')" style="flex: 1; background: #28a745; color: white; border: none; padding: 1rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">
-                                ✓ Yes
-                            </button>
-                            <button onclick="window.recordAnswer('no')" style="flex: 1; background: #dc3545; color: white; border: none; padding: 1rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">
-                                ✗ No
-                            </button>
-                            <button onclick="window.recordAnswer('maybe')" style="flex: 1; background: #ffc107; color: white; border: none; padding: 1rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">
-                                ? Maybe
-                            </button>
-                        </div>
-                    </div>
-                ` : `
-                    <div style="background: #fff3cd; padding: 2rem; border-radius: 10px; text-align: center; border: 2px solid #ffc107;">
-                        <h3 style="color: #856404; margin-bottom: 1rem;">Out of Questions!</h3>
-                        <p style="color: #856404;">Did the guesser figure it out?</p>
-                    </div>
-                `}
-
-                <div style="text-align: center; margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="window.resetTwentyQuestions()" style="background: #3498db; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">
-                        New Game
-                    </button>
-                    <button onclick="window.exitTwentyQuestions()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">
-                        Change Mode
-                    </button>
-                </div>
-
-                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">
-                    <h4 style="color: #333; margin-bottom: 1rem;">Tips:</h4>
-                    <ul style="color: #666; line-height: 1.8; padding-left: 1.5rem;">
-                        <li>Start with broad categories (animal, person, place, thing?)</li>
-                        <li>Narrow down with specific questions</li>
-                        <li>Think strategically to use your 20 questions wisely!</li>
-                    </ul>
-                </div>
-            </div>
-        `;
-
-        setTimeout(() => {
-            const input = document.getElementById('questionInput');
-            if (input) input.focus();
-        }, 100);
     }
 
     function renderPlayerGuessingGame() {
@@ -469,20 +384,6 @@
         }
     }
 
-    function recordAnswer(answer) {
-        const input = document.getElementById('questionInput');
-        const question = input ? input.value.trim() : '';
-
-        if (!question) {
-            alert('Please enter a question first!');
-            return;
-        }
-
-        questionsAsked++;
-        questionHistory.push({ question, answer });
-        renderPvPGame();
-    }
-
     function askAIQuestion() {
         const input = document.getElementById('aiQuestionInput');
         const question = input ? input.value.trim() : '';
@@ -579,14 +480,6 @@
                 <h3 style="color: #333; margin-bottom: 2rem; font-size: 1.5rem;">Choose Game Mode</h3>
 
                 <div style="display: grid; gap: 1.5rem; max-width: 700px; margin: 0 auto;">
-                    <div onclick="window.startTwentyQuestionsPvP()"
-                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 15px; cursor: pointer; transition: transform 0.2s;"
-                        onmouseover="this.style.transform='scale(1.02)'"
-                        onmouseout="this.style.transform='scale(1)'">
-                        <h4 style="font-size: 1.5rem; margin-bottom: 0.5rem;">👥 Pass & Play</h4>
-                        <p style="opacity: 0.9;">One player thinks, the other asks questions</p>
-                    </div>
-
                     <div onclick="window.startTwentyQuestionsPlayerGuessing()"
                         style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 15px; cursor: pointer; transition: transform 0.2s;"
                         onmouseover="this.style.transform='scale(1.02)'"
@@ -626,10 +519,6 @@
         showModeSelection();
     };
 
-    window.startTwentyQuestionsPvP = function() {
-        startPlayerVsPlayer();
-    };
-
     window.startTwentyQuestionsPlayerGuessing = function() {
         startPlayerVsAI();
     };
@@ -638,7 +527,6 @@
         startAIVsPlayer();
     };
 
-    window.recordAnswer = recordAnswer;
     window.askAIQuestion = askAIQuestion;
     window.answerAIQuestion = answerAIQuestion;
     window.askNextAIQuestion = askNextAIQuestion;
@@ -646,8 +534,7 @@
     window.makeGuess = makeGuess;
 
     window.resetTwentyQuestions = function() {
-        if (gameMode === 'pvp') startPlayerVsPlayer();
-        else if (gameMode === 'player-guessing') startPlayerVsAI();
+        if (gameMode === 'player-guessing') startPlayerVsAI();
         else if (gameMode === 'ai-guessing') startAIVsPlayer();
         else showModeSelection();
     };
