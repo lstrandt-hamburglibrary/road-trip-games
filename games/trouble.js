@@ -132,7 +132,7 @@
 
                 <div style="background: rgba(0,0,0,0.05); padding: 0.5rem; border-radius: 8px; margin-bottom: 1rem;">
                     <div style="font-weight: bold; color: ${player.color}; font-size: 1.1rem;">
-                        ${player.name}'s Turn
+                        ${player.name}'s Turn ${player.isAI ? '(AI)' : ''}
                     </div>
                     <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
                         ${troubleState.message}
@@ -141,143 +141,346 @@
 
                 ${renderBoard()}
 
-                <div style="margin: 1rem 0;">
-                    ${renderDieButton()}
+                <div style="margin: 1rem 0; font-size: 0.85rem; color: #666;">
+                    ${troubleState.dieValue ? `Rolled: ${troubleState.dieValue}` : 'Click the center to roll!'}
                 </div>
 
-                <button onclick="exitTrouble()" style="background: #6c757d; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">
+                <button onclick="exitTrouble()" style="background: #6c757d; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; margin-top: 0.5rem;">
                     ← Back
                 </button>
             </div>
         `;
-    }
 
-    function renderBoard() {
-        // Simplified board visualization for mobile
-        return `
-            <div style="max-width: 400px; margin: 0 auto; background: #f5f5f5; padding: 1rem; border-radius: 12px;">
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1rem;">
-                    ${troubleState.players.map((p, idx) => renderPlayerZone(p, idx)).join('')}
-                </div>
-                ${renderTrackSummary()}
-            </div>
-        `;
-    }
-
-    function renderPlayerZone(player, playerIndex) {
-        const homeCount = player.pegs.filter(p => p.location === 'home').length;
-        const trackCount = player.pegs.filter(p => p.location === 'track').length;
-        const finishCount = player.pegs.filter(p => p.location === 'finish').length;
-        const doneCount = player.pegs.filter(p => p.location === 'done').length;
-
-        return `
-            <div style="background: white; padding: 0.75rem; border-radius: 8px; border: 2px solid ${player.color};">
-                <div style="font-weight: bold; color: ${player.color}; margin-bottom: 0.5rem;">
-                    ${player.name}${player.isAI ? ' (AI)' : ''}
-                </div>
-                <div style="font-size: 0.85rem; line-height: 1.5;">
-                    🏠 Home: ${homeCount}<br>
-                    🔄 Track: ${trackCount}<br>
-                    🎯 Finish: ${finishCount}<br>
-                    ✅ Done: ${doneCount}
-                </div>
-                ${renderPegButtons(player, playerIndex)}
-            </div>
-        `;
-    }
-
-    function renderPegButtons(player, playerIndex) {
-        if (troubleState.currentPlayer !== playerIndex || !troubleState.dieValue) {
-            return '';
+        if (troubleState.gameOver) {
+            showWinScreen();
         }
+    }
 
-        const validMoves = getValidMoves(playerIndex);
-        if (validMoves.length === 0) {
-            return '<div style="margin-top: 0.5rem; font-size: 0.75rem; color: #999;">No valid moves</div>';
-        }
+    function showWinScreen() {
+        const winner = troubleState.players[troubleState.winner];
+        const content = document.getElementById('troubleContent');
 
-        return `
-            <div style="margin-top: 0.5rem; display: flex; gap: 0.25rem; flex-wrap: wrap;">
-                ${player.pegs.map((peg, pegIdx) => {
-                    const isValid = validMoves.includes(pegIdx);
-                    if (!isValid) return '';
-                    return `
-                        <button onclick="selectPeg(${pegIdx})" style="background: ${player.color}; color: white; border: none; padding: 0.4rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold;">
-                            Peg ${pegIdx + 1}
-                        </button>
-                    `;
-                }).join('')}
+        content.innerHTML = `
+            <div style="padding: 2rem; text-align: center;">
+                <h2 style="margin-bottom: 1rem; font-size: 2rem;">🎉 Game Over!</h2>
+
+                <div style="background: linear-gradient(135deg, ${winner.color} 0%, ${winner.color}dd 100%); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">👑</div>
+                    <div style="font-size: 1.5rem; font-weight: bold;">${winner.name} Wins!</div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="startTroubleGame()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                        Play Again
+                    </button>
+                    <button onclick="showTroubleSetup()" style="background: #2196F3; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                        New Setup
+                    </button>
+                    <button onclick="exitTrouble()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                        Exit
+                    </button>
+                </div>
             </div>
         `;
     }
 
-    function renderTrackSummary() {
-        // Show which pegs are on the track
-        const pegsOnTrack = [];
-        troubleState.players.forEach((player, pIdx) => {
-            player.pegs.forEach((peg, pegIdx) => {
-                if (peg.location === 'track') {
-                    pegsOnTrack.push({
-                        position: peg.position,
-                        color: player.color,
-                        playerIdx: pIdx,
-                        pegIdx: pegIdx
-                    });
-                }
+    function getTrackPosition(spaceIndex, centerX, centerY, radius) {
+        // Convert space index to angle (counter-clockwise starting from right)
+        const angle = (spaceIndex / BOARD_SPACES) * 2 * Math.PI - Math.PI / 2;
+        return {
+            x: centerX + radius * Math.cos(angle),
+            y: centerY + radius * Math.sin(angle)
+        };
+    }
+
+    function renderBoardBackground(boardSize, centerX, centerY) {
+        const quadrantSize = boardSize * 0.28;
+        const offset = boardSize * 0.12;
+
+        return `
+            <!-- Yellow quadrant (top-left) -->
+            <rect x="${offset}" y="${offset}" width="${quadrantSize}" height="${quadrantSize}" fill="#FFD700" opacity="0.3" rx="8"/>
+            <!-- Blue quadrant (top-right) -->
+            <rect x="${boardSize - offset - quadrantSize}" y="${offset}" width="${quadrantSize}" height="${quadrantSize}" fill="#4169E1" opacity="0.3" rx="8"/>
+            <!-- Green quadrant (bottom-left) -->
+            <rect x="${offset}" y="${boardSize - offset - quadrantSize}" width="${quadrantSize}" height="${quadrantSize}" fill="#32CD32" opacity="0.3" rx="8"/>
+            <!-- Red quadrant (bottom-right) -->
+            <rect x="${boardSize - offset - quadrantSize}" y="${boardSize - offset - quadrantSize}" width="${quadrantSize}" height="${quadrantSize}" fill="#DC143C" opacity="0.3" rx="8"/>
+        `;
+    }
+
+    function renderTrack(boardSize, centerX, centerY, radius) {
+        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+        let svg = '';
+
+        for (let i = 0; i < BOARD_SPACES; i++) {
+            const pos = getTrackPosition(i, centerX, centerY, radius);
+            const startIndex = [0, 7, 14, 21].indexOf(i);
+            const isStartSpace = startIndex !== -1;
+            const fill = isStartSpace ? colors[startIndex] : '#1a1a1a';
+            const stroke = isStartSpace ? colors[startIndex] : '#444';
+            const strokeWidth = isStartSpace ? 3 : 2;
+
+            svg += `
+                <circle cx="${pos.x}" cy="${pos.y}" r="8" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"
+                    class="track-space" data-space="${i}" opacity="${isStartSpace ? 0.8 : 1}"/>
+            `;
+        }
+        return svg;
+    }
+
+    function renderHomeAreas(boardSize, centerX, centerY, homeRadius) {
+        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+        const positions = [
+            { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 }, // Yellow
+            { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 }, // Blue
+            { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 }, // Green
+            { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }  // Red
+        ];
+
+        let svg = '';
+        positions.forEach((pos, idx) => {
+            // Home area background
+            svg += `<circle cx="${pos.x}" cy="${pos.y}" r="${homeRadius}" fill="${colors[idx]}" opacity="0.2" stroke="${colors[idx]}" stroke-width="2"/>`;
+
+            // 4 peg spots in home area
+            const spotRadius = homeRadius * 0.35;
+            const pegSpots = [
+                { x: pos.x - spotRadius, y: pos.y - spotRadius },
+                { x: pos.x + spotRadius, y: pos.y - spotRadius },
+                { x: pos.x - spotRadius, y: pos.y + spotRadius },
+                { x: pos.x + spotRadius, y: pos.y + spotRadius }
+            ];
+
+            pegSpots.forEach((spot, spotIdx) => {
+                svg += `<circle cx="${spot.x}" cy="${spot.y}" r="6" fill="#1a1a1a" stroke="${colors[idx]}" stroke-width="1"
+                    class="home-spot" data-player="${idx}" data-spot="${spotIdx}"/>`;
             });
         });
 
-        if (pegsOnTrack.length === 0) {
-            return '<div style="margin-top: 1rem; font-size: 0.9rem; color: #999;">No pegs on track yet</div>';
+        return svg;
+    }
+
+    function renderFinishZones(boardSize, centerX, centerY, trackRadius, homeRadius) {
+        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+        let svg = '';
+
+        for (let i = 0; i < 4; i++) {
+            const homePos = [
+                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
+            ][i];
+
+            const finishEntry = getFinishEntry(i);
+            const entryPos = getTrackPosition(finishEntry, centerX, centerY, trackRadius);
+
+            // Draw finish zone path (4 spaces)
+            for (let j = 0; j < FINISH_SPACES; j++) {
+                const t = (j + 1) / (FINISH_SPACES + 1);
+                const x = entryPos.x + (homePos.x - entryPos.x) * t;
+                const y = entryPos.y + (homePos.y - entryPos.y) * t;
+
+                svg += `<circle cx="${x}" cy="${y}" r="6" fill="${colors[i]}" stroke="${colors[i]}" stroke-width="2" opacity="0.5"
+                    class="finish-space" data-player="${i}" data-position="${j}"/>`;
+            }
         }
 
-        pegsOnTrack.sort((a, b) => a.position - b.position);
+        return svg;
+    }
+
+    function renderPegs(boardSize, centerX, centerY, trackRadius, homeRadius) {
+        let svg = '';
+        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+
+        troubleState.players.forEach((player, playerIdx) => {
+            const playerColor = colors[playerIdx];
+
+            player.pegs.forEach((peg, pegIdx) => {
+                let pos = getPegVisualPosition(peg, playerIdx, pegIdx, boardSize, centerX, centerY, trackRadius, homeRadius);
+                const isValidMove = troubleState.currentPlayer === playerIdx &&
+                                   troubleState.dieValue !== null &&
+                                   getValidMoves(playerIdx).includes(pegIdx);
+
+                const pegSize = isValidMove ? 10 : 8;
+                const strokeWidth = isValidMove ? 3 : 2;
+                const opacity = isValidMove ? 1 : 0.9;
+                const pulse = isValidMove ? 'peg-pulse' : '';
+
+                svg += `
+                    <circle cx="${pos.x}" cy="${pos.y}" r="${pegSize}" fill="${playerColor}"
+                        stroke="white" stroke-width="${strokeWidth}" opacity="${opacity}"
+                        class="game-peg ${pulse}" data-player="${playerIdx}" data-peg="${pegIdx}"
+                        onclick="selectPeg(${pegIdx})" style="cursor: ${isValidMove ? 'pointer' : 'default'}; transition: all 0.3s ease;"/>
+                `;
+            });
+        });
+
+        return svg;
+    }
+
+    function getPegVisualPosition(peg, playerIdx, pegIdx, boardSize, centerX, centerY, trackRadius, homeRadius) {
+        if (peg.location === 'home') {
+            // Position in home area
+            const homePositions = [
+                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
+            ];
+            const homePos = homePositions[playerIdx];
+            const spotRadius = homeRadius * 0.35;
+            const spots = [
+                { x: homePos.x - spotRadius, y: homePos.y - spotRadius },
+                { x: homePos.x + spotRadius, y: homePos.y - spotRadius },
+                { x: homePos.x - spotRadius, y: homePos.y + spotRadius },
+                { x: homePos.x + spotRadius, y: homePos.y + spotRadius }
+            ];
+            return spots[pegIdx];
+        } else if (peg.location === 'track') {
+            return getTrackPosition(peg.position, centerX, centerY, trackRadius);
+        } else if (peg.location === 'finish') {
+            const homePos = [
+                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
+            ][playerIdx];
+
+            const finishEntry = getFinishEntry(playerIdx);
+            const entryPos = getTrackPosition(finishEntry, centerX, centerY, trackRadius);
+
+            const t = (peg.position + 1) / (FINISH_SPACES + 1);
+            return {
+                x: entryPos.x + (homePos.x - entryPos.x) * t,
+                y: entryPos.y + (homePos.y - entryPos.y) * t
+            };
+        } else if (peg.location === 'done') {
+            // Position in center of home area
+            const homePositions = [
+                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
+                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
+                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
+            ];
+            return homePositions[playerIdx];
+        }
+
+        return { x: centerX, y: centerY };
+    }
+
+    function renderCenterDie(centerX, centerY) {
+        const dieSize = 40;
+        return `
+            <g class="center-die" onclick="rollDie()" style="cursor: pointer;">
+                <circle cx="${centerX}" cy="${centerY}" r="${dieSize}" fill="#333" stroke="#666" stroke-width="3" opacity="0.9"/>
+                <circle cx="${centerX}" cy="${centerY}" r="${dieSize - 5}" fill="#444" opacity="0.8"/>
+                ${troubleState.dieValue ? `
+                    <text x="${centerX}" y="${centerY}" text-anchor="middle" dominant-baseline="middle"
+                        fill="white" font-size="24" font-weight="bold">${troubleState.dieValue}</text>
+                ` : `
+                    <text x="${centerX}" y="${centerY - 5}" text-anchor="middle" dominant-baseline="middle"
+                        fill="white" font-size="20">🎲</text>
+                    <text x="${centerX}" y="${centerY + 12}" text-anchor="middle" dominant-baseline="middle"
+                        fill="white" font-size="10">POP</text>
+                `}
+            </g>
+        `;
+    }
+
+    function renderBoard() {
+        const boardSize = Math.min(400, window.innerWidth - 40);
+        const centerX = boardSize / 2;
+        const centerY = boardSize / 2;
+        const trackRadius = boardSize * 0.35;
+        const homeRadius = boardSize * 0.15;
 
         return `
-            <div style="margin-top: 1rem;">
-                <div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 0.9rem;">Track:</div>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; justify-content: center;">
-                    ${pegsOnTrack.map(peg => `
-                        <div style="background: ${peg.color}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
-                            Pos ${peg.position}
-                        </div>
-                    `).join('')}
-                </div>
+            <style>
+                @keyframes peg-pulse {
+                    0%, 100% {
+                        transform: scale(1);
+                        filter: drop-shadow(0 0 3px rgba(255,255,255,0.5));
+                    }
+                    50% {
+                        transform: scale(1.2);
+                        filter: drop-shadow(0 0 8px rgba(255,255,255,0.9));
+                    }
+                }
+                .peg-pulse {
+                    animation: peg-pulse 0.8s ease-in-out infinite;
+                    transform-origin: center;
+                }
+                @keyframes die-pop {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.3); }
+                    100% { transform: scale(1); }
+                }
+                .die-popping {
+                    animation: die-pop 0.3s ease-out;
+                }
+                .game-peg {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .track-space:hover, .center-die:hover {
+                    opacity: 0.8;
+                }
+            </style>
+            <div style="position: relative; max-width: ${boardSize}px; margin: 0 auto;">
+                <svg width="${boardSize}" height="${boardSize}" viewBox="0 0 ${boardSize} ${boardSize}" style="background: #2a2a2a; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
+                    ${renderBoardBackground(boardSize, centerX, centerY)}
+                    ${renderTrack(boardSize, centerX, centerY, trackRadius)}
+                    ${renderHomeAreas(boardSize, centerX, centerY, homeRadius)}
+                    ${renderFinishZones(boardSize, centerX, centerY, trackRadius, homeRadius)}
+                    ${renderPegs(boardSize, centerX, centerY, trackRadius, homeRadius)}
+                    ${renderCenterDie(centerX, centerY)}
+                </svg>
             </div>
         `;
     }
 
-    function renderDieButton() {
-        if (troubleState.dieValue === null) {
-            return `
-                <button onclick="rollDie()" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; border: none; padding: 1.5rem; border-radius: 50%; width: 100px; height: 100px; cursor: pointer; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                    <div style="font-size: 2rem;">🎲</div>
-                    POP!
-                </button>
-            `;
-        } else {
-            return `
-                <div style="display: inline-block; background: white; border: 3px solid #333; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                    <div style="font-size: 3rem; font-weight: bold;">${troubleState.dieValue}</div>
-                </div>
-            `;
-        }
-    }
 
     function rollDie() {
-        troubleState.dieValue = Math.floor(Math.random() * 6) + 1;
+        if (troubleState.dieValue !== null || troubleState.gameOver) return;
+
+        // Animate the die roll
+        troubleState.message = 'Rolling...';
+        showGameBoard();
+
+        // Simulate rolling animation
+        let rollCount = 0;
+        const rollInterval = setInterval(() => {
+            troubleState.dieValue = Math.floor(Math.random() * 6) + 1;
+            showGameBoard();
+            rollCount++;
+
+            if (rollCount >= 8) {
+                clearInterval(rollInterval);
+                finalizeRoll();
+            }
+        }, 100);
+    }
+
+    function finalizeRoll() {
         const validMoves = getValidMoves(troubleState.currentPlayer);
 
         if (validMoves.length === 0) {
             troubleState.message = `Rolled ${troubleState.dieValue} - No valid moves!`;
+            showGameBoard();
             setTimeout(() => {
                 endTurn();
             }, 1500);
         } else {
-            troubleState.message = `Rolled ${troubleState.dieValue} - Select a peg to move`;
-        }
+            troubleState.message = `Rolled ${troubleState.dieValue} - Click a glowing peg to move`;
+            showGameBoard();
 
-        showGameBoard();
+            // Auto-move if AI
+            const player = troubleState.players[troubleState.currentPlayer];
+            if (player.isAI && !troubleState.gameOver) {
+                setTimeout(() => makeAIMove(), 1000);
+            }
+        }
     }
 
     function getValidMoves(playerIndex) {
@@ -348,15 +551,21 @@
     }
 
     function selectPeg(pegIndex) {
+        if (!troubleState.dieValue || troubleState.gameOver) return;
+
+        const validMoves = getValidMoves(troubleState.currentPlayer);
+        if (!validMoves.includes(pegIndex)) return;
+
         const player = troubleState.players[troubleState.currentPlayer];
         const peg = player.pegs[pegIndex];
         const dieValue = troubleState.dieValue;
+        let capturedSomeone = false;
 
         if (peg.location === 'home' && dieValue === 6) {
             // Move to start
             peg.location = 'track';
             peg.position = getStartPosition(troubleState.currentPlayer);
-            checkForCapture(troubleState.currentPlayer, peg.position);
+            capturedSomeone = checkForCapture(troubleState.currentPlayer, peg.position);
             troubleState.message = `${player.name} moved a peg to START!`;
             troubleState.extraRoll = true;
         } else if (peg.location === 'track') {
@@ -370,7 +579,7 @@
                 troubleState.message = `${player.name} entered the FINISH zone!`;
             } else {
                 peg.position = (peg.position + dieValue) % BOARD_SPACES;
-                checkForCapture(troubleState.currentPlayer, peg.position);
+                capturedSomeone = checkForCapture(troubleState.currentPlayer, peg.position);
                 troubleState.message = `${player.name} moved forward ${dieValue} spaces`;
             }
         } else if (peg.location === 'finish') {
@@ -378,7 +587,7 @@
             if (newFinishPos === FINISH_SPACES) {
                 peg.location = 'done';
                 peg.position = 0;
-                troubleState.message = `${player.name} got a peg HOME!`;
+                troubleState.message = `${player.name} got a peg HOME! 🏠`;
 
                 // Check for win
                 if (player.pegs.every(p => p.location === 'done')) {
@@ -392,31 +601,36 @@
             }
         }
 
+        // Show the move immediately
+        showGameBoard();
+
         if (!troubleState.gameOver) {
             if (troubleState.extraRoll) {
                 troubleState.dieValue = null;
                 troubleState.extraRoll = false;
-                troubleState.message += ' - Roll again!';
+                troubleState.message += ' - Roll again! 🎲';
+                showGameBoard();
             } else {
-                setTimeout(() => endTurn(), 1000);
+                setTimeout(() => endTurn(), capturedSomeone ? 1500 : 800);
             }
         }
-
-        showGameBoard();
     }
 
     function checkForCapture(playerIndex, position) {
+        let captured = false;
         troubleState.players.forEach((opponent, oppIdx) => {
             if (oppIdx !== playerIndex) {
                 opponent.pegs.forEach(peg => {
                     if (peg.location === 'track' && peg.position === position) {
                         peg.location = 'home';
                         peg.position = 0;
-                        troubleState.message += ` - Sent ${opponent.name}'s peg home!`;
+                        troubleState.message += ` 💥 Captured ${opponent.name}'s peg!`;
+                        captured = true;
                     }
                 });
             }
         });
+        return captured;
     }
 
     function endTurn() {
@@ -426,7 +640,7 @@
         // Move to next player
         troubleState.currentPlayer = (troubleState.currentPlayer + 1) % troubleState.players.length;
         const nextPlayer = troubleState.players[troubleState.currentPlayer];
-        troubleState.message = `${nextPlayer.name}'s turn - Pop the die!`;
+        troubleState.message = `${nextPlayer.name}'s turn - ${nextPlayer.isAI ? 'Thinking...' : 'Pop the die!'}`;
 
         showGameBoard();
 
@@ -434,8 +648,7 @@
         if (nextPlayer.isAI && !troubleState.gameOver) {
             setTimeout(() => {
                 rollDie();
-                setTimeout(() => makeAIMove(), 1000);
-            }, 1000);
+            }, 800);
         }
     }
 
