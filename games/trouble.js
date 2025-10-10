@@ -2,9 +2,9 @@
 (function() {
     'use strict';
 
-    const COLORS = ['yellow', 'blue', 'green', 'pink'];
-    const COLOR_NAMES = { yellow: 'Yellow', blue: 'Blue', green: 'Green', pink: 'Pink' };
-    const BOARD_SPACES = 28; // Main circular track
+    const COLORS = ['yellow', 'blue', 'red', 'green'];
+    const COLOR_NAMES = { yellow: 'Yellow', blue: 'Blue', red: 'Red', green: 'Green' };
+    const BOARD_SPACES = 28; // Main square track around edge
     const FINISH_SPACES = 3; // Spaces in finish zone (1, 2, 3)
 
     let troubleState = {
@@ -40,13 +40,17 @@
     }
 
     // Get start position on track for each player
+    // Yellow=21, Blue=14, Red=7, Green=0
     function getStartPosition(playerIndex) {
-        return playerIndex * 7; // Each player starts 7 spaces apart
+        const starts = [21, 14, 7, 0]; // Yellow, Blue, Red, Green
+        return starts[playerIndex];
     }
 
-    // Get finish entry position for each player
+    // Get finish entry position for each player (one space before start, going around the board)
+    // Yellow=27, Blue=20, Red=13, Green=6
     function getFinishEntry(playerIndex) {
-        return (getStartPosition(playerIndex) - 1 + BOARD_SPACES) % BOARD_SPACES;
+        const entries = [27, 20, 13, 6]; // Yellow, Blue, Red, Green
+        return entries[playerIndex];
     }
 
     function launchTrouble() {
@@ -185,12 +189,36 @@
     }
 
     function getTrackPosition(spaceIndex, centerX, centerY, radius) {
-        // Convert space index to angle (counter-clockwise starting from right)
-        const angle = (spaceIndex / BOARD_SPACES) * 2 * Math.PI - Math.PI / 2;
-        return {
-            x: centerX + radius * Math.cos(angle),
-            y: centerY + radius * Math.sin(angle)
-        };
+        // Track goes around a square path: bottom (green) -> right -> top (blue) -> left (yellow)
+        // 28 spaces total = 7 per side
+        const margin = radius * 0.85; // Distance from center to track
+        const spacesPerSide = 7;
+        const spacing = (margin * 2) / (spacesPerSide - 1);
+
+        let x, y;
+
+        if (spaceIndex < 7) {
+            // Bottom side (spaces 0-6) - Green's start is at 0
+            x = centerX - margin + (spaceIndex * spacing);
+            y = centerY + margin;
+        } else if (spaceIndex < 14) {
+            // Right side (spaces 7-13) - Red's start is at 7
+            const pos = spaceIndex - 7;
+            x = centerX + margin;
+            y = centerY + margin - (pos * spacing);
+        } else if (spaceIndex < 21) {
+            // Top side (spaces 14-20) - Blue's start is at 14
+            const pos = spaceIndex - 14;
+            x = centerX + margin - (pos * spacing);
+            y = centerY - margin;
+        } else {
+            // Left side (spaces 21-27) - Yellow's start is at 21
+            const pos = spaceIndex - 21;
+            x = centerX - margin;
+            y = centerY - margin + (pos * spacing);
+        }
+
+        return { x, y };
     }
 
     function renderBoardBackground(boardSize, centerX, centerY) {
@@ -199,65 +227,72 @@
             yellow: '#FFD700',
             blue: '#4169E1',
             green: '#32CD32',
-            pink: '#FF1493'
+            red: '#DC143C'
         };
 
         return `
             <!-- Background -->
             <rect width="${size}" height="${size}" fill="#f5f5f5" rx="12"/>
 
-            <!-- Yellow quadrant (bottom-left) -->
-            <path d="M 0 ${size} L 0 ${size/2} L ${size/2} ${size/2} L ${size/2} ${size} Z"
+            <!-- Yellow quadrant (left) -->
+            <path d="M 0 0 L 0 ${size} L ${size/2} ${size/2} Z"
                 fill="${colors.yellow}" opacity="0.3"/>
 
-            <!-- Blue quadrant (top-left) -->
-            <path d="M 0 0 L 0 ${size/2} L ${size/2} ${size/2} L ${size/2} 0 Z"
+            <!-- Blue quadrant (top) -->
+            <path d="M 0 0 L ${size} 0 L ${size/2} ${size/2} Z"
                 fill="${colors.blue}" opacity="0.3"/>
 
-            <!-- Green quadrant (top-right) -->
-            <path d="M ${size} 0 L ${size} ${size/2} L ${size/2} ${size/2} L ${size/2} 0 Z"
-                fill="${colors.green}" opacity="0.3"/>
+            <!-- Red quadrant (right) -->
+            <path d="M ${size} 0 L ${size} ${size} L ${size/2} ${size/2} Z"
+                fill="${colors.red}" opacity="0.3"/>
 
-            <!-- Pink quadrant (bottom-right) -->
-            <path d="M ${size} ${size} L ${size} ${size/2} L ${size/2} ${size/2} L ${size/2} ${size} Z"
-                fill="${colors.pink}" opacity="0.3"/>
+            <!-- Green quadrant (bottom) -->
+            <path d="M 0 ${size} L ${size} ${size} L ${size/2} ${size/2} Z"
+                fill="${colors.green}" opacity="0.3"/>
         `;
     }
 
     function renderTrack(boardSize, centerX, centerY, radius) {
-        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+        const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32']; // Yellow, Blue, Red, Green
         let svg = '';
-
-        // Draw connecting line for track
-        svg += `<circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="none" stroke="#555" stroke-width="30"/>`;
 
         for (let i = 0; i < BOARD_SPACES; i++) {
             const pos = getTrackPosition(i, centerX, centerY, radius);
+
+            // Start positions: Green=0, Red=7, Blue=14, Yellow=21
             const startIndex = [0, 7, 14, 21].indexOf(i);
             const isStartSpace = startIndex !== -1;
-            const fill = isStartSpace ? colors[startIndex] : '#3a3a3a';
-            const stroke = isStartSpace ? colors[startIndex] : '#666';
-            const strokeWidth = isStartSpace ? 3 : 2;
 
-            svg += `
-                <circle cx="${pos.x}" cy="${pos.y}" r="10" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"
-                    class="track-space" data-space="${i}"/>
-            `;
+            if (isStartSpace) {
+                // Draw double-ring start space
+                const colorIdx = startIndex === 0 ? 3 : startIndex === 1 ? 2 : startIndex === 2 ? 1 : 0; // Map to color array
+                svg += `
+                    <circle cx="${pos.x}" cy="${pos.y}" r="14" fill="${colors[colorIdx]}" stroke="#fff" stroke-width="3" opacity="0.9"/>
+                    <circle cx="${pos.x}" cy="${pos.y}" r="10" fill="none" stroke="#fff" stroke-width="2"/>
+                    <circle cx="${pos.x}" cy="${pos.y}" r="6" fill="${colors[colorIdx]}"/>
+                `;
+            } else {
+                // Regular track space
+                svg += `
+                    <circle cx="${pos.x}" cy="${pos.y}" r="10" fill="#e0e0e0" stroke="#999" stroke-width="2"
+                        class="track-space" data-space="${i}"/>
+                `;
+            }
         }
         return svg;
     }
 
     function renderHomeAreas(boardSize, centerX, centerY, homeRadius) {
-        const colors = ['#FFD700', '#4169E1', '#32CD32', '#FF1493'];
+        const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32']; // Yellow, Blue, Red, Green
         const labels = ['H', 'O', 'M', 'E'];
         const cornerOffset = boardSize * 0.12;
 
         // Home areas in the 4 corners
         const positions = [
-            { x: cornerOffset, y: boardSize - cornerOffset, label: 'Yellow' },      // Yellow - bottom-left
-            { x: cornerOffset, y: cornerOffset, label: 'Blue' },                    // Blue - top-left
-            { x: boardSize - cornerOffset, y: cornerOffset, label: 'Green' },       // Green - top-right
-            { x: boardSize - cornerOffset, y: boardSize - cornerOffset, label: 'Pink' } // Pink - bottom-right
+            { x: cornerOffset, y: centerY, label: 'Yellow' },           // Yellow - left
+            { x: centerX, y: cornerOffset, label: 'Blue' },             // Blue - top
+            { x: boardSize - cornerOffset, y: centerY, label: 'Red' },  // Red - right
+            { x: centerX, y: boardSize - cornerOffset, label: 'Green' } // Green - bottom
         ];
 
         let svg = '';
@@ -290,38 +325,41 @@
     }
 
     function renderFinishZones(boardSize, centerX, centerY, trackRadius, homeRadius) {
-        const colors = ['#FFD700', '#4169E1', '#32CD32', '#FF1493'];
-        const innerRadius = trackRadius * 0.5; // Finish zones go toward center
+        const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32']; // Yellow, Blue, Red, Green
         let svg = '';
 
-        for (let i = 0; i < 4; i++) {
-            const finishEntry = getFinishEntry(i);
-            const entryPos = getTrackPosition(finishEntry, centerX, centerY, trackRadius);
+        // Finish zones: Green=entry at 6, Red=entry at 13, Blue=entry at 20, Yellow=entry at 27
+        const finishEntries = [
+            { entry: 27, dir: 'horizontal', sign: 1 },  // Yellow - goes right toward center
+            { entry: 20, dir: 'vertical', sign: 1 },    // Blue - goes down toward center
+            { entry: 13, dir: 'horizontal', sign: -1 }, // Red - goes left toward center
+            { entry: 6, dir: 'vertical', sign: -1 }     // Green - goes up toward center
+        ];
 
-            // Calculate direction toward center
-            const angle = Math.atan2(centerY - entryPos.y, centerX - entryPos.x);
+        finishEntries.forEach((finish, i) => {
+            const entryPos = getTrackPosition(finish.entry, centerX, centerY, trackRadius);
+            const spacing = 25;
 
-            // Draw finish zone path (3 numbered spaces) going toward center
+            // Draw 3 numbered finish spaces going toward center
             for (let j = 0; j < 3; j++) {
-                const distance = (trackRadius - innerRadius) * ((j + 1) / 4);
-                const x = entryPos.x + Math.cos(angle) * distance;
-                const y = entryPos.y + Math.sin(angle) * distance;
+                const distance = (j + 1) * spacing;
+                const x = finish.dir === 'horizontal' ? entryPos.x + (finish.sign * distance) : entryPos.x;
+                const y = finish.dir === 'vertical' ? entryPos.y + (finish.sign * distance) : entryPos.y;
 
-                // Draw the space
                 svg += `
                     <circle cx="${x}" cy="${y}" r="12" fill="${colors[i]}" stroke="#fff" stroke-width="3" opacity="0.9"
                         class="finish-space" data-player="${i}" data-position="${j}"/>
                     <text x="${x}" y="${y + 5}" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">${j + 1}</text>
                 `;
             }
-        }
+        });
 
         return svg;
     }
 
     function renderPegs(boardSize, centerX, centerY, trackRadius, homeRadius) {
         let svg = '';
-        const colors = ['#FFD700', '#4169E1', '#32CD32', '#FF1493']; // Yellow, Blue, Green, Pink
+        const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32']; // Yellow, Blue, Red, Green
 
         troubleState.players.forEach((player, playerIdx) => {
             const playerColor = colors[playerIdx];
@@ -354,12 +392,12 @@
         const cornerOffset = boardSize * 0.12;
 
         if (peg.location === 'home') {
-            // Home areas are in corners
+            // Home areas: Yellow=left, Blue=top, Red=right, Green=bottom
             const homePositions = [
-                { x: cornerOffset, y: boardSize - cornerOffset },      // Yellow - bottom-left
-                { x: cornerOffset, y: cornerOffset },                   // Blue - top-left
-                { x: boardSize - cornerOffset, y: cornerOffset },       // Green - top-right
-                { x: boardSize - cornerOffset, y: boardSize - cornerOffset } // Pink - bottom-right
+                { x: cornerOffset, y: centerY },           // Yellow - left
+                { x: centerX, y: cornerOffset },           // Blue - top
+                { x: boardSize - cornerOffset, y: centerY }, // Red - right
+                { x: centerX, y: boardSize - cornerOffset }  // Green - bottom
             ];
             const homePos = homePositions[playerIdx];
             const size = homeRadius * 1.8;
@@ -375,18 +413,22 @@
         } else if (peg.location === 'track') {
             return getTrackPosition(peg.position, centerX, centerY, trackRadius);
         } else if (peg.location === 'finish') {
-            // Finish zones go toward center
-            const innerRadius = trackRadius * 0.5;
-            const finishEntry = getFinishEntry(playerIdx);
-            const entryPos = getTrackPosition(finishEntry, centerX, centerY, trackRadius);
+            // Straight finish lanes toward center
+            const finishEntries = [
+                { entry: 27, dir: 'horizontal', sign: 1 },  // Yellow
+                { entry: 20, dir: 'vertical', sign: 1 },    // Blue
+                { entry: 13, dir: 'horizontal', sign: -1 }, // Red
+                { entry: 6, dir: 'vertical', sign: -1 }     // Green
+            ];
 
-            // Calculate direction toward center
-            const angle = Math.atan2(centerY - entryPos.y, centerX - entryPos.x);
-            const distance = (trackRadius - innerRadius) * ((peg.position + 1) / 4);
+            const finish = finishEntries[playerIdx];
+            const entryPos = getTrackPosition(finish.entry, centerX, centerY, trackRadius);
+            const spacing = 25;
+            const distance = (peg.position + 1) * spacing;
 
             return {
-                x: entryPos.x + Math.cos(angle) * distance,
-                y: entryPos.y + Math.sin(angle) * distance
+                x: finish.dir === 'horizontal' ? entryPos.x + (finish.sign * distance) : entryPos.x,
+                y: finish.dir === 'vertical' ? entryPos.y + (finish.sign * distance) : entryPos.y
             };
         } else if (peg.location === 'done') {
             // Stack in center of board when done
