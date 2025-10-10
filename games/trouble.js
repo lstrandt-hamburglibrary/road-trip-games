@@ -194,18 +194,9 @@
     }
 
     function renderBoardBackground(boardSize, centerX, centerY) {
-        const quadrantSize = boardSize * 0.28;
-        const offset = boardSize * 0.12;
-
+        // Simple background with better contrast
         return `
-            <!-- Yellow quadrant (top-left) -->
-            <rect x="${offset}" y="${offset}" width="${quadrantSize}" height="${quadrantSize}" fill="#FFD700" opacity="0.3" rx="8"/>
-            <!-- Blue quadrant (top-right) -->
-            <rect x="${boardSize - offset - quadrantSize}" y="${offset}" width="${quadrantSize}" height="${quadrantSize}" fill="#4169E1" opacity="0.3" rx="8"/>
-            <!-- Green quadrant (bottom-left) -->
-            <rect x="${offset}" y="${boardSize - offset - quadrantSize}" width="${quadrantSize}" height="${quadrantSize}" fill="#32CD32" opacity="0.3" rx="8"/>
-            <!-- Red quadrant (bottom-right) -->
-            <rect x="${boardSize - offset - quadrantSize}" y="${boardSize - offset - quadrantSize}" width="${quadrantSize}" height="${quadrantSize}" fill="#DC143C" opacity="0.3" rx="8"/>
+            <rect width="${boardSize}" height="${boardSize}" fill="#2d2d2d" rx="12"/>
         `;
     }
 
@@ -213,17 +204,20 @@
         const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
         let svg = '';
 
+        // Draw connecting line for track
+        svg += `<circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="none" stroke="#555" stroke-width="30"/>`;
+
         for (let i = 0; i < BOARD_SPACES; i++) {
             const pos = getTrackPosition(i, centerX, centerY, radius);
             const startIndex = [0, 7, 14, 21].indexOf(i);
             const isStartSpace = startIndex !== -1;
-            const fill = isStartSpace ? colors[startIndex] : '#1a1a1a';
-            const stroke = isStartSpace ? colors[startIndex] : '#444';
+            const fill = isStartSpace ? colors[startIndex] : '#3a3a3a';
+            const stroke = isStartSpace ? colors[startIndex] : '#666';
             const strokeWidth = isStartSpace ? 3 : 2;
 
             svg += `
-                <circle cx="${pos.x}" cy="${pos.y}" r="8" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"
-                    class="track-space" data-space="${i}" opacity="${isStartSpace ? 0.8 : 1}"/>
+                <circle cx="${pos.x}" cy="${pos.y}" r="10" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"
+                    class="track-space" data-space="${i}"/>
             `;
         }
         return svg;
@@ -231,6 +225,7 @@
 
     function renderHomeAreas(boardSize, centerX, centerY, homeRadius) {
         const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+        const names = ['Yellow', 'Blue', 'Green', 'Red'];
         const positions = [
             { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 }, // Yellow
             { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 }, // Blue
@@ -240,10 +235,15 @@
 
         let svg = '';
         positions.forEach((pos, idx) => {
-            // Home area background
-            svg += `<circle cx="${pos.x}" cy="${pos.y}" r="${homeRadius}" fill="${colors[idx]}" opacity="0.2" stroke="${colors[idx]}" stroke-width="2"/>`;
+            // Home area background - solid color, more visible
+            svg += `<rect x="${pos.x - homeRadius}" y="${pos.y - homeRadius}" width="${homeRadius * 2}" height="${homeRadius * 2}"
+                fill="${colors[idx]}" opacity="0.4" stroke="${colors[idx]}" stroke-width="3" rx="8"/>`;
 
-            // 4 peg spots in home area
+            // Label
+            svg += `<text x="${pos.x}" y="${pos.y - homeRadius - 8}" text-anchor="middle" fill="${colors[idx]}"
+                font-size="12" font-weight="bold">${names[idx]} Home</text>`;
+
+            // 4 peg spots in home area - larger and clearer
             const spotRadius = homeRadius * 0.35;
             const pegSpots = [
                 { x: pos.x - spotRadius, y: pos.y - spotRadius },
@@ -253,7 +253,7 @@
             ];
 
             pegSpots.forEach((spot, spotIdx) => {
-                svg += `<circle cx="${spot.x}" cy="${spot.y}" r="6" fill="#1a1a1a" stroke="${colors[idx]}" stroke-width="1"
+                svg += `<circle cx="${spot.x}" cy="${spot.y}" r="8" fill="#2a2a2a" stroke="${colors[idx]}" stroke-width="2"
                     class="home-spot" data-player="${idx}" data-spot="${spotIdx}"/>`;
             });
         });
@@ -276,13 +276,17 @@
             const finishEntry = getFinishEntry(i);
             const entryPos = getTrackPosition(finishEntry, centerX, centerY, trackRadius);
 
-            // Draw finish zone path (4 spaces)
+            // Draw finish zone path line
+            svg += `<line x1="${entryPos.x}" y1="${entryPos.y}" x2="${homePos.x}" y2="${homePos.y}"
+                stroke="${colors[i]}" stroke-width="6" opacity="0.3"/>`;
+
+            // Draw finish zone path (4 spaces) - larger and clearer
             for (let j = 0; j < FINISH_SPACES; j++) {
                 const t = (j + 1) / (FINISH_SPACES + 1);
                 const x = entryPos.x + (homePos.x - entryPos.x) * t;
                 const y = entryPos.y + (homePos.y - entryPos.y) * t;
 
-                svg += `<circle cx="${x}" cy="${y}" r="6" fill="${colors[i]}" stroke="${colors[i]}" stroke-width="2" opacity="0.5"
+                svg += `<circle cx="${x}" cy="${y}" r="9" fill="${colors[i]}" stroke="white" stroke-width="2" opacity="0.7"
                     class="finish-space" data-player="${i}" data-position="${j}"/>`;
             }
         }
@@ -303,16 +307,17 @@
                                    troubleState.dieValue !== null &&
                                    getValidMoves(playerIdx).includes(pegIdx);
 
-                const pegSize = isValidMove ? 10 : 8;
-                const strokeWidth = isValidMove ? 3 : 2;
-                const opacity = isValidMove ? 1 : 0.9;
+                const pegSize = isValidMove ? 14 : 12;
+                const strokeWidth = isValidMove ? 4 : 3;
                 const pulse = isValidMove ? 'peg-pulse' : '';
 
+                // Draw peg with a highlight to make it pop
                 svg += `
                     <circle cx="${pos.x}" cy="${pos.y}" r="${pegSize}" fill="${playerColor}"
-                        stroke="white" stroke-width="${strokeWidth}" opacity="${opacity}"
+                        stroke="#fff" stroke-width="${strokeWidth}"
                         class="game-peg ${pulse}" data-player="${playerIdx}" data-peg="${pegIdx}"
-                        onclick="selectPeg(${pegIdx})" style="cursor: ${isValidMove ? 'pointer' : 'default'}; transition: all 0.3s ease;"/>
+                        onclick="selectPeg(${pegIdx})" style="cursor: ${isValidMove ? 'pointer' : 'default'}; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"/>
+                    <circle cx="${pos.x - 2}" cy="${pos.y - 2}" r="${pegSize * 0.3}" fill="rgba(255,255,255,0.4)"/>
                 `;
             });
         });
@@ -371,19 +376,21 @@
     }
 
     function renderCenterDie(centerX, centerY) {
-        const dieSize = 40;
+        const dieSize = 45;
         return `
             <g class="center-die" onclick="rollDie()" style="cursor: pointer;">
-                <circle cx="${centerX}" cy="${centerY}" r="${dieSize}" fill="#333" stroke="#666" stroke-width="3" opacity="0.9"/>
-                <circle cx="${centerX}" cy="${centerY}" r="${dieSize - 5}" fill="#444" opacity="0.8"/>
+                <!-- Outer ring -->
+                <circle cx="${centerX}" cy="${centerY}" r="${dieSize}" fill="#e74c3c" stroke="#c0392b" stroke-width="4"/>
+                <!-- Inner circle -->
+                <circle cx="${centerX}" cy="${centerY}" r="${dieSize - 8}" fill="#fff" stroke="#c0392b" stroke-width="2"/>
                 ${troubleState.dieValue ? `
-                    <text x="${centerX}" y="${centerY}" text-anchor="middle" dominant-baseline="middle"
-                        fill="white" font-size="24" font-weight="bold">${troubleState.dieValue}</text>
+                    <text x="${centerX}" y="${centerY + 3}" text-anchor="middle" dominant-baseline="middle"
+                        fill="#e74c3c" font-size="32" font-weight="bold">${troubleState.dieValue}</text>
                 ` : `
-                    <text x="${centerX}" y="${centerY - 5}" text-anchor="middle" dominant-baseline="middle"
-                        fill="white" font-size="20">🎲</text>
-                    <text x="${centerX}" y="${centerY + 12}" text-anchor="middle" dominant-baseline="middle"
-                        fill="white" font-size="10">POP</text>
+                    <text x="${centerX}" y="${centerY - 3}" text-anchor="middle" dominant-baseline="middle"
+                        fill="#e74c3c" font-size="24">🎲</text>
+                    <text x="${centerX}" y="${centerY + 15}" text-anchor="middle" dominant-baseline="middle"
+                        fill="#e74c3c" font-size="11" font-weight="bold">CLICK</text>
                 `}
             </g>
         `;
@@ -428,7 +435,7 @@
                 }
             </style>
             <div style="position: relative; max-width: ${boardSize}px; margin: 0 auto;">
-                <svg width="${boardSize}" height="${boardSize}" viewBox="0 0 ${boardSize} ${boardSize}" style="background: #2a2a2a; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
+                <svg width="${boardSize}" height="${boardSize}" viewBox="0 0 ${boardSize} ${boardSize}" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
                     ${renderBoardBackground(boardSize, centerX, centerY)}
                     ${renderTrack(boardSize, centerX, centerY, trackRadius)}
                     ${renderHomeAreas(boardSize, centerX, centerY, homeRadius)}
