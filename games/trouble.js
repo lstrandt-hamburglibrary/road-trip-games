@@ -285,14 +285,14 @@
     function renderHomeAreas(boardSize, centerX, centerY, homeRadius) {
         const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32']; // Yellow, Blue, Red, Green
         const labels = ['H', 'O', 'M', 'E'];
-        const cornerOffset = boardSize * 0.12;
+        const cornerOffset = boardSize * 0.08; // Closer to actual corners
 
-        // Home areas in the 4 corners
+        // Home areas in the 4 corners - positioned away from track
         const positions = [
-            { x: cornerOffset, y: centerY, label: 'Yellow' },           // Yellow - left
-            { x: centerX, y: cornerOffset, label: 'Blue' },             // Blue - top
-            { x: boardSize - cornerOffset, y: centerY, label: 'Red' },  // Red - right
-            { x: centerX, y: boardSize - cornerOffset, label: 'Green' } // Green - bottom
+            { x: cornerOffset, y: centerY, label: 'Yellow' },           // Yellow - far left edge
+            { x: centerX, y: cornerOffset, label: 'Blue' },             // Blue - top edge
+            { x: boardSize - cornerOffset, y: centerY, label: 'Red' },  // Red - far right edge
+            { x: centerX, y: boardSize - cornerOffset, label: 'Green' } // Green - bottom edge
         ];
 
         let svg = '';
@@ -460,52 +460,46 @@
     }
 
     function renderBoard() {
-        const boardSize = Math.min(400, window.innerWidth - 40);
-        const centerX = boardSize / 2;
-        const centerY = boardSize / 2;
-        const trackRadius = boardSize * 0.35;
-        const homeRadius = boardSize * 0.15;
+        return `
+            <div style="max-width: 600px; margin: 0 auto;">
+                ${renderSimpleBoard()}
+            </div>
+        `;
+    }
+
+    function renderSimpleBoard() {
+        const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32'];
+        const names = ['Yellow', 'Blue', 'Red', 'Green'];
 
         return `
-            <style>
-                @keyframes peg-pulse {
-                    0%, 100% {
-                        transform: scale(1);
-                        filter: drop-shadow(0 0 3px rgba(255,255,255,0.5));
-                    }
-                    50% {
-                        transform: scale(1.2);
-                        filter: drop-shadow(0 0 8px rgba(255,255,255,0.9));
-                    }
-                }
-                .peg-pulse {
-                    animation: peg-pulse 0.8s ease-in-out infinite;
-                    transform-origin: center;
-                }
-                @keyframes die-pop {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.3); }
-                    100% { transform: scale(1); }
-                }
-                .die-popping {
-                    animation: die-pop 0.3s ease-out;
-                }
-                .game-peg {
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                }
-                .track-space:hover, .center-die:hover {
-                    opacity: 0.8;
-                }
-            </style>
-            <div style="position: relative; max-width: ${boardSize}px; margin: 0 auto;">
-                <svg width="${boardSize}" height="${boardSize}" viewBox="0 0 ${boardSize} ${boardSize}" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3);">
-                    ${renderBoardBackground(boardSize, centerX, centerY)}
-                    ${renderTrack(boardSize, centerX, centerY, trackRadius)}
-                    ${renderHomeAreas(boardSize, centerX, centerY, homeRadius)}
-                    ${renderFinishZones(boardSize, centerX, centerY, trackRadius, homeRadius)}
-                    ${renderPegs(boardSize, centerX, centerY, trackRadius, homeRadius)}
-                    ${renderCenterDie(centerX, centerY)}
-                </svg>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                ${troubleState.players.map((player, idx) => `
+                    <div style="background: ${colors[idx]}; opacity: 0.9; padding: 1rem; border-radius: 12px; border: 3px solid ${colors[idx]};">
+                        <h3 style="margin: 0 0 0.5rem 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                            ${names[idx]} ${player.isAI ? '(AI)' : ''}
+                        </h3>
+                        ${player.pegs.map((peg, pegIdx) => {
+                            const validMoves = troubleState.currentPlayer === idx && troubleState.dieValue !== null
+                                ? getValidMoves(idx) : [];
+                            const canMove = validMoves.includes(pegIdx);
+                            const location = peg.location === 'home' ? 'HOME' :
+                                           peg.location === 'track' ? `Track ${peg.position}` :
+                                           peg.location === 'finish' ? `Finish ${peg.position + 1}` : 'DONE';
+
+                            return `
+                                <div style="background: rgba(255,255,255,0.3); padding: 0.5rem; margin: 0.25rem 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: white; font-weight: bold;">Peg ${pegIdx + 1}: ${location}</span>
+                                    ${canMove ? `
+                                        <button onclick="selectPeg(${pegIdx})"
+                                            style="background: white; color: ${colors[idx]}; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                            MOVE
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `).join('')}
             </div>
         `;
     }
