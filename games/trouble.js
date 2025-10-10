@@ -2,10 +2,10 @@
 (function() {
     'use strict';
 
-    const COLORS = ['red', 'blue', 'yellow', 'green'];
-    const COLOR_NAMES = { red: 'Red', blue: 'Blue', yellow: 'Yellow', green: 'Green' };
+    const COLORS = ['yellow', 'blue', 'green', 'pink'];
+    const COLOR_NAMES = { yellow: 'Yellow', blue: 'Blue', green: 'Green', pink: 'Pink' };
     const BOARD_SPACES = 28; // Main circular track
-    const FINISH_SPACES = 4; // Spaces in finish zone
+    const FINISH_SPACES = 3; // Spaces in finish zone (1, 2, 3)
 
     let troubleState = {
         numPlayers: 2,
@@ -194,9 +194,33 @@
     }
 
     function renderBoardBackground(boardSize, centerX, centerY) {
-        // Simple background with better contrast
+        const size = boardSize;
+        const colors = {
+            yellow: '#FFD700',
+            blue: '#4169E1',
+            green: '#32CD32',
+            pink: '#FF1493'
+        };
+
         return `
-            <rect width="${boardSize}" height="${boardSize}" fill="#2d2d2d" rx="12"/>
+            <!-- Background -->
+            <rect width="${size}" height="${size}" fill="#f5f5f5" rx="12"/>
+
+            <!-- Yellow quadrant (bottom-left) -->
+            <path d="M 0 ${size} L 0 ${size/2} L ${size/2} ${size/2} L ${size/2} ${size} Z"
+                fill="${colors.yellow}" opacity="0.3"/>
+
+            <!-- Blue quadrant (top-left) -->
+            <path d="M 0 0 L 0 ${size/2} L ${size/2} ${size/2} L ${size/2} 0 Z"
+                fill="${colors.blue}" opacity="0.3"/>
+
+            <!-- Green quadrant (top-right) -->
+            <path d="M ${size} 0 L ${size} ${size/2} L ${size/2} ${size/2} L ${size/2} 0 Z"
+                fill="${colors.green}" opacity="0.3"/>
+
+            <!-- Pink quadrant (bottom-right) -->
+            <path d="M ${size} ${size} L ${size} ${size/2} L ${size/2} ${size/2} L ${size/2} ${size} Z"
+                fill="${colors.pink}" opacity="0.3"/>
         `;
     }
 
@@ -224,37 +248,41 @@
     }
 
     function renderHomeAreas(boardSize, centerX, centerY, homeRadius) {
-        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
-        const names = ['Yellow', 'Blue', 'Green', 'Red'];
+        const colors = ['#FFD700', '#4169E1', '#32CD32', '#FF1493'];
+        const labels = ['H', 'O', 'M', 'E'];
+        const cornerOffset = boardSize * 0.12;
+
+        // Home areas in the 4 corners
         const positions = [
-            { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 }, // Yellow
-            { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 }, // Blue
-            { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 }, // Green
-            { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }  // Red
+            { x: cornerOffset, y: boardSize - cornerOffset, label: 'Yellow' },      // Yellow - bottom-left
+            { x: cornerOffset, y: cornerOffset, label: 'Blue' },                    // Blue - top-left
+            { x: boardSize - cornerOffset, y: cornerOffset, label: 'Green' },       // Green - top-right
+            { x: boardSize - cornerOffset, y: boardSize - cornerOffset, label: 'Pink' } // Pink - bottom-right
         ];
 
         let svg = '';
         positions.forEach((pos, idx) => {
-            // Home area background - solid color, more visible
-            svg += `<rect x="${pos.x - homeRadius}" y="${pos.y - homeRadius}" width="${homeRadius * 2}" height="${homeRadius * 2}"
-                fill="${colors[idx]}" opacity="0.4" stroke="${colors[idx]}" stroke-width="3" rx="8"/>`;
+            const size = homeRadius * 1.8;
 
-            // Label
-            svg += `<text x="${pos.x}" y="${pos.y - homeRadius - 8}" text-anchor="middle" fill="${colors[idx]}"
-                font-size="12" font-weight="bold">${names[idx]} Home</text>`;
+            // Home area background box
+            svg += `<rect x="${pos.x - size/2}" y="${pos.y - size/2}" width="${size}" height="${size}"
+                fill="${colors[idx]}" opacity="0.6" stroke="${colors[idx]}" stroke-width="3" rx="6"/>`;
 
-            // 4 peg spots in home area - larger and clearer
-            const spotRadius = homeRadius * 0.35;
+            // 4 peg spots in 2x2 grid showing H O M E
+            const spacing = size * 0.3;
             const pegSpots = [
-                { x: pos.x - spotRadius, y: pos.y - spotRadius },
-                { x: pos.x + spotRadius, y: pos.y - spotRadius },
-                { x: pos.x - spotRadius, y: pos.y + spotRadius },
-                { x: pos.x + spotRadius, y: pos.y + spotRadius }
+                { x: pos.x - spacing, y: pos.y - spacing, letter: labels[0] },
+                { x: pos.x + spacing, y: pos.y - spacing, letter: labels[1] },
+                { x: pos.x - spacing, y: pos.y + spacing, letter: labels[2] },
+                { x: pos.x + spacing, y: pos.y + spacing, letter: labels[3] }
             ];
 
             pegSpots.forEach((spot, spotIdx) => {
-                svg += `<circle cx="${spot.x}" cy="${spot.y}" r="8" fill="#2a2a2a" stroke="${colors[idx]}" stroke-width="2"
-                    class="home-spot" data-player="${idx}" data-spot="${spotIdx}"/>`;
+                svg += `
+                    <circle cx="${spot.x}" cy="${spot.y}" r="10" fill="#fff" stroke="#333" stroke-width="2"
+                        class="home-spot" data-player="${idx}" data-spot="${spotIdx}"/>
+                    <text x="${spot.x}" y="${spot.y + 4}" text-anchor="middle" fill="#333" font-size="10" font-weight="bold">${spot.letter}</text>
+                `;
             });
         });
 
@@ -262,32 +290,29 @@
     }
 
     function renderFinishZones(boardSize, centerX, centerY, trackRadius, homeRadius) {
-        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+        const colors = ['#FFD700', '#4169E1', '#32CD32', '#FF1493'];
+        const innerRadius = trackRadius * 0.5; // Finish zones go toward center
         let svg = '';
 
         for (let i = 0; i < 4; i++) {
-            const homePos = [
-                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
-            ][i];
-
             const finishEntry = getFinishEntry(i);
             const entryPos = getTrackPosition(finishEntry, centerX, centerY, trackRadius);
 
-            // Draw finish zone path line
-            svg += `<line x1="${entryPos.x}" y1="${entryPos.y}" x2="${homePos.x}" y2="${homePos.y}"
-                stroke="${colors[i]}" stroke-width="6" opacity="0.3"/>`;
+            // Calculate direction toward center
+            const angle = Math.atan2(centerY - entryPos.y, centerX - entryPos.x);
 
-            // Draw finish zone path (4 spaces) - larger and clearer
-            for (let j = 0; j < FINISH_SPACES; j++) {
-                const t = (j + 1) / (FINISH_SPACES + 1);
-                const x = entryPos.x + (homePos.x - entryPos.x) * t;
-                const y = entryPos.y + (homePos.y - entryPos.y) * t;
+            // Draw finish zone path (3 numbered spaces) going toward center
+            for (let j = 0; j < 3; j++) {
+                const distance = (trackRadius - innerRadius) * ((j + 1) / 4);
+                const x = entryPos.x + Math.cos(angle) * distance;
+                const y = entryPos.y + Math.sin(angle) * distance;
 
-                svg += `<circle cx="${x}" cy="${y}" r="9" fill="${colors[i]}" stroke="white" stroke-width="2" opacity="0.7"
-                    class="finish-space" data-player="${i}" data-position="${j}"/>`;
+                // Draw the space
+                svg += `
+                    <circle cx="${x}" cy="${y}" r="12" fill="${colors[i]}" stroke="#fff" stroke-width="3" opacity="0.9"
+                        class="finish-space" data-player="${i}" data-position="${j}"/>
+                    <text x="${x}" y="${y + 5}" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">${j + 1}</text>
+                `;
             }
         }
 
@@ -296,7 +321,7 @@
 
     function renderPegs(boardSize, centerX, centerY, trackRadius, homeRadius) {
         let svg = '';
-        const colors = ['#FFD700', '#4169E1', '#32CD32', '#DC143C'];
+        const colors = ['#FFD700', '#4169E1', '#32CD32', '#FF1493']; // Yellow, Blue, Green, Pink
 
         troubleState.players.forEach((player, playerIdx) => {
             const playerColor = colors[playerIdx];
@@ -317,7 +342,7 @@
                         stroke="#fff" stroke-width="${strokeWidth}"
                         class="game-peg ${pulse}" data-player="${playerIdx}" data-peg="${pegIdx}"
                         onclick="selectPeg(${pegIdx})" style="cursor: ${isValidMove ? 'pointer' : 'default'}; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"/>
-                    <circle cx="${pos.x - 2}" cy="${pos.y - 2}" r="${pegSize * 0.3}" fill="rgba(255,255,255,0.4)"/>
+                    <circle cx="${pos.x - 2}" cy="${pos.y - 2}" r="${pegSize * 0.3}" fill="rgba(255,255,255,0.5)"/>
                 `;
             });
         });
@@ -326,50 +351,46 @@
     }
 
     function getPegVisualPosition(peg, playerIdx, pegIdx, boardSize, centerX, centerY, trackRadius, homeRadius) {
+        const cornerOffset = boardSize * 0.12;
+
         if (peg.location === 'home') {
-            // Position in home area
+            // Home areas are in corners
             const homePositions = [
-                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
+                { x: cornerOffset, y: boardSize - cornerOffset },      // Yellow - bottom-left
+                { x: cornerOffset, y: cornerOffset },                   // Blue - top-left
+                { x: boardSize - cornerOffset, y: cornerOffset },       // Green - top-right
+                { x: boardSize - cornerOffset, y: boardSize - cornerOffset } // Pink - bottom-right
             ];
             const homePos = homePositions[playerIdx];
-            const spotRadius = homeRadius * 0.35;
+            const size = homeRadius * 1.8;
+            const spacing = size * 0.3;
+
             const spots = [
-                { x: homePos.x - spotRadius, y: homePos.y - spotRadius },
-                { x: homePos.x + spotRadius, y: homePos.y - spotRadius },
-                { x: homePos.x - spotRadius, y: homePos.y + spotRadius },
-                { x: homePos.x + spotRadius, y: homePos.y + spotRadius }
+                { x: homePos.x - spacing, y: homePos.y - spacing },
+                { x: homePos.x + spacing, y: homePos.y - spacing },
+                { x: homePos.x - spacing, y: homePos.y + spacing },
+                { x: homePos.x + spacing, y: homePos.y + spacing }
             ];
             return spots[pegIdx];
         } else if (peg.location === 'track') {
             return getTrackPosition(peg.position, centerX, centerY, trackRadius);
         } else if (peg.location === 'finish') {
-            const homePos = [
-                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
-            ][playerIdx];
-
+            // Finish zones go toward center
+            const innerRadius = trackRadius * 0.5;
             const finishEntry = getFinishEntry(playerIdx);
             const entryPos = getTrackPosition(finishEntry, centerX, centerY, trackRadius);
 
-            const t = (peg.position + 1) / (FINISH_SPACES + 1);
+            // Calculate direction toward center
+            const angle = Math.atan2(centerY - entryPos.y, centerX - entryPos.x);
+            const distance = (trackRadius - innerRadius) * ((peg.position + 1) / 4);
+
             return {
-                x: entryPos.x + (homePos.x - entryPos.x) * t,
-                y: entryPos.y + (homePos.y - entryPos.y) * t
+                x: entryPos.x + Math.cos(angle) * distance,
+                y: entryPos.y + Math.sin(angle) * distance
             };
         } else if (peg.location === 'done') {
-            // Position in center of home area
-            const homePositions = [
-                { x: centerX - boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY - boardSize * 0.25 },
-                { x: centerX - boardSize * 0.25, y: centerY + boardSize * 0.25 },
-                { x: centerX + boardSize * 0.25, y: centerY + boardSize * 0.25 }
-            ];
-            return homePositions[playerIdx];
+            // Stack in center of board when done
+            return { x: centerX, y: centerY };
         }
 
         return { x: centerX, y: centerY };
