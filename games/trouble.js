@@ -475,6 +475,19 @@
                 <svg width="${size}" height="${size}" viewBox="0 0 100 100" style="background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
                     ${renderSimpleVisualBoard()}
                 </svg>
+
+                <!-- Die Button Below Board -->
+                <div style="text-align: center; margin-top: 1rem;">
+                    ${troubleState.dieValue === null ? `
+                        <button onclick="rollDie()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 1.5rem 2rem; border-radius: 50%; cursor: pointer; font-size: 1.5rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); width: 80px; height: 80px;">
+                            🎲<br><span style="font-size: 0.8rem;">POP!</span>
+                        </button>
+                    ` : `
+                        <div style="display: inline-block; background: white; border: 4px solid #e74c3c; padding: 1rem 1.5rem; border-radius: 12px; font-size: 2.5rem; font-weight: bold; color: #e74c3c; min-width: 80px;">
+                            ${troubleState.dieValue}
+                        </div>
+                    `}
+                </div>
             </div>
         `;
     }
@@ -552,15 +565,6 @@
 
         // Draw pegs
         svg += renderSimplePegs();
-
-        // Center die
-        svg += `
-            <circle cx="50" cy="50" r="8" fill="#e74c3c" stroke="#c0392b" stroke-width="1"
-                onclick="rollDie()" style="cursor: pointer;"/>
-            <text x="50" y="53" text-anchor="middle" fill="white" font-size="6" font-weight="bold">
-                ${troubleState.dieValue || 'ROLL'}
-            </text>
-        `;
 
         return svg;
     }
