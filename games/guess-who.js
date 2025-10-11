@@ -426,6 +426,42 @@
         guessWhoState.currentPlayer = guessWhoState.currentPlayer === 'player1' ? 'player2' : 'player1';
         guessWhoState.pendingQuestion = null;
 
+        // Show pass device screen before continuing
+        showPassDeviceBackToAsker();
+    };
+
+    // Show pass device screen to return to the asking player
+    function showPassDeviceBackToAsker() {
+        const app = document.getElementById('guessWhoContent');
+        const currentPlayerName = guessWhoState.currentPlayer === 'player1' ? 'Player 1' : 'Player 2';
+        const otherPlayerName = guessWhoState.currentPlayer === 'player1' ? 'Player 2' : 'Player 1';
+
+        app.innerHTML = `
+            <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <button onclick="launchGuessWho()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+                        ← Menu
+                    </button>
+                    <h2 style="margin: 0; font-size: 1.5rem;">🕵️ Guess Who</h2>
+                    <div style="width: 80px;"></div>
+                </div>
+
+                <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="font-size: 5rem; margin-bottom: 2rem;">🔄</div>
+                    <h3 style="color: #333; font-size: 2rem; margin-bottom: 1rem;">Question Answered!</h3>
+                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device back to ${currentPlayerName}</p>
+                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">${otherPlayerName}: Look away! 🙈</p>
+
+                    <button onclick="continueToNextTurn()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1.5rem 3rem; border-radius: 12px; cursor: pointer; font-size: 1.3rem; font-weight: bold; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                        ${currentPlayerName}: Continue →
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Continue to next turn
+    window.continueToNextTurn = function() {
         renderGame();
     };
 
