@@ -55,7 +55,8 @@
         currentPlayer: 'player1', // 'player1' or 'player2'
         questionHistory: [], // { player, question, answer }
         gameOver: false,
-        winner: null
+        winner: null,
+        pendingQuestion: null // Store question waiting to be answered
     };
 
     // Launch game and show mode selection
@@ -117,6 +118,7 @@
         guessWhoState.questionHistory = [];
         guessWhoState.gameOver = false;
         guessWhoState.winner = null;
+        guessWhoState.pendingQuestion = null;
 
         if (mode === 'vs-ai') {
             // AI picks a random character
@@ -314,25 +316,24 @@
         if (guessWhoState.gameOver) return;
 
         const question = questions[questionIdx];
-        const secret = guessWhoState.currentPlayer === 'player1' ? guessWhoState.opponentSecret : guessWhoState.mySecret;
-        const answer = secret[question.attribute] === question.value;
 
-        const playerName = guessWhoState.gameMode === 'vs-ai' ?
-            'You' :
-            (guessWhoState.currentPlayer === 'player1' ? 'Player 1' : 'Player 2');
-
-        guessWhoState.questionHistory.push({
-            player: playerName,
-            question: question.text,
-            answer: answer
-        });
-
-        // In pass-and-play, switch players after question
         if (guessWhoState.gameMode === 'pass-and-play') {
-            guessWhoState.currentPlayer = guessWhoState.currentPlayer === 'player1' ? 'player2' : 'player1';
-            renderGame();
+            // Store the question and show pass device screen
+            guessWhoState.pendingQuestion = {
+                questionIdx: questionIdx,
+                askedBy: guessWhoState.currentPlayer
+            };
+            showPassDeviceToAnswer();
         } else {
-            // In VS AI mode, AI takes a turn after player
+            // VS AI mode - auto answer based on secret character
+            const answer = guessWhoState.mySecret[question.attribute] === question.value;
+
+            guessWhoState.questionHistory.push({
+                player: 'You',
+                question: question.text,
+                answer: answer
+            });
+
             renderGame();
             setTimeout(() => {
                 if (!guessWhoState.gameOver) {
@@ -340,6 +341,92 @@
                 }
             }, 1000);
         }
+    };
+
+    // Show pass device screen for answering a question
+    function showPassDeviceToAnswer() {
+        const app = document.getElementById('guessWhoContent');
+        const askingPlayer = guessWhoState.pendingQuestion.askedBy;
+        const answeringPlayer = askingPlayer === 'player1' ? 'Player 2' : 'Player 1';
+
+        app.innerHTML = `
+            <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <button onclick="launchGuessWho()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+                        ← Menu
+                    </button>
+                    <h2 style="margin: 0; font-size: 1.5rem;">🕵️ Guess Who</h2>
+                    <div style="width: 80px;"></div>
+                </div>
+
+                <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="font-size: 5rem; margin-bottom: 2rem;">🔄</div>
+                    <h3 style="color: #333; font-size: 2rem; margin-bottom: 1rem;">Question Asked!</h3>
+                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device to ${answeringPlayer}</p>
+                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">${askingPlayer === 'player1' ? 'Player 1' : 'Player 2'}: Look away! 🙈</p>
+
+                    <button onclick="showQuestionToAnswer()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1.5rem 3rem; border-radius: 12px; cursor: pointer; font-size: 1.3rem; font-weight: bold; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                        ${answeringPlayer}: Answer Question →
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Show the question with Yes/No buttons
+    window.showQuestionToAnswer = function() {
+        const app = document.getElementById('guessWhoContent');
+        const question = questions[guessWhoState.pendingQuestion.questionIdx];
+        const askingPlayer = guessWhoState.pendingQuestion.askedBy;
+        const answeringPlayer = askingPlayer === 'player1' ? 'Player 2' : 'Player 1';
+
+        app.innerHTML = `
+            <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <button onclick="launchGuessWho()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+                        ← Menu
+                    </button>
+                    <h2 style="margin: 0; font-size: 1.5rem;">🕵️ Guess Who</h2>
+                    <div style="width: 80px;"></div>
+                </div>
+
+                <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="color: #333; font-size: 1.5rem; margin-bottom: 2rem;">${answeringPlayer}, answer this question:</h3>
+
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 3rem;">
+                        <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">${question.text}</p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 500px; margin: 0 auto;">
+                        <button onclick="answerQuestion(true)" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 2rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);">
+                            ✓ YES
+                        </button>
+                        <button onclick="answerQuestion(false)" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 2rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);">
+                            ✗ NO
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    // Record the answer and continue
+    window.answerQuestion = function(answer) {
+        const question = questions[guessWhoState.pendingQuestion.questionIdx];
+        const askingPlayer = guessWhoState.pendingQuestion.askedBy;
+        const playerName = askingPlayer === 'player1' ? 'Player 1' : 'Player 2';
+
+        guessWhoState.questionHistory.push({
+            player: playerName,
+            question: question.text,
+            answer: answer
+        });
+
+        // Switch players
+        guessWhoState.currentPlayer = guessWhoState.currentPlayer === 'player1' ? 'player2' : 'player1';
+        guessWhoState.pendingQuestion = null;
+
+        renderGame();
     };
 
     // AI takes a turn
