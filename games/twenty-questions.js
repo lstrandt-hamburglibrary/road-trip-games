@@ -241,6 +241,13 @@
         // Find the best question to ask based on what we know
         const question = selectBestAIQuestion();
 
+        // If we've already asked this question (or have no good questions left), make a guess instead
+        const alreadyAsked = questionHistory.some(q => q.question === question.question);
+        if (alreadyAsked || question.property === 'generic') {
+            makeAIGuess();
+            return;
+        }
+
         const questionDiv = document.getElementById('aiCurrentQuestion');
         if (questionDiv) {
             questionDiv.innerHTML = `
