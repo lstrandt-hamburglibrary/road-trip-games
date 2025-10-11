@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.31.3';</script>
+    <script>window.APP_VERSION = '1.32.0';</script>
 
     <style>
         * {
@@ -403,6 +403,11 @@
                         <h3>🎴 War</h3>
                         <p>Classic card battle - highest card wins!</p>
                     </div>
+
+                    <div class="feature-card" onclick="launchJoust()" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
+                        <h3>🦅 Joust</h3>
+                        <p>Flap and fly to defeat enemy riders!</p>
+                    </div>
                 </div>
             </div>
 
@@ -480,6 +485,11 @@
             <!-- Trouble Game Section (hidden by default) -->
             <div id="troubleGame" style="display: none;">
                 <div id="troubleContent"></div>
+            </div>
+
+            <!-- Joust Game Section (hidden by default) -->
+            <div id="joustGame" style="display: none;">
+                <div id="joustContent"></div>
             </div>
 
             <div class="roadmap">
@@ -804,6 +814,7 @@
     <script src="games/would-you-rather.js?v=1.21.1"></script>
     <script src="games/dots-and-boxes.js?v=1.28.3"></script>
     <script src="games/guess-who.js?v=1.31.1"></script>
+    <script src="games/joust.js?v=1.32.0"></script>
     <!-- <script src="games/trouble.js?v=1.27.1"></script> -->
 </body>
 </html>
