@@ -59,23 +59,75 @@
 
     // Common questions AI can ask when it's the guesser
     const AI_QUESTIONS = [
+        // Category questions (most important - ask first)
         { question: "Is it a living thing?", property: 'isLiving' },
         { question: "Is it an animal?", property: 'category', value: 'animal' },
         { question: "Is it an object?", property: 'category', value: 'object' },
         { question: "Is it a place?", property: 'category', value: 'place' },
         { question: "Is it food?", property: 'category', value: 'food' },
+        { question: "Is it a concept or idea?", property: 'category', value: 'concept' },
+
+        // Animal-specific questions
         { question: "Can it fly?", property: 'canFly' },
         { question: "Does it have legs?", property: 'hasLegs' },
+        { question: "Does it live in water?", property: 'livesInWater' },
+        { question: "Is it a mammal?", property: 'isMammal' },
+        { question: "Is it a pet?", property: 'isPet' },
+        { question: "Does it have fur?", property: 'hasFur' },
+        { question: "Is it a wild animal?", property: 'isWild' },
+        { question: "Does it have a tail?", property: 'hasTail' },
+        { question: "Can it swim?", property: 'canSwim' },
+        { question: "Does it make noise?", property: 'makesNoise' },
+
+        // Object-specific questions
         { question: "Is it electronic?", property: 'isElectronic' },
+        { question: "Is it a vehicle?", property: 'isVehicle' },
+        { question: "Do people use it every day?", property: 'usedDaily' },
+        { question: "Can you hold it in your hand?", property: 'size', value: 'small' },
+        { question: "Is it made of metal?", property: 'material', value: 'metal' },
+        { question: "Is it made of wood?", property: 'material', value: 'wood' },
+        { question: "Is it made of plastic?", property: 'material', value: 'plastic' },
+        { question: "Does it use electricity?", property: 'usesElectricity' },
+        { question: "Is it a tool?", property: 'isTool' },
+        { question: "Is it furniture?", property: 'isFurniture' },
+        { question: "Can you wear it?", property: 'isClothing' },
+        { question: "Is it used for entertainment?", property: 'forEntertainment' },
+
+        // Size questions
         { question: "Is it bigger than a person?", property: 'size', value: 'large' },
         { question: "Is it smaller than your hand?", property: 'size', value: 'small' },
-        { question: "Do people use it every day?", property: 'usedDaily' },
-        { question: "Is it a vehicle?", property: 'isVehicle' },
-        { question: "Is it a pet?", property: 'isPet' },
+        { question: "Can it fit in a backpack?", property: 'size', value: 'small' },
+        { question: "Is it bigger than a car?", property: 'size', value: 'huge' },
+
+        // Place-specific questions
         { question: "Is it indoors?", property: 'isIndoors' },
         { question: "Is it natural (not man-made)?", property: 'isNatural' },
+        { question: "Does it have water?", property: 'hasWater' },
+        { question: "Is it a public place?", property: 'isPublic' },
+        { question: "Can you visit it?", property: 'canVisit' },
+        { question: "Is it in a city?", property: 'inCity' },
+
+        // Food-specific questions
         { question: "Is it sweet?", property: 'isSweet' },
         { question: "Is it a fruit?", property: 'isFruit' },
+        { question: "Is it hot when you eat it?", property: 'isHot' },
+        { question: "Is it healthy?", property: 'isHealthy' },
+        { question: "Is it a vegetable?", property: 'isVegetable' },
+        { question: "Is it a drink?", property: 'isDrink' },
+        { question: "Do you eat it for breakfast?", property: 'isBreakfast' },
+
+        // Person/concept questions
+        { question: "Is it a real person?", property: 'isReal' },
+        { question: "Is it fictional?", property: 'isFictional' },
+        { question: "Is it famous?", property: 'isFamous' },
+        { question: "Is it a job or profession?", property: 'isJob' },
+
+        // Color questions
+        { question: "Is it usually red?", property: 'color', value: 'red' },
+        { question: "Is it usually blue?", property: 'color', value: 'blue' },
+        { question: "Is it usually green?", property: 'color', value: 'green' },
+        { question: "Is it usually yellow?", property: 'color', value: 'yellow' },
+        { question: "Is it colorful?", property: 'isColorful' },
     ];
 
     function startPlayerVsAI() {
