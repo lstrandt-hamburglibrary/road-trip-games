@@ -412,6 +412,9 @@
         const askingPlayer = guessWhoState.pendingQuestion.askedBy;
         const answeringPlayer = askingPlayer === 'player1' ? 'Player 2' : 'Player 1';
 
+        // Get the answering player's secret character
+        const mySecret = askingPlayer === 'player1' ? guessWhoState.opponentSecret : guessWhoState.mySecret;
+
         app.innerHTML = `
             <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -425,8 +428,22 @@
                 <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
                     <h3 style="color: #333; font-size: 1.5rem; margin-bottom: 2rem;">${answeringPlayer}, answer this question:</h3>
 
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 3rem;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
                         <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">${question.text}</p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                        <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">Your Secret Character:</p>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                            <div style="font-size: 4rem;">${mySecret.emoji}</div>
+                            <div style="text-align: left;">
+                                <div style="font-size: 1.3rem; font-weight: bold; color: #333;">${mySecret.name}</div>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                    ${mySecret.gender === 'male' ? '👨 Male' : '👩 Female'} •
+                                    ${mySecret.hair === 'bald' ? 'Bald' : mySecret.hair.charAt(0).toUpperCase() + mySecret.hair.slice(1) + ' hair'}${mySecret.glasses ? ' • 👓 Glasses' : ''}${mySecret.hat ? ' • 🎩 Hat' : ''}${mySecret.facialHair !== 'none' ? ' • ' + mySecret.facialHair.charAt(0).toUpperCase() + mySecret.facialHair.slice(1) : ''}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 500px; margin: 0 auto;">
