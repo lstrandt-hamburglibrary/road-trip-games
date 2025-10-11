@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.28.3';</script>
+    <script>window.APP_VERSION = '1.29.0';</script>
 
     <style>
         * {
@@ -472,6 +472,11 @@
                 <div id="dotsAndBoxesContent"></div>
             </div>
 
+            <!-- Guess Who Game Section (hidden by default) -->
+            <div id="guessWhoGame" style="display: none;">
+                <div id="guessWhoContent"></div>
+            </div>
+
             <!-- Trouble Game Section (hidden by default) -->
             <div id="troubleGame" style="display: none;">
                 <div id="troubleContent"></div>
@@ -637,6 +642,7 @@
             document.querySelector('.roadmap').style.display = 'none';
             document.getElementById('plateTracker').style.display = 'none';
             document.getElementById('dotsAndBoxesGame').style.display = 'none';
+            document.getElementById('guessWhoGame').style.display = 'none';
             document.getElementById('gamesMenu').style.display = 'block';
         }
 
@@ -797,6 +803,7 @@
     <script src="games/twenty-questions.js?v=1.20.2"></script>
     <script src="games/would-you-rather.js?v=1.21.1"></script>
     <script src="games/dots-and-boxes.js?v=1.28.3"></script>
+    <script src="games/guess-who.js?v=1.29.0"></script>
     <!-- <script src="games/trouble.js?v=1.27.1"></script> -->
 </body>
 </html>
