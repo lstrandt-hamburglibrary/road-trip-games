@@ -307,13 +307,20 @@
 
         const content = document.getElementById('connect4Content');
         content.innerHTML = `
-            <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
-                <h2 style="font-size: 4rem; margin-bottom: 1rem;">🎉 Victory!</h2>
-                <p style="font-size: 2rem; margin-bottom: 1rem;">${winnerColor} ${winnerName} Wins!</p>
-                <p style="font-size: 1.2rem; margin-bottom: 3rem;">Four in a row!</p>
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="launchConnectFour()" style="background: white; color: #f5576c; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">🔄 Play Again</button>
-                    <button onclick="exitConnect4()" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">← Back to Games</button>
+            <div style="text-align: center;">
+                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                    <h2 style="font-size: 3rem; margin-bottom: 0.5rem;">🎉 Victory!</h2>
+                    <p style="font-size: 1.8rem; margin-bottom: 0.5rem;">${winnerColor} ${winnerName} Wins!</p>
+                    <p style="font-size: 1.1rem; margin-bottom: 0;">Four in a row!</p>
+                </div>
+
+                <div style="background: #0066cc; padding: 8px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); max-width: min(400px, 90vw); margin: 0 auto 2rem auto; box-sizing: border-box;">
+                    ${renderConnect4Board()}
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="launchConnectFour()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">🔄 Play Again</button>
+                    <button onclick="exitConnect4()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">← Back to Games</button>
                 </div>
             </div>
         `;
@@ -322,12 +329,19 @@
     function showConnect4Draw() {
         const content = document.getElementById('connect4Content');
         content.innerHTML = `
-            <div style="text-align: center; padding: 4rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
-                <h2 style="font-size: 4rem; margin-bottom: 1rem;">🤝 Draw!</h2>
-                <p style="font-size: 2rem; margin-bottom: 3rem;">Board is full - it's a tie!</p>
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="launchConnectFour()" style="background: white; color: #f5576c; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">🔄 Play Again</button>
-                    <button onclick="exitConnect4()" style="background: rgba(255,255,255,0.3); color: white; border: 2px solid white; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">← Back to Games</button>
+            <div style="text-align: center;">
+                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                    <h2 style="font-size: 3rem; margin-bottom: 0.5rem;">🤝 Draw!</h2>
+                    <p style="font-size: 1.5rem; margin-bottom: 0;">Board is full - it's a tie!</p>
+                </div>
+
+                <div style="background: #0066cc; padding: 8px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); max-width: min(400px, 90vw); margin: 0 auto 2rem auto; box-sizing: border-box;">
+                    ${renderConnect4Board()}
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="launchConnectFour()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">🔄 Play Again</button>
+                    <button onclick="exitConnect4()" style="background: #6c757d; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">← Back to Games</button>
                 </div>
             </div>
         `;
