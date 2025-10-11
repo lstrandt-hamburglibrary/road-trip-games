@@ -95,9 +95,19 @@
         return shuffled.slice(0, 20);
     }
 
+    // Get player name by player ID
+    function getPlayerName(playerId) {
+        if (guessWhoState.gameMode === 'vs-ai') {
+            return playerId === 'player1' ? 'You' : 'Computer';
+        }
+        return playerId === 'player1' ? guessWhoState.player1Name : guessWhoState.player2Name;
+    }
+
     // Game state
     const guessWhoState = {
         gameMode: null, // 'pass-and-play' or 'vs-ai'
+        player1Name: '', // Player 1's name
+        player2Name: '', // Player 2's name
         mySecret: null, // Character I picked
         opponentSecret: null, // Character opponent picked (or AI picked)
         myEliminated: [], // Character IDs I've eliminated
@@ -176,7 +186,62 @@
         if (mode === 'vs-ai') {
             // AI picks a random character from the game pool
             guessWhoState.opponentSecret = gameCharacters[Math.floor(Math.random() * gameCharacters.length)];
+            showCharacterPicker();
+        } else {
+            // Pass-and-play mode - ask for names first
+            showNameInput();
         }
+    };
+
+    // Show name input screen for pass-and-play mode
+    function showNameInput() {
+        const app = document.getElementById('guessWhoContent');
+        app.innerHTML = `
+            <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <button onclick="launchGuessWho()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+                        ← Back
+                    </button>
+                    <h2 style="margin: 0; font-size: 1.5rem;">🕵️ Guess Who</h2>
+                    <div style="width: 80px;"></div>
+                </div>
+
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <h3 style="text-align: center; margin-bottom: 1.5rem;">Enter Player Names</h3>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">Player 1 Name:</label>
+                        <input type="text" id="player1NameInput" placeholder="Enter name" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;" />
+                    </div>
+
+                    <div style="margin-bottom: 2rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333;">Player 2 Name:</label>
+                        <input type="text" id="player2NameInput" placeholder="Enter name" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;" />
+                    </div>
+
+                    <button onclick="saveNamesAndStart()" style="width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1.5rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">
+                        Start Game →
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Focus on first input
+        setTimeout(() => document.getElementById('player1NameInput').focus(), 100);
+    }
+
+    // Save names and continue to character picker
+    window.saveNamesAndStart = function() {
+        const name1 = document.getElementById('player1NameInput').value.trim();
+        const name2 = document.getElementById('player2NameInput').value.trim();
+
+        if (!name1 || !name2) {
+            alert('Please enter names for both players!');
+            return;
+        }
+
+        guessWhoState.player1Name = name1;
+        guessWhoState.player2Name = name2;
 
         showCharacterPicker();
     };
@@ -185,6 +250,8 @@
     function showCharacterPicker() {
         const app = document.getElementById('guessWhoContent');
         const isPlayer2Pick = guessWhoState.gameMode === 'pass-and-play' && guessWhoState.mySecret !== null;
+        const currentPlayerName = isPlayer2Pick ? guessWhoState.player2Name : (guessWhoState.gameMode === 'vs-ai' ? 'You' : guessWhoState.player1Name);
+        const otherPlayerName = isPlayer2Pick ? guessWhoState.player1Name : guessWhoState.player2Name;
 
         app.innerHTML = `
             <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
@@ -198,9 +265,9 @@
 
                 <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1rem;">
                     <h3 style="text-align: center; margin-bottom: 1.5rem;">
-                        ${isPlayer2Pick ? 'Player 2: Pick Your Secret Character' : 'Pick Your Secret Character'}
+                        ${isPlayer2Pick ? `${currentPlayerName}: Pick Your Secret Character` : 'Pick Your Secret Character'}
                     </h3>
-                    ${isPlayer2Pick ? '<p style="text-align: center; color: #666; margin-bottom: 1rem;">Player 1: Look away! 🙈</p>' : ''}
+                    ${isPlayer2Pick ? `<p style="text-align: center; color: #666; margin-bottom: 1rem;">${otherPlayerName}: Look away! 🙈</p>` : ''}
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem;">
                         ${gameCharacters.map(char => `
@@ -250,11 +317,11 @@
                 <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     <div style="font-size: 5rem; margin-bottom: 2rem;">🔄</div>
                     <h3 style="color: #333; font-size: 2rem; margin-bottom: 1rem;">Both Characters Selected!</h3>
-                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device back to Player 1</p>
-                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">Player 2: Look away! 🙈</p>
+                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device back to ${guessWhoState.player1Name}</p>
+                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">${guessWhoState.player2Name}: Look away! 🙈</p>
 
                     <button onclick="startGamePlay()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1.5rem 3rem; border-radius: 12px; cursor: pointer; font-size: 1.3rem; font-weight: bold; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
-                        Player 1: Start Game →
+                        ${guessWhoState.player1Name}: Start Game →
                     </button>
                 </div>
             </div>
@@ -281,12 +348,12 @@
 
                 <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     <div style="font-size: 5rem; margin-bottom: 2rem;">🔄</div>
-                    <h3 style="color: #333; font-size: 2rem; margin-bottom: 1rem;">Player 1's Turn Complete!</h3>
-                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device to Player 2</p>
-                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">Player 1: Look away! 🙈</p>
+                    <h3 style="color: #333; font-size: 2rem; margin-bottom: 1rem;">${guessWhoState.player1Name}'s Turn Complete!</h3>
+                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device to ${guessWhoState.player2Name}</p>
+                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">${guessWhoState.player1Name}: Look away! 🙈</p>
 
                     <button onclick="continueToPlayer2Pick()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1.5rem 3rem; border-radius: 12px; cursor: pointer; font-size: 1.3rem; font-weight: bold; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
-                        Player 2: Pick Your Character →
+                        ${guessWhoState.player2Name}: Pick Your Character →
                     </button>
                 </div>
             </div>
@@ -317,7 +384,7 @@
 
                 ${!guessWhoState.gameOver ? `
                     <div style="text-align: center; padding: 1rem; background: #43e97b; color: white; border-radius: 8px; margin-bottom: 1rem; font-size: 1.2rem; font-weight: bold;">
-                        ${guessWhoState.gameMode === 'vs-ai' ? 'Your Turn' : guessWhoState.currentPlayer === 'player1' ? 'Player 1\'s Turn' : 'Player 2\'s Turn'}
+                        ${getPlayerName(guessWhoState.currentPlayer)}'s Turn
                     </div>
                 ` : ''}
 
@@ -398,7 +465,10 @@
 
                 ${guessWhoState.gameOver ? `
                     <div style="text-align: center; padding: 1.5rem; background: ${guessWhoState.winner === 'player1' || guessWhoState.winner === 'player' ? '#43e97b' : '#f5576c'}; color: white; border-radius: 8px; margin-top: 1rem; font-size: 1.3rem; font-weight: bold;">
-                        ${guessWhoState.winner === 'player' ? '🎉 You Win!' : guessWhoState.winner === 'ai' ? '🤖 Computer Wins!' : guessWhoState.winner === 'player1' ? '🎉 Player 1 Wins!' : '🎉 Player 2 Wins!'}
+                        ${guessWhoState.gameMode === 'vs-ai' ?
+                            (guessWhoState.winner === 'player' ? '🎉 You Win!' : '🤖 Computer Wins!') :
+                            `🎉 ${getPlayerName(guessWhoState.winner)} Wins!`
+                        }
                     </div>
                 ` : ''}
             </div>
@@ -441,7 +511,9 @@
     function showPassDeviceToAnswer() {
         const app = document.getElementById('guessWhoContent');
         const askingPlayer = guessWhoState.pendingQuestion.askedBy;
-        const answeringPlayer = askingPlayer === 'player1' ? 'Player 2' : 'Player 1';
+        const answeringPlayer = askingPlayer === 'player1' ? 'player2' : 'player1';
+        const askingPlayerName = getPlayerName(askingPlayer);
+        const answeringPlayerName = getPlayerName(answeringPlayer);
 
         app.innerHTML = `
             <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
@@ -456,11 +528,11 @@
                 <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     <div style="font-size: 5rem; margin-bottom: 2rem;">🔄</div>
                     <h3 style="color: #333; font-size: 2rem; margin-bottom: 1rem;">Question Asked!</h3>
-                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device to ${answeringPlayer}</p>
-                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">${askingPlayer === 'player1' ? 'Player 1' : 'Player 2'}: Look away! 🙈</p>
+                    <p style="color: #666; font-size: 1.2rem; margin-bottom: 2rem;">Pass the device to ${answeringPlayerName}</p>
+                    <p style="color: #999; font-size: 1rem; margin-bottom: 3rem;">${askingPlayerName}: Look away! 🙈</p>
 
                     <button onclick="showQuestionToAnswer()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1.5rem 3rem; border-radius: 12px; cursor: pointer; font-size: 1.3rem; font-weight: bold; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
-                        ${answeringPlayer}: Answer Question →
+                        ${answeringPlayerName}: Answer Question →
                     </button>
                 </div>
             </div>
@@ -472,7 +544,8 @@
         const app = document.getElementById('guessWhoContent');
         const question = questions[guessWhoState.pendingQuestion.questionIdx];
         const askingPlayer = guessWhoState.pendingQuestion.askedBy;
-        const answeringPlayer = askingPlayer === 'player1' ? 'Player 2' : 'Player 1';
+        const answeringPlayer = askingPlayer === 'player1' ? 'player2' : 'player1';
+        const answeringPlayerName = getPlayerName(answeringPlayer);
 
         // Get the answering player's secret character
         const mySecret = askingPlayer === 'player1' ? guessWhoState.opponentSecret : guessWhoState.mySecret;
@@ -488,7 +561,7 @@
                 </div>
 
                 <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
-                    <h3 style="color: #333; font-size: 1.5rem; margin-bottom: 2rem;">${answeringPlayer}, answer this question:</h3>
+                    <h3 style="color: #333; font-size: 1.5rem; margin-bottom: 2rem;">${answeringPlayerName}, answer this question:</h3>
 
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
                         <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">${question.text}</p>
@@ -528,7 +601,7 @@
     window.answerQuestion = function(answer) {
         const question = questions[guessWhoState.pendingQuestion.questionIdx];
         const askingPlayer = guessWhoState.pendingQuestion.askedBy;
-        const playerName = askingPlayer === 'player1' ? 'Player 1' : 'Player 2';
+        const playerName = getPlayerName(askingPlayer);
 
         guessWhoState.questionHistory.push({
             player: playerName,
@@ -547,8 +620,9 @@
     // Show pass device screen to return to the asking player
     function showPassDeviceBackToAsker() {
         const app = document.getElementById('guessWhoContent');
-        const currentPlayerName = guessWhoState.currentPlayer === 'player1' ? 'Player 1' : 'Player 2';
-        const otherPlayerName = guessWhoState.currentPlayer === 'player1' ? 'Player 2' : 'Player 1';
+        const currentPlayerName = getPlayerName(guessWhoState.currentPlayer);
+        const otherPlayer = guessWhoState.currentPlayer === 'player1' ? 'player2' : 'player1';
+        const otherPlayerName = getPlayerName(otherPlayer);
 
         app.innerHTML = `
             <div style="padding: 1rem; max-width: 800px; margin: 0 auto;">
