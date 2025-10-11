@@ -2,29 +2,67 @@
 (function() {
     'use strict';
 
-    // Character database
-    const characters = [
-        { id: 1, name: 'Alex', emoji: '👨🏻', gender: 'male', hair: 'brown', hairLength: 'short', glasses: false, hat: false, facialHair: 'none' },
-        { id: 2, name: 'Emma', emoji: '👩🏼', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none' },
-        { id: 3, name: 'James', emoji: '👨🏻‍🦰', gender: 'male', hair: 'red', hairLength: 'short', glasses: true, hat: false, facialHair: 'beard' },
-        { id: 4, name: 'Sophia', emoji: '👩🏽‍🦱', gender: 'female', hair: 'brown', hairLength: 'long', glasses: true, hat: false, facialHair: 'none' },
-        { id: 5, name: 'Michael', emoji: '👨🏾‍🦲', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'none' },
-        { id: 6, name: 'Olivia', emoji: '👵🏻', gender: 'female', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
-        { id: 7, name: 'William', emoji: '🧔🏾', gender: 'male', hair: 'black', hairLength: 'short', glasses: false, hat: false, facialHair: 'beard' },
-        { id: 8, name: 'Ava', emoji: '👩🏼‍🦰', gender: 'female', hair: 'red', hairLength: 'long', glasses: false, hat: true, facialHair: 'none' },
-        { id: 9, name: 'Daniel', emoji: '👨🏻‍💼', gender: 'male', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
-        { id: 10, name: 'Isabella', emoji: '👸🏻', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none' },
-        { id: 11, name: 'Robert', emoji: '👴🏻', gender: 'male', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'mustache' },
-        { id: 12, name: 'Mia', emoji: '👧🏽', gender: 'female', hair: 'black', hairLength: 'short', glasses: false, hat: true, facialHair: 'none' },
-        { id: 13, name: 'David', emoji: '🤵🏻', gender: 'male', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none' },
-        { id: 14, name: 'Charlotte', emoji: '👩🏼‍💼', gender: 'female', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
-        { id: 15, name: 'Joseph', emoji: '🧑🏾‍🦲', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: true, hat: false, facialHair: 'beard' },
-        { id: 16, name: 'Amelia', emoji: '👩🏾‍🎓', gender: 'female', hair: 'black', hairLength: 'long', glasses: true, hat: false, facialHair: 'none' },
-        { id: 17, name: 'Thomas', emoji: '🎅🏻', gender: 'male', hair: 'gray', hairLength: 'short', glasses: false, hat: true, facialHair: 'beard' },
-        { id: 18, name: 'Harper', emoji: '👱🏽‍♀️', gender: 'female', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none' },
-        { id: 19, name: 'Christopher', emoji: '👨🏽‍🎓', gender: 'male', hair: 'black', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
-        { id: 20, name: 'Evelyn', emoji: '👩🏻‍🦲', gender: 'female', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'none' }
+    // Full character database (40 characters)
+    const allCharacters = [
+        // Casual clothes
+        { id: 1, name: 'Alex', emoji: '👨🏻', gender: 'male', hair: 'brown', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 2, name: 'Emma', emoji: '👩🏼', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 3, name: 'Mia', emoji: '👧🏽', gender: 'female', hair: 'black', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 4, name: 'William', emoji: '🧔🏾', gender: 'male', hair: 'black', hairLength: 'short', glasses: false, hat: false, facialHair: 'beard', clothing: 'casual' },
+        { id: 5, name: 'Harper', emoji: '👱🏽‍♀️', gender: 'female', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 6, name: 'Olivia', emoji: '👵🏻', gender: 'female', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 7, name: 'Robert', emoji: '👴🏻', gender: 'male', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'mustache', clothing: 'casual' },
+        { id: 8, name: 'Ava', emoji: '👩🏼‍🦰', gender: 'female', hair: 'red', hairLength: 'long', glasses: false, hat: true, facialHair: 'none', clothing: 'casual' },
+
+        // Business/Suit
+        { id: 9, name: 'Daniel', emoji: '👨🏻‍💼', gender: 'male', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'suit' },
+        { id: 10, name: 'Charlotte', emoji: '👩🏼‍💼', gender: 'female', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'suit' },
+        { id: 11, name: 'David', emoji: '🤵🏻', gender: 'male', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', clothing: 'suit' },
+        { id: 12, name: 'Isabella', emoji: '👰🏻', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none', clothing: 'suit' },
+        { id: 13, name: 'Marcus', emoji: '🕴️', gender: 'male', hair: 'black', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'suit' },
+
+        // White coat (doctor/scientist)
+        { id: 14, name: 'Dr. Sophia', emoji: '👩🏽‍⚕️', gender: 'female', hair: 'brown', hairLength: 'long', glasses: true, hat: false, facialHair: 'none', clothing: 'whitecoat' },
+        { id: 15, name: 'Dr. James', emoji: '👨🏻‍⚕️', gender: 'male', hair: 'red', hairLength: 'short', glasses: true, hat: false, facialHair: 'beard', clothing: 'whitecoat' },
+        { id: 16, name: 'Dr. Lisa', emoji: '👩🏾‍⚕️', gender: 'female', hair: 'black', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', clothing: 'whitecoat' },
+        { id: 17, name: 'Dr. Chen', emoji: '👨🏻‍🔬', gender: 'male', hair: 'black', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'whitecoat' },
+
+        // Uniform
+        { id: 18, name: 'Officer Mike', emoji: '👮🏻‍♂️', gender: 'male', hair: 'brown', hairLength: 'short', glasses: false, hat: true, facialHair: 'none', clothing: 'uniform' },
+        { id: 19, name: 'Officer Ana', emoji: '👮🏽‍♀️', gender: 'female', hair: 'black', hairLength: 'short', glasses: false, hat: true, facialHair: 'none', clothing: 'uniform' },
+        { id: 20, name: 'Captain Ray', emoji: '✈️', gender: 'male', hair: 'blonde', hairLength: 'short', glasses: false, hat: true, facialHair: 'none', clothing: 'uniform' },
+        { id: 21, name: 'Guard Tom', emoji: '💂🏻‍♂️', gender: 'male', hair: 'black', hairLength: 'short', glasses: false, hat: true, facialHair: 'mustache', clothing: 'uniform' },
+        { id: 22, name: 'Builder Joe', emoji: '👷🏾‍♂️', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'beard', clothing: 'uniform' },
+        { id: 23, name: 'Builder Amy', emoji: '👷🏼‍♀️', gender: 'female', hair: 'red', hairLength: 'short', glasses: true, hat: true, facialHair: 'none', clothing: 'uniform' },
+        { id: 24, name: 'Firefighter Sam', emoji: '🧑🏻‍🚒', gender: 'male', hair: 'blonde', hairLength: 'short', glasses: false, hat: true, facialHair: 'none', clothing: 'uniform' },
+
+        // Chef
+        { id: 25, name: 'Chef Maria', emoji: '👩🏽‍🍳', gender: 'female', hair: 'brown', hairLength: 'long', glasses: false, hat: true, facialHair: 'none', clothing: 'chef' },
+        { id: 26, name: 'Chef Pierre', emoji: '👨🏻‍🍳', gender: 'male', hair: 'gray', hairLength: 'short', glasses: false, hat: true, facialHair: 'mustache', clothing: 'chef' },
+        { id: 27, name: 'Chef Kim', emoji: '🧑🏻‍🍳', gender: 'male', hair: 'black', hairLength: 'short', glasses: true, hat: true, facialHair: 'none', clothing: 'chef' },
+
+        // Students
+        { id: 28, name: 'Student Chris', emoji: '👨🏽‍🎓', gender: 'male', hair: 'black', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 29, name: 'Student Amy', emoji: '👩🏾‍🎓', gender: 'female', hair: 'black', hairLength: 'long', glasses: true, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 30, name: 'Student Jake', emoji: '🧑🏼‍🎓', gender: 'male', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', clothing: 'casual' },
+
+        // Special/Fantasy
+        { id: 31, name: 'Santa', emoji: '🎅🏻', gender: 'male', hair: 'gray', hairLength: 'short', glasses: false, hat: true, facialHair: 'beard', clothing: 'special' },
+        { id: 32, name: 'Wizard', emoji: '🧙🏻‍♂️', gender: 'male', hair: 'gray', hairLength: 'long', glasses: false, hat: true, facialHair: 'beard', clothing: 'special' },
+        { id: 33, name: 'Fairy', emoji: '🧚🏼‍♀️', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none', clothing: 'special' },
+        { id: 34, name: 'Vampire', emoji: '🧛🏻‍♂️', gender: 'male', hair: 'black', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', clothing: 'special' },
+        { id: 35, name: 'Princess', emoji: '👸🏻', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none', clothing: 'special' },
+
+        // More variety
+        { id: 36, name: 'Artist May', emoji: '👩🏻‍🎨', gender: 'female', hair: 'red', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 37, name: 'Teacher Ben', emoji: '👨🏽‍🏫', gender: 'male', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 38, name: 'Michael', emoji: '👨🏾‍🦲', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: false, hat: false, facialHair: 'none', clothing: 'casual' },
+        { id: 39, name: 'Joseph', emoji: '🧑🏾‍🦲', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: true, hat: false, facialHair: 'beard', clothing: 'casual' },
+        { id: 40, name: 'Evelyn', emoji: '👩🏻‍🦲', gender: 'female', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'none', clothing: 'casual' }
     ];
+
+    // Selected characters for current game (randomly chosen at game start)
+    let gameCharacters = [];
 
     // Common questions
     const questions = [
@@ -42,8 +80,20 @@
         { text: 'Does your person wear a hat?', attribute: 'hat', value: true },
         { text: 'Does your person have a beard?', attribute: 'facialHair', value: 'beard' },
         { text: 'Does your person have a mustache?', attribute: 'facialHair', value: 'mustache' },
-        { text: 'Does your person have no facial hair?', attribute: 'facialHair', value: 'none' }
+        { text: 'Does your person have no facial hair?', attribute: 'facialHair', value: 'none' },
+        { text: 'Is your person wearing a white coat?', attribute: 'clothing', value: 'whitecoat' },
+        { text: 'Is your person wearing a uniform?', attribute: 'clothing', value: 'uniform' },
+        { text: 'Is your person wearing a suit?', attribute: 'clothing', value: 'suit' },
+        { text: 'Is your person wearing a chef outfit?', attribute: 'clothing', value: 'chef' },
+        { text: 'Is your person wearing casual clothes?', attribute: 'clothing', value: 'casual' },
+        { text: 'Is your person wearing a special outfit?', attribute: 'clothing', value: 'special' }
     ];
+
+    // Randomly select 20 characters from the full pool
+    function selectRandomCharacters() {
+        const shuffled = [...allCharacters].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, 20);
+    }
 
     // Game state
     const guessWhoState = {
@@ -109,6 +159,9 @@
 
     // Start game with selected mode
     window.startGuessWho = function(mode) {
+        // Select 20 random characters for this game
+        gameCharacters = selectRandomCharacters();
+
         guessWhoState.gameMode = mode;
         guessWhoState.mySecret = null;
         guessWhoState.opponentSecret = null;
@@ -121,8 +174,8 @@
         guessWhoState.pendingQuestion = null;
 
         if (mode === 'vs-ai') {
-            // AI picks a random character
-            guessWhoState.opponentSecret = characters[Math.floor(Math.random() * characters.length)];
+            // AI picks a random character from the game pool
+            guessWhoState.opponentSecret = gameCharacters[Math.floor(Math.random() * gameCharacters.length)];
         }
 
         showCharacterPicker();
@@ -150,7 +203,7 @@
                     ${isPlayer2Pick ? '<p style="text-align: center; color: #666; margin-bottom: 1rem;">Player 1: Look away! 🙈</p>' : ''}
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem;">
-                        ${characters.map(char => `
+                        ${gameCharacters.map(char => `
                             <div onclick="selectCharacter(${char.id})" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; cursor: pointer; text-align: center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                 <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">${char.emoji}</div>
                                 <div style="font-weight: bold;">${char.name}</div>
@@ -164,7 +217,7 @@
 
     // Select character
     window.selectCharacter = function(characterId) {
-        const character = characters.find(c => c.id === characterId);
+        const character = gameCharacters.find(c => c.id === characterId);
 
         if (guessWhoState.gameMode === 'pass-and-play' && guessWhoState.mySecret === null) {
             // Player 1 picking
@@ -318,7 +371,7 @@
                 <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1rem;">
                     <h3 style="margin-top: 0;">All Characters:</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.75rem;">
-                        ${characters.map(char => {
+                        ${gameCharacters.map(char => {
                             const isEliminated = activeEliminated.includes(char.id);
                             return `
                                 <div onclick="toggleEliminate(${char.id})" style="background: ${isEliminated ? '#ddd' : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'}; padding: 0.75rem; border-radius: 8px; cursor: pointer; text-align: center; ${isEliminated ? 'opacity: 0.3;' : ''} transition: all 0.2s;">
@@ -334,7 +387,7 @@
                 <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <h3 style="margin-top: 0;">Make Your Guess:</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem;">
-                        ${characters.map(char => `
+                        ${gameCharacters.map(char => `
                             <button onclick="makeGuess(${char.id})" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 0.75rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
                                 <span style="font-size: 1.5rem;">${char.emoji}</span>
                                 <span>${char.name}</span>
@@ -451,6 +504,9 @@
                                     ${mySecret.gender === 'male' ? '👨 Male' : '👩 Female'} •
                                     ${mySecret.hair === 'bald' ? 'Bald' : mySecret.hair.charAt(0).toUpperCase() + mySecret.hair.slice(1) + ' hair'}${mySecret.glasses ? ' • 👓 Glasses' : ''}${mySecret.hat ? ' • 🎩 Hat' : ''}${mySecret.facialHair !== 'none' ? ' • ' + mySecret.facialHair.charAt(0).toUpperCase() + mySecret.facialHair.slice(1) : ''}
                                 </div>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">
+                                    👔 ${mySecret.clothing === 'whitecoat' ? 'White coat' : mySecret.clothing === 'uniform' ? 'Uniform' : mySecret.clothing === 'suit' ? 'Suit' : mySecret.clothing === 'chef' ? 'Chef outfit' : mySecret.clothing === 'special' ? 'Special outfit' : 'Casual clothes'}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -547,7 +603,7 @@
         });
 
         // AI eliminates characters based on answer
-        characters.forEach(char => {
+        gameCharacters.forEach(char => {
             if (answer) {
                 // Answer was YES, eliminate characters that DON'T match
                 if (char[question.attribute] !== question.value) {
@@ -568,7 +624,7 @@
         renderGame();
 
         // AI might make a guess if it has narrowed it down
-        const remaining = characters.filter(c => !guessWhoState.opponentEliminated.includes(c.id));
+        const remaining = gameCharacters.filter(c => !guessWhoState.opponentEliminated.includes(c.id));
         if (remaining.length === 1) {
             setTimeout(() => {
                 if (!guessWhoState.gameOver) {
@@ -580,8 +636,8 @@
 
     // AI makes a guess
     function aiMakeGuess() {
-        const remaining = characters.filter(c => !guessWhoState.opponentEliminated.includes(c.id));
-        const guess = remaining.length > 0 ? remaining[0] : characters[Math.floor(Math.random() * characters.length)];
+        const remaining = gameCharacters.filter(c => !guessWhoState.opponentEliminated.includes(c.id));
+        const guess = remaining.length > 0 ? remaining[0] : gameCharacters[Math.floor(Math.random() * gameCharacters.length)];
         makeGuess(guess.id, true);
     }
 
@@ -605,7 +661,7 @@
     window.makeGuess = function(characterId, isAI = false) {
         if (guessWhoState.gameOver) return;
 
-        const character = characters.find(c => c.id === characterId);
+        const character = gameCharacters.find(c => c.id === characterId);
 
         if (guessWhoState.gameMode === 'vs-ai') {
             if (isAI) {
