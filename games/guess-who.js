@@ -282,12 +282,21 @@
                 <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1rem;">
                     <h3 style="margin-top: 0;">Ask a Question:</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem;">
-                        ${questions.map((q, idx) => `
-                            <button onclick="askQuestion(${idx})" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem; border-radius: 8px; cursor: pointer; text-align: left; font-size: 0.9rem;">
-                                ${q.text}
-                            </button>
-                        `).join('')}
+                        ${questions.map((q, idx) => {
+                            // Check if this question has already been asked
+                            const alreadyAsked = guessWhoState.questionHistory.some(h => h.question === q.text);
+                            if (alreadyAsked) return ''; // Don't show already-asked questions
+
+                            return `
+                                <button onclick="askQuestion(${idx})" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem; border-radius: 8px; cursor: pointer; text-align: left; font-size: 0.9rem;">
+                                    ${q.text}
+                                </button>
+                            `;
+                        }).join('')}
                     </div>
+                    ${questions.every((q) => guessWhoState.questionHistory.some(h => h.question === q.text)) ?
+                        '<p style="text-align: center; color: #999; margin-top: 1rem; font-style: italic;">All questions have been asked. Make your guess!</p>' :
+                        ''}
                 </div>
 
                 ${guessWhoState.questionHistory.length > 0 ? `
