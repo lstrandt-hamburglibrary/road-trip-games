@@ -42,7 +42,17 @@
 
     // Launch game and show mode selection
     window.launchDotsAndBoxes = function() {
-        const app = document.getElementById('app');
+        // Hide all other sections
+        document.querySelector('.welcome').style.display = 'none';
+        document.querySelector('.feature-grid').style.display = 'none';
+        document.querySelector('.roadmap').style.display = 'none';
+        document.getElementById('plateTracker').style.display = 'none';
+        document.getElementById('gamesMenu').style.display = 'none';
+
+        // Show Dots and Boxes game
+        document.getElementById('dotsAndBoxesGame').style.display = 'block';
+
+        const app = document.getElementById('dotsAndBoxesContent');
         app.innerHTML = `
             <div style="padding: 1rem; max-width: 600px; margin: 0 auto;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -87,7 +97,7 @@
 
     // Render the game board
     function renderGame() {
-        const app = document.getElementById('app');
+        const app = document.getElementById('dotsAndBoxesContent');
         const boxesTotal = (dotsState.gridSize - 1) * (dotsState.gridSize - 1);
         const boxesRemaining = boxesTotal - dotsState.scores[0] - dotsState.scores[1];
 
