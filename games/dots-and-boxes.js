@@ -316,6 +316,31 @@
                dotsState.verticalLines[row][col + 1];     // Right
     }
 
+    // Count how many boxes would be completed by a move (without capturing them)
+    function countCompletedBoxes(type, row, col) {
+        let completedCount = 0;
+
+        if (type === 'h') {
+            // Horizontal line - check box above and below
+            if (row > 0 && isBoxComplete(row - 1, col)) {
+                completedCount++;
+            }
+            if (row < dotsState.gridSize - 1 && isBoxComplete(row, col)) {
+                completedCount++;
+            }
+        } else {
+            // Vertical line - check box to left and right
+            if (col > 0 && isBoxComplete(row, col - 1)) {
+                completedCount++;
+            }
+            if (col < dotsState.gridSize - 1 && isBoxComplete(row, col)) {
+                completedCount++;
+            }
+        }
+
+        return completedCount;
+    }
+
     // AI Move
     function makeAIMove() {
         if (dotsState.gameOver) return;
@@ -345,7 +370,7 @@
                 if (!dotsState.horizontalLines[row][col]) {
                     // Try this horizontal line
                     dotsState.horizontalLines[row][col] = true;
-                    const boxes = checkCompletedBoxes('h', row, col);
+                    const boxes = countCompletedBoxes('h', row, col);
                     dotsState.horizontalLines[row][col] = false;
 
                     if (boxes > 0) {
@@ -360,7 +385,7 @@
                 if (!dotsState.verticalLines[row][col]) {
                     // Try this vertical line
                     dotsState.verticalLines[row][col] = true;
-                    const boxes = checkCompletedBoxes('v', row, col);
+                    const boxes = countCompletedBoxes('v', row, col);
                     dotsState.verticalLines[row][col] = false;
 
                     if (boxes > 0) {
