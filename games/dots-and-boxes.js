@@ -233,7 +233,6 @@
     // Draw a line
     window.drawLine = function(type, row, col) {
         if (dotsState.gameOver) return;
-        if (dotsState.gameMode === 'vs-ai' && dotsState.currentPlayer === 1) return; // Don't allow moves during AI turn
 
         // Check if line already exists
         if (type === 'h' && dotsState.horizontalLines[row][col]) return;
