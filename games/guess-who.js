@@ -4,92 +4,27 @@
 
     // Character database
     const characters = [
-        { id: 1, name: 'Alex', gender: 'male', hair: 'brown', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', skinTone: '#f4c8a8' },
-        { id: 2, name: 'Emma', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none', skinTone: '#fadcbc' },
-        { id: 3, name: 'James', gender: 'male', hair: 'red', hairLength: 'short', glasses: true, hat: false, facialHair: 'beard', skinTone: '#f4c8a8' },
-        { id: 4, name: 'Sophia', gender: 'female', hair: 'brown', hairLength: 'long', glasses: true, hat: false, facialHair: 'none', skinTone: '#c68642' },
-        { id: 5, name: 'Michael', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'none', skinTone: '#8d5524' },
-        { id: 6, name: 'Olivia', gender: 'female', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', skinTone: '#fadcbc' },
-        { id: 7, name: 'William', gender: 'male', hair: 'black', hairLength: 'short', glasses: false, hat: false, facialHair: 'beard', skinTone: '#8d5524' },
-        { id: 8, name: 'Ava', gender: 'female', hair: 'red', hairLength: 'long', glasses: false, hat: true, facialHair: 'none', skinTone: '#fadcbc' },
-        { id: 9, name: 'Daniel', gender: 'male', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', skinTone: '#fadcbc' },
-        { id: 10, name: 'Isabella', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none', skinTone: '#f4c8a8' },
-        { id: 11, name: 'Robert', gender: 'male', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'mustache', skinTone: '#fadcbc' },
-        { id: 12, name: 'Mia', gender: 'female', hair: 'black', hairLength: 'short', glasses: false, hat: true, facialHair: 'none', skinTone: '#c68642' },
-        { id: 13, name: 'David', gender: 'male', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', skinTone: '#f4c8a8' },
-        { id: 14, name: 'Charlotte', gender: 'female', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', skinTone: '#fadcbc' },
-        { id: 15, name: 'Joseph', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: true, hat: false, facialHair: 'beard', skinTone: '#8d5524' },
-        { id: 16, name: 'Amelia', gender: 'female', hair: 'black', hairLength: 'long', glasses: true, hat: false, facialHair: 'none', skinTone: '#8d5524' },
-        { id: 17, name: 'Thomas', gender: 'male', hair: 'gray', hairLength: 'short', glasses: false, hat: true, facialHair: 'beard', skinTone: '#fadcbc' },
-        { id: 18, name: 'Harper', gender: 'female', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none', skinTone: '#c68642' },
-        { id: 19, name: 'Christopher', gender: 'male', hair: 'black', hairLength: 'short', glasses: true, hat: false, facialHair: 'none', skinTone: '#c68642' },
-        { id: 20, name: 'Evelyn', gender: 'female', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'none', skinTone: '#f4c8a8' }
+        { id: 1, name: 'Alex', emoji: '👨🏻', gender: 'male', hair: 'brown', hairLength: 'short', glasses: false, hat: false, facialHair: 'none' },
+        { id: 2, name: 'Emma', emoji: '👩🏼', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none' },
+        { id: 3, name: 'James', emoji: '👨🏻‍🦰', gender: 'male', hair: 'red', hairLength: 'short', glasses: true, hat: false, facialHair: 'beard' },
+        { id: 4, name: 'Sophia', emoji: '👩🏽‍🦱', gender: 'female', hair: 'brown', hairLength: 'long', glasses: true, hat: false, facialHair: 'none' },
+        { id: 5, name: 'Michael', emoji: '👨🏾‍🦲', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'none' },
+        { id: 6, name: 'Olivia', emoji: '👵🏻', gender: 'female', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
+        { id: 7, name: 'William', emoji: '🧔🏾', gender: 'male', hair: 'black', hairLength: 'short', glasses: false, hat: false, facialHair: 'beard' },
+        { id: 8, name: 'Ava', emoji: '👩🏼‍🦰', gender: 'female', hair: 'red', hairLength: 'long', glasses: false, hat: true, facialHair: 'none' },
+        { id: 9, name: 'Daniel', emoji: '👨🏻‍💼', gender: 'male', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
+        { id: 10, name: 'Isabella', emoji: '👸🏻', gender: 'female', hair: 'blonde', hairLength: 'long', glasses: false, hat: false, facialHair: 'none' },
+        { id: 11, name: 'Robert', emoji: '👴🏻', gender: 'male', hair: 'gray', hairLength: 'short', glasses: true, hat: false, facialHair: 'mustache' },
+        { id: 12, name: 'Mia', emoji: '👧🏽', gender: 'female', hair: 'black', hairLength: 'short', glasses: false, hat: true, facialHair: 'none' },
+        { id: 13, name: 'David', emoji: '🤵🏻', gender: 'male', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none' },
+        { id: 14, name: 'Charlotte', emoji: '👩🏼‍💼', gender: 'female', hair: 'brown', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
+        { id: 15, name: 'Joseph', emoji: '🧑🏾‍🦲', gender: 'male', hair: 'bald', hairLength: 'bald', glasses: true, hat: false, facialHair: 'beard' },
+        { id: 16, name: 'Amelia', emoji: '👩🏾‍🎓', gender: 'female', hair: 'black', hairLength: 'long', glasses: true, hat: false, facialHair: 'none' },
+        { id: 17, name: 'Thomas', emoji: '🎅🏻', gender: 'male', hair: 'gray', hairLength: 'short', glasses: false, hat: true, facialHair: 'beard' },
+        { id: 18, name: 'Harper', emoji: '👱🏽‍♀️', gender: 'female', hair: 'blonde', hairLength: 'short', glasses: false, hat: false, facialHair: 'none' },
+        { id: 19, name: 'Christopher', emoji: '👨🏽‍🎓', gender: 'male', hair: 'black', hairLength: 'short', glasses: true, hat: false, facialHair: 'none' },
+        { id: 20, name: 'Evelyn', emoji: '👩🏻‍🦲', gender: 'female', hair: 'bald', hairLength: 'bald', glasses: false, hat: true, facialHair: 'none' }
     ];
-
-    // Generate SVG avatar for character
-    function generateAvatar(char, size = 80) {
-        const hairColors = {
-            'brown': '#6b4423',
-            'blonde': '#ffd700',
-            'black': '#1a1a1a',
-            'red': '#d2691e',
-            'gray': '#a9a9a9',
-            'bald': 'none'
-        };
-
-        const hairColor = hairColors[char.hair];
-        const isLongHair = char.hairLength === 'long';
-        const isBald = char.hair === 'bald';
-
-        // Build SVG
-        let svg = `<svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">`;
-
-        // Hat (behind head if present)
-        if (char.hat) {
-            svg += `<ellipse cx="50" cy="30" rx="38" ry="18" fill="#2c3e50"/>
-                    <rect x="12" y="28" width="76" height="8" rx="4" fill="#34495e"/>`;
-        }
-
-        // Hair (behind for long hair)
-        if (!isBald && isLongHair) {
-            svg += `<ellipse cx="50" cy="55" rx="40" ry="48" fill="${hairColor}"/>`;
-        }
-
-        // Face
-        svg += `<circle cx="50" cy="55" r="32" fill="${char.skinTone}"/>`;
-
-        // Hair (top for short hair)
-        if (!isBald && !isLongHair && !char.hat) {
-            svg += `<ellipse cx="50" cy="30" rx="32" ry="20" fill="${hairColor}"/>`;
-        }
-
-        // Eyes
-        svg += `<circle cx="40" cy="50" r="3" fill="#2c3e50"/>
-                <circle cx="60" cy="50" r="3" fill="#2c3e50"/>`;
-
-        // Glasses
-        if (char.glasses) {
-            svg += `<circle cx="40" cy="50" r="8" fill="none" stroke="#2c3e50" stroke-width="2"/>
-                    <circle cx="60" cy="50" r="8" fill="none" stroke="#2c3e50" stroke-width="2"/>
-                    <line x1="48" y1="50" x2="52" y2="50" stroke="#2c3e50" stroke-width="2"/>`;
-        }
-
-        // Nose
-        svg += `<line x1="50" y1="55" x2="50" y2="62" stroke="#2c3e50" stroke-width="1"/>`;
-
-        // Mouth
-        svg += `<path d="M 42 68 Q 50 72 58 68" fill="none" stroke="#2c3e50" stroke-width="2" stroke-linecap="round"/>`;
-
-        // Facial hair
-        if (char.facialHair === 'beard') {
-            svg += `<ellipse cx="50" cy="75" rx="18" ry="12" fill="${hairColor}"/>`;
-        } else if (char.facialHair === 'mustache') {
-            svg += `<ellipse cx="50" cy="65" rx="12" ry="4" fill="${hairColor}"/>`;
-        }
-
-        svg += `</svg>`;
-        return svg;
-    }
 
     // Common questions
     const questions = [
@@ -215,7 +150,7 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem;">
                         ${characters.map(char => `
                             <div onclick="selectCharacter(${char.id})" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px; cursor: pointer; text-align: center; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                <div style="margin-bottom: 0.5rem; display: flex; justify-content: center;">${generateAvatar(char, 60)}</div>
+                                <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">${char.emoji}</div>
                                 <div style="font-weight: bold;">${char.name}</div>
                             </div>
                         `).join('')}
@@ -270,7 +205,7 @@
                 <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1rem;">
                     <h3 style="margin-top: 0;">Your Secret Character:</h3>
                     <div style="display: flex; align-items: center; gap: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 8px;">
-                        <div>${generateAvatar(guessWhoState.currentPlayer === 'player1' ? guessWhoState.mySecret : guessWhoState.opponentSecret, 80)}</div>
+                        <div style="font-size: 4rem;">${(guessWhoState.currentPlayer === 'player1' ? guessWhoState.mySecret : guessWhoState.opponentSecret).emoji}</div>
                         <div>
                             <div style="font-size: 1.5rem; font-weight: bold;">${guessWhoState.currentPlayer === 'player1' ? guessWhoState.mySecret.name : guessWhoState.opponentSecret.name}</div>
                             <div style="opacity: 0.9;">Keep this secret!</div>
@@ -312,7 +247,7 @@
                             const isEliminated = activeEliminated.includes(char.id);
                             return `
                                 <div onclick="toggleEliminate(${char.id})" style="background: ${isEliminated ? '#ddd' : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'}; padding: 0.75rem; border-radius: 8px; cursor: pointer; text-align: center; ${isEliminated ? 'opacity: 0.3;' : ''} transition: all 0.2s;">
-                                    <div style="margin-bottom: 0.25rem; ${isEliminated ? 'filter: grayscale(100%);' : ''} display: flex; justify-content: center;">${generateAvatar(char, 60)}</div>
+                                    <div style="font-size: 2.5rem; margin-bottom: 0.25rem; ${isEliminated ? 'filter: grayscale(100%);' : ''}">${char.emoji}</div>
                                     <div style="font-weight: bold; font-size: 0.9rem; ${isEliminated ? 'text-decoration: line-through;' : ''}">${char.name}</div>
                                 </div>
                             `;
@@ -326,7 +261,7 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem;">
                         ${characters.map(char => `
                             <button onclick="makeGuess(${char.id})" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none; padding: 0.75rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
-                                <div style="display: inline-flex;">${generateAvatar(char, 30)}</div>
+                                <span style="font-size: 1.5rem;">${char.emoji}</span>
                                 <span>${char.name}</span>
                             </button>
                         `).join('')}
