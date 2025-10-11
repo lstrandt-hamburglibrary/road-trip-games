@@ -23,13 +23,14 @@
         animationId: null
     };
 
-    // Platform positions (y-coordinates)
+    // Platform positions (y-coordinates) - Classic Joust layout
     const PLATFORM_DATA = [
-        { y: 550, width: 800 },    // Bottom platform
-        { y: 450, width: 600, x: 100 }, // Lower middle
-        { y: 350, width: 600, x: 100 }, // Upper middle
-        { y: 250, width: 600, x: 100 }, // Upper
-        { y: 150, width: 400, x: 200 }  // Top
+        { y: 450, width: 400, x: 200 },  // Center platform
+        { y: 350, width: 200, x: 50 },   // Left middle
+        { y: 350, width: 200, x: 550 },  // Right middle
+        { y: 250, width: 250, x: 275 },  // Upper center
+        { y: 150, width: 150, x: 100 },  // Top left
+        { y: 150, width: 150, x: 550 }   // Top right
     ];
 
     class Player {
@@ -64,7 +65,7 @@
             gameState.platforms.forEach(platform => {
                 if (this.velocityY > 0 && // Falling
                     this.y + this.height >= platform.y &&
-                    this.y + this.height <= platform.y + 10 &&
+                    this.y + this.height <= platform.y + 15 &&
                     this.x + this.width > platform.x &&
                     this.x < platform.x + platform.width) {
                     this.y = platform.y - this.height;
@@ -73,10 +74,10 @@
                 }
             });
 
-            // Bottom boundary
-            if (this.y > CANVAS_HEIGHT - this.height) {
-                this.y = CANVAS_HEIGHT - this.height;
-                this.velocityY = 0;
+            // Lava boundary - game over if player touches lava
+            if (this.y + this.height > CANVAS_HEIGHT - 50) {
+                gameState.gameOver = true;
+                gameState.gameStarted = false;
             }
 
             // Top boundary
@@ -95,7 +96,7 @@
             ctx.font = '40px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🦅', 0, 0);
+            ctx.fillText('🕊️', 0, 0);
             ctx.restore();
         }
     }
@@ -141,7 +142,7 @@
             gameState.platforms.forEach(platform => {
                 if (this.velocityY > 0 &&
                     this.y + this.height >= platform.y &&
-                    this.y + this.height <= platform.y + 10 &&
+                    this.y + this.height <= platform.y + 15 &&
                     this.x + this.width > platform.x &&
                     this.x < platform.x + platform.width) {
                     this.y = platform.y - this.height;
@@ -149,10 +150,10 @@
                 }
             });
 
-            // Bottom boundary
-            if (this.y > CANVAS_HEIGHT - this.height) {
-                this.y = CANVAS_HEIGHT - this.height;
-                this.velocityY = 0;
+            // Don't let enemies fall into lava - they bounce back up
+            if (this.y + this.height > CANVAS_HEIGHT - 50) {
+                this.y = CANVAS_HEIGHT - 50 - this.height;
+                this.velocityY = FLAP_POWER * 0.5; // Bounce up
             }
 
             // Top boundary
@@ -200,7 +201,7 @@
             gameState.platforms.forEach(platform => {
                 if (this.velocityY > 0 &&
                     this.y + this.height >= platform.y &&
-                    this.y + this.height <= platform.y + 10 &&
+                    this.y + this.height <= platform.y + 15 &&
                     this.x + this.width > platform.x &&
                     this.x < platform.x + platform.width) {
                     this.y = platform.y - this.height;
@@ -208,9 +209,9 @@
                 }
             });
 
-            // Bottom boundary
-            if (this.y > CANVAS_HEIGHT - this.height) {
-                this.y = CANVAS_HEIGHT - this.height;
+            // Eggs land on top of lava
+            if (this.y + this.height > CANVAS_HEIGHT - 50) {
+                this.y = CANVAS_HEIGHT - 50 - this.height;
                 this.velocityY = 0;
             }
 
@@ -348,14 +349,33 @@
     function draw() {
         const ctx = gameState.ctx;
 
-        // Clear canvas
-        ctx.fillStyle = '#1a1a2e';
+        // Clear canvas - black background like classic Joust
+        ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // Draw platforms
-        ctx.fillStyle = '#8B4513';
+        // Draw lava at bottom
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(0, CANVAS_HEIGHT - 50, CANVAS_WIDTH, 50);
+
+        // Draw lava bubbles effect
+        ctx.fillStyle = '#ff6600';
+        for (let i = 0; i < 10; i++) {
+            const x = (i * 80 + Date.now() / 10) % CANVAS_WIDTH;
+            ctx.fillRect(x, CANVAS_HEIGHT - 45, 20, 10);
+        }
+
+        // Draw platforms - orange/tan color like classic Joust
+        ctx.fillStyle = '#D2691E';
         gameState.platforms.forEach(platform => {
-            ctx.fillRect(platform.x, platform.y, platform.width, 10);
+            // Main platform
+            ctx.fillRect(platform.x, platform.y, platform.width, 15);
+
+            // Jagged top edge effect
+            ctx.fillStyle = '#CD853F';
+            for (let i = 0; i < platform.width; i += 20) {
+                ctx.fillRect(platform.x + i, platform.y - 3, 10, 3);
+            }
+            ctx.fillStyle = '#D2691E';
         });
 
         // Draw eggs
@@ -442,14 +462,14 @@
                     <button onclick="exitJoust()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
                         ← Back
                     </button>
-                    <h2 style="margin: 0; font-size: 1.5rem;">🦅 Joust</h2>
+                    <h2 style="margin: 0; font-size: 1.5rem;">🕊️ Joust</h2>
                     <button onclick="restartJoust()" style="background: #3498db; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
                         🔄 Play Again
                     </button>
                 </div>
 
                 <div style="position: relative; max-width: 800px; margin: 0 auto;">
-                    <canvas id="joustCanvas" width="800" height="600" style="border: 4px solid #667eea; border-radius: 10px; background: #1a1a2e; max-width: 100%; height: auto; display: block;"></canvas>
+                    <canvas id="joustCanvas" width="800" height="600" style="border: 4px solid #333; border-radius: 10px; background: #000; max-width: 100%; height: auto; display: block;"></canvas>
 
                     <!-- Mobile Controls -->
                     <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
@@ -470,9 +490,10 @@
                 <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
                     <h4 style="color: #333; margin-bottom: 1rem;">How to Play:</h4>
                     <ul style="color: #666; text-align: left; line-height: 1.8;">
-                        <li>🦅 Flap to fly and fight enemy riders!</li>
+                        <li>🕊️ Flap to fly and fight enemy riders!</li>
                         <li>⚔️ Defeat enemies by hitting them from ABOVE</li>
                         <li>🥚 Collect eggs before they hatch into new enemies</li>
+                        <li>🌋 Don't touch the lava at the bottom!</li>
                         <li>📈 Survive waves to increase your score</li>
                         <li>💀 Get hit from below = Game Over!</li>
                     </ul>
