@@ -460,48 +460,167 @@
     }
 
     function renderBoard() {
+        const size = Math.min(400, window.innerWidth - 40);
         return `
-            <div style="max-width: 600px; margin: 0 auto;">
-                ${renderSimpleBoard()}
+            <style>
+                @keyframes peg-pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                }
+                .peg-pulse {
+                    animation: peg-pulse 0.8s ease-in-out infinite;
+                }
+            </style>
+            <div style="max-width: ${size}px; margin: 0 auto;">
+                <svg width="${size}" height="${size}" viewBox="0 0 100 100" style="background: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                    ${renderSimpleVisualBoard()}
+                </svg>
             </div>
         `;
     }
 
-    function renderSimpleBoard() {
+    function renderSimpleVisualBoard() {
         const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32'];
-        const names = ['Yellow', 'Blue', 'Red', 'Green'];
+        let svg = '';
 
-        return `
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                ${troubleState.players.map((player, idx) => `
-                    <div style="background: ${colors[idx]}; opacity: 0.9; padding: 1rem; border-radius: 12px; border: 3px solid ${colors[idx]};">
-                        <h3 style="margin: 0 0 0.5rem 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-                            ${names[idx]} ${player.isAI ? '(AI)' : ''}
-                        </h3>
-                        ${player.pegs.map((peg, pegIdx) => {
-                            const validMoves = troubleState.currentPlayer === idx && troubleState.dieValue !== null
-                                ? getValidMoves(idx) : [];
-                            const canMove = validMoves.includes(pegIdx);
-                            const location = peg.location === 'home' ? 'HOME' :
-                                           peg.location === 'track' ? `Track ${peg.position}` :
-                                           peg.location === 'finish' ? `Finish ${peg.position + 1}` : 'DONE';
-
-                            return `
-                                <div style="background: rgba(255,255,255,0.3); padding: 0.5rem; margin: 0.25rem 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="color: white; font-weight: bold;">Peg ${pegIdx + 1}: ${location}</span>
-                                    ${canMove ? `
-                                        <button onclick="selectPeg(${pegIdx})"
-                                            style="background: white; color: ${colors[idx]}; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: bold;">
-                                            MOVE
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `).join('')}
-            </div>
+        // Draw 4 colored triangular quadrants
+        svg += `
+            <path d="M 0,0 L 0,50 L 50,50 Z" fill="${colors[0]}" opacity="0.2"/>
+            <path d="M 50,0 L 100,0 L 50,50 Z" fill="${colors[1]}" opacity="0.2"/>
+            <path d="M 100,50 L 100,100 L 50,50 Z" fill="${colors[2]}" opacity="0.2"/>
+            <path d="M 50,100 L 0,100 L 50,50 Z" fill="${colors[3]}" opacity="0.2"/>
         `;
+
+        // Draw track squares around the edge
+        const trackSpaces = [
+            // Bottom row (Green side)
+            {x: 10, y: 90}, {x: 20, y: 90}, {x: 30, y: 90}, {x: 40, y: 90}, {x: 50, y: 90}, {x: 60, y: 90}, {x: 70, y: 90},
+            // Right column (Red side)
+            {x: 90, y: 80}, {x: 90, y: 70}, {x: 90, y: 60}, {x: 90, y: 50}, {x: 90, y: 40}, {x: 90, y: 30}, {x: 90, y: 20},
+            // Top row (Blue side)
+            {x: 80, y: 10}, {x: 70, y: 10}, {x: 60, y: 10}, {x: 50, y: 10}, {x: 40, y: 10}, {x: 30, y: 10}, {x: 20, y: 10},
+            // Left column (Yellow side)
+            {x: 10, y: 20}, {x: 10, y: 30}, {x: 10, y: 40}, {x: 10, y: 50}, {x: 10, y: 60}, {x: 10, y: 70}, {x: 10, y: 80}
+        ];
+
+        trackSpaces.forEach((pos, idx) => {
+            // Start spaces: Green=0, Red=7, Blue=14, Yellow=21
+            const isStart = [0, 7, 14, 21].includes(idx);
+            svg += `<rect x="${pos.x - 3}" y="${pos.y - 3}" width="6" height="6"
+                fill="${isStart ? colors[[3,2,1,0][[0, 7, 14, 21].indexOf(idx)]] : '#ddd'}"
+                stroke="#666" stroke-width="0.5" rx="1"/>`;
+        });
+
+        // Draw finish lanes (3 spaces each going toward center)
+        const finishLanes = [
+            // Yellow (left side, going right)
+            [{x: 20, y: 50}, {x: 30, y: 50}, {x: 40, y: 50}],
+            // Blue (top, going down)
+            [{x: 50, y: 20}, {x: 50, y: 30}, {x: 50, y: 40}],
+            // Red (right, going left)
+            [{x: 80, y: 50}, {x: 70, y: 50}, {x: 60, y: 50}],
+            // Green (bottom, going up)
+            [{x: 50, y: 80}, {x: 50, y: 70}, {x: 50, y: 60}]
+        ];
+
+        finishLanes.forEach((lane, playerIdx) => {
+            lane.forEach(pos => {
+                svg += `<rect x="${pos.x - 2.5}" y="${pos.y - 2.5}" width="5" height="5"
+                    fill="${colors[playerIdx]}" opacity="0.6" stroke="${colors[playerIdx]}" stroke-width="0.5" rx="1"/>`;
+            });
+        });
+
+        // Draw home areas in corners
+        const homes = [
+            {x: 5, y: 5, color: colors[0]},    // Yellow top-left
+            {x: 95, y: 5, color: colors[1]},   // Blue top-right
+            {x: 95, y: 95, color: colors[2]},  // Red bottom-right
+            {x: 5, y: 95, color: colors[3]}    // Green bottom-left
+        ];
+
+        homes.forEach(home => {
+            svg += `<rect x="${home.x - 8}" y="${home.y - 8}" width="16" height="16"
+                fill="${home.color}" opacity="0.4" stroke="${home.color}" stroke-width="1" rx="2"/>`;
+            // 4 peg spots
+            [-3, 3].forEach(dx => {
+                [-3, 3].forEach(dy => {
+                    svg += `<circle cx="${home.x + dx}" cy="${home.y + dy}" r="1.5"
+                        fill="white" stroke="${home.color}" stroke-width="0.5"/>`;
+                });
+            });
+        });
+
+        // Draw pegs
+        svg += renderSimplePegs();
+
+        // Center die
+        svg += `
+            <circle cx="50" cy="50" r="8" fill="#e74c3c" stroke="#c0392b" stroke-width="1"
+                onclick="rollDie()" style="cursor: pointer;"/>
+            <text x="50" y="53" text-anchor="middle" fill="white" font-size="6" font-weight="bold">
+                ${troubleState.dieValue || 'ROLL'}
+            </text>
+        `;
+
+        return svg;
+    }
+
+    function renderSimplePegs() {
+        const colors = ['#FFD700', '#4169E1', '#DC143C', '#32CD32'];
+        let svg = '';
+
+        troubleState.players.forEach((player, pIdx) => {
+            player.pegs.forEach((peg, pegIdx) => {
+                const pos = getSimplePegPosition(peg, pIdx, pegIdx);
+                const canMove = troubleState.currentPlayer === pIdx &&
+                               troubleState.dieValue !== null &&
+                               getValidMoves(pIdx).includes(pegIdx);
+
+                svg += `
+                    <circle cx="${pos.x}" cy="${pos.y}" r="${canMove ? 2.5 : 2}"
+                        fill="${colors[pIdx]}" stroke="white" stroke-width="0.8"
+                        ${canMove ? 'class="peg-pulse"' : ''}
+                        onclick="selectPeg(${pegIdx})"
+                        style="cursor: ${canMove ? 'pointer' : 'default'};">
+                        <title>Player ${pIdx + 1}, Peg ${pegIdx + 1}</title>
+                    </circle>
+                `;
+            });
+        });
+
+        return svg;
+    }
+
+    function getSimplePegPosition(peg, playerIdx, pegIdx) {
+        if (peg.location === 'home') {
+            const homes = [
+                {x: 5, y: 5},    // Yellow
+                {x: 95, y: 5},   // Blue
+                {x: 95, y: 95},  // Red
+                {x: 5, y: 95}    // Green
+            ];
+            const home = homes[playerIdx];
+            const offsets = [{x: -3, y: -3}, {x: 3, y: -3}, {x: -3, y: 3}, {x: 3, y: 3}];
+            return {x: home.x + offsets[pegIdx].x, y: home.y + offsets[pegIdx].y};
+        } else if (peg.location === 'track') {
+            const trackSpaces = [
+                {x: 10, y: 90}, {x: 20, y: 90}, {x: 30, y: 90}, {x: 40, y: 90}, {x: 50, y: 90}, {x: 60, y: 90}, {x: 70, y: 90},
+                {x: 90, y: 80}, {x: 90, y: 70}, {x: 90, y: 60}, {x: 90, y: 50}, {x: 90, y: 40}, {x: 90, y: 30}, {x: 90, y: 20},
+                {x: 80, y: 10}, {x: 70, y: 10}, {x: 60, y: 10}, {x: 50, y: 10}, {x: 40, y: 10}, {x: 30, y: 10}, {x: 20, y: 10},
+                {x: 10, y: 20}, {x: 10, y: 30}, {x: 10, y: 40}, {x: 10, y: 50}, {x: 10, y: 60}, {x: 10, y: 70}, {x: 10, y: 80}
+            ];
+            return trackSpaces[peg.position];
+        } else if (peg.location === 'finish') {
+            const finishLanes = [
+                [{x: 20, y: 50}, {x: 30, y: 50}, {x: 40, y: 50}],
+                [{x: 50, y: 20}, {x: 50, y: 30}, {x: 50, y: 40}],
+                [{x: 80, y: 50}, {x: 70, y: 50}, {x: 60, y: 50}],
+                [{x: 50, y: 80}, {x: 50, y: 70}, {x: 50, y: 60}]
+            ];
+            return finishLanes[playerIdx][peg.position];
+        } else {
+            return {x: 50, y: 50}; // Done - at center
+        }
     }
 
 
