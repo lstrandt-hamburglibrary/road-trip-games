@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.9 loaded - Fixed ghost wrapping and eaten ghost pathfinding');
+    console.log('🟡 Pac-Man v1.46.0 loaded - Fixed eaten ghosts can now phase through walls');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -412,15 +412,18 @@
 
                 // Can't reverse direction
                 const isReverse = dir.x === -ghost.direction.x && dir.y === -ghost.direction.y;
+                if (isReverse) return false;
 
-                // Check if valid position
+                // Eaten ghosts can move through walls, so skip wall check
+                if (ghost.mode === 'eaten' || ghost.mode === 'exiting') {
+                    return true;
+                }
+
+                // Check if valid position for non-eaten ghosts
                 if (!isValidPosition(nextX, nextY)) return false;
 
                 // Non-eaten ghosts can't enter ghost house
                 if (ghost.mode !== 'eaten' && isGhostHouse(nextX, nextY)) return false;
-
-                // Can't reverse
-                if (isReverse) return false;
 
                 return true;
             });
@@ -601,7 +604,14 @@
                 const nextX = ghost.gridX + dir.x;
                 const nextY = ghost.gridY + dir.y;
                 const isReverse = dir.x === -ghost.direction.x && dir.y === -ghost.direction.y;
-                return isValidPosition(nextX, nextY) && !isReverse;
+                if (isReverse) return false;
+
+                // Eaten ghosts can move through walls
+                if (ghost.mode === 'eaten' || ghost.mode === 'exiting') {
+                    return true;
+                }
+
+                return isValidPosition(nextX, nextY);
             });
 
             if (validDirections.length > 0) {
