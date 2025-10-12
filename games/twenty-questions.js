@@ -374,7 +374,9 @@
         { question: "Is it made of metal?", property: 'material', value: 'metal' },
         { question: "Is it made of wood?", property: 'material', value: 'wood' },
         { question: "Is it made of plastic?", property: 'material', value: 'plastic' },
-        { question: "Does it use electricity?", property: 'usesElectricity' },
+        { question: "Is it made of fabric?", property: 'material', value: 'fabric' },
+        { question: "Is it made of glass?", property: 'material', value: 'glass' },
+        { question: "Is it made of paper?", property: 'material', value: 'paper' },
         { question: "Is it a tool?", property: 'isTool' },
         { question: "Is it furniture?", property: 'isFurniture' },
         { question: "Can you wear it?", property: 'isClothing' },
@@ -391,8 +393,6 @@
         { question: "Is it natural (not man-made)?", property: 'isNatural' },
         { question: "Does it have water?", property: 'hasWater' },
         { question: "Is it a public place?", property: 'isPublic' },
-        { question: "Can you visit it?", property: 'canVisit' },
-        { question: "Is it in a city?", property: 'inCity' },
 
         // Food-specific questions
         { question: "Is it sweet?", property: 'isSweet' },
@@ -408,13 +408,6 @@
         { question: "Is it fictional?", property: 'isFictional' },
         { question: "Is it famous?", property: 'isFamous' },
         { question: "Is it a job or profession?", property: 'isJob' },
-
-        // Color questions
-        { question: "Is it usually red?", property: 'color', value: 'red' },
-        { question: "Is it usually blue?", property: 'color', value: 'blue' },
-        { question: "Is it usually green?", property: 'color', value: 'green' },
-        { question: "Is it usually yellow?", property: 'color', value: 'yellow' },
-        { question: "Is it colorful?", property: 'isColorful' },
     ];
 
     function startPlayerVsAI() {
@@ -742,13 +735,13 @@
             }
 
             // Object-specific properties - non-objects should answer 'no'
-            const objectProps = ['isElectronic', 'isVehicle', 'usedDaily', 'isTool', 'isFurniture', 'isClothing', 'forEntertainment', 'usesElectricity'];
+            const objectProps = ['isElectronic', 'isVehicle', 'usedDaily', 'isTool', 'isFurniture', 'isClothing', 'forEntertainment'];
             if (objectProps.includes(property) && item.category !== 'object') {
                 return 'no';
             }
 
             // Place-specific properties - non-places should answer 'no'
-            const placeProps = ['isIndoors', 'isNatural', 'hasWater', 'isPublic', 'canVisit', 'inCity'];
+            const placeProps = ['isIndoors', 'isNatural', 'hasWater', 'isPublic'];
             if (placeProps.includes(property) && item.category !== 'place') {
                 return 'no';
             }
