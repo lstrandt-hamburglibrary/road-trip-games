@@ -844,6 +844,77 @@
         }
     }
 
+    // Touch control variables
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+
+    // Handle touch start
+    function handleTouchStart(e) {
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+
+        // Start game on tap if in menu or game over
+        if (gameState === 'menu' || gameState === 'gameOver') {
+            e.preventDefault();
+            score = 0;
+            lives = 3;
+            level = 1;
+            initGame();
+        }
+    }
+
+    // Handle touch move (for swipe detection)
+    function handleTouchMove(e) {
+        if (gameState !== 'playing') return;
+        e.preventDefault();
+    }
+
+    // Handle touch end (swipe detection)
+    function handleTouchEnd(e) {
+        if (gameState !== 'playing') return;
+
+        const touch = e.changedTouches[0];
+        const touchEndX = touch.clientX;
+        const touchEndY = touch.clientY;
+        const touchEndTime = Date.now();
+
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+        const deltaTime = touchEndTime - touchStartTime;
+
+        // Minimum swipe distance (30px) and maximum time (300ms for a quick swipe)
+        const minSwipeDistance = 30;
+
+        if (Math.abs(deltaX) > minSwipeDistance || Math.abs(deltaY) > minSwipeDistance) {
+            // Determine primary direction
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Horizontal swipe
+                if (deltaX > 0) {
+                    pacman.nextDirection = { x: 1, y: 0 }; // Right
+                } else {
+                    pacman.nextDirection = { x: -1, y: 0 }; // Left
+                }
+            } else {
+                // Vertical swipe
+                if (deltaY > 0) {
+                    pacman.nextDirection = { x: 0, y: 1 }; // Down
+                } else {
+                    pacman.nextDirection = { x: 0, y: -1 }; // Up
+                }
+            }
+        }
+    }
+
+    // Handle d-pad button clicks
+    function handleDPadClick(direction) {
+        if (gameState === 'playing') {
+            pacman.nextDirection = direction;
+        }
+    }
+
     // Launch Pac-Man
     window.launchPacman = function() {
         const content = document.getElementById('pacmanContent');
@@ -857,11 +928,27 @@
                     height: auto;
                     background: #000000;
                     cursor: pointer;
+                    touch-action: none;
                 "></canvas>
 
                 <div style="text-align: center; color: #666;">
-                    <p style="margin: 0.5rem 0;">🕹️ <strong>Controls:</strong> Arrow keys to move</p>
+                    <p style="margin: 0.5rem 0;">🕹️ <strong>Controls:</strong> Arrow keys or swipe to move</p>
                     <p style="margin: 0.5rem 0;">💊 <strong>Strategy:</strong> Eat power pellets to turn ghosts blue!</p>
+                </div>
+
+                <!-- D-Pad Controls -->
+                <div id="dpadControls" style="display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 5px; margin-top: 1rem;">
+                    <div style="grid-column: 2;"></div>
+                    <button id="btnUp" style="grid-column: 2; grid-row: 1; background: linear-gradient(145deg, #4a4a4a, #2a2a2a); border: 2px solid #666; border-radius: 10px; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); user-select: none; -webkit-tap-highlight-color: transparent;">▲</button>
+                    <div style="grid-column: 2;"></div>
+
+                    <button id="btnLeft" style="grid-column: 1; grid-row: 2; background: linear-gradient(145deg, #4a4a4a, #2a2a2a); border: 2px solid #666; border-radius: 10px; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); user-select: none; -webkit-tap-highlight-color: transparent;">◀</button>
+                    <div style="grid-column: 2; grid-row: 2; background: #1a1a1a; border: 2px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px;">PAC</div>
+                    <button id="btnRight" style="grid-column: 3; grid-row: 2; background: linear-gradient(145deg, #4a4a4a, #2a2a2a); border: 2px solid #666; border-radius: 10px; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); user-select: none; -webkit-tap-highlight-color: transparent;">▶</button>
+
+                    <div style="grid-column: 2;"></div>
+                    <button id="btnDown" style="grid-column: 2; grid-row: 3; background: linear-gradient(145deg, #4a4a4a, #2a2a2a); border: 2px solid #666; border-radius: 10px; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); user-select: none; -webkit-tap-highlight-color: transparent;">▼</button>
+                    <div style="grid-column: 2;"></div>
                 </div>
             </div>
         `;
@@ -880,8 +967,37 @@
         gameState = 'menu';
         draw();
 
-        // Event listeners
+        // Event listeners for keyboard
         document.addEventListener('keydown', handleKeyDown);
+
+        // Event listeners for touch on canvas (swipe)
+        gameCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        gameCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        gameCanvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+        // Event listeners for d-pad buttons
+        document.getElementById('btnUp').addEventListener('click', () => handleDPadClick({ x: 0, y: -1 }));
+        document.getElementById('btnDown').addEventListener('click', () => handleDPadClick({ x: 0, y: 1 }));
+        document.getElementById('btnLeft').addEventListener('click', () => handleDPadClick({ x: -1, y: 0 }));
+        document.getElementById('btnRight').addEventListener('click', () => handleDPadClick({ x: 1, y: 0 }));
+
+        // Also handle touch events for d-pad (better mobile experience)
+        document.getElementById('btnUp').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleDPadClick({ x: 0, y: -1 });
+        });
+        document.getElementById('btnDown').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleDPadClick({ x: 0, y: 1 });
+        });
+        document.getElementById('btnLeft').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleDPadClick({ x: -1, y: 0 });
+        });
+        document.getElementById('btnRight').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleDPadClick({ x: 1, y: 0 });
+        });
     };
 
     // Exit to menu
@@ -891,6 +1007,13 @@
         }
 
         document.removeEventListener('keydown', handleKeyDown);
+
+        // Remove touch event listeners
+        if (gameCanvas) {
+            gameCanvas.removeEventListener('touchstart', handleTouchStart);
+            gameCanvas.removeEventListener('touchmove', handleTouchMove);
+            gameCanvas.removeEventListener('touchend', handleTouchEnd);
+        }
 
         document.getElementById('pacmanGame').style.display = 'none';
         document.getElementById('gamesMenu').style.display = 'block';

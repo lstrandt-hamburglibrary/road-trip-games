@@ -587,6 +587,71 @@
         }
     }
 
+    // Touch control variables
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchMoving = false;
+
+    // Handle touch start
+    function handleTouchStart(e) {
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+
+        // Start game on tap if in menu or game over
+        if (gameState === 'menu' || gameState === 'gameOver') {
+            e.preventDefault();
+            handleClick();
+        } else if (gameState === 'playing') {
+            isTouchMoving = false;
+        }
+    }
+
+    // Handle touch move (for continuous swipe control)
+    function handleTouchMove(e) {
+        if (gameState !== 'playing') return;
+        e.preventDefault();
+
+        const touch = e.touches[0];
+        const touchCurrentX = touch.clientX;
+        const deltaX = touchCurrentX - touchStartX;
+
+        // If swipe distance is significant, set direction
+        if (Math.abs(deltaX) > 20) {
+            isTouchMoving = true;
+            if (deltaX < 0) {
+                keys['ArrowLeft'] = true;
+                keys['ArrowRight'] = false;
+            } else {
+                keys['ArrowRight'] = true;
+                keys['ArrowLeft'] = false;
+            }
+        }
+    }
+
+    // Handle touch end
+    function handleTouchEnd(e) {
+        if (gameState === 'playing') {
+            // Stop movement when touch ends
+            keys['ArrowLeft'] = false;
+            keys['ArrowRight'] = false;
+            isTouchMoving = false;
+        }
+    }
+
+    // Handle button press (for on-screen buttons)
+    function handleButtonDown(direction) {
+        if (gameState === 'playing') {
+            keys[direction] = true;
+        }
+    }
+
+    function handleButtonUp(direction) {
+        if (gameState === 'playing') {
+            keys[direction] = false;
+        }
+    }
+
     // Launch Downhill Skier
     window.launchDownhillSkier = function() {
         const content = document.getElementById('downhillSkierContent');
@@ -604,8 +669,44 @@
                 "></canvas>
 
                 <div style="text-align: center; color: #666;">
-                    <p style="margin: 0.5rem 0;">💡 <strong>Controls:</strong> Use ← → arrow keys to ski left and right</p>
+                    <p style="margin: 0.5rem 0;">💡 <strong>Controls:</strong> Arrow keys, swipe, or use buttons below</p>
                     <p style="margin: 0.5rem 0;">🎯 <strong>Goal:</strong> Avoid trees and stay on the slope!</p>
+                </div>
+
+                <!-- Left/Right Control Buttons -->
+                <div style="display: flex; gap: 20px; margin-top: 1rem;">
+                    <button id="btnSkiLeft" style="
+                        width: 100px;
+                        height: 80px;
+                        background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+                        border: 3px solid #666;
+                        border-radius: 15px;
+                        color: white;
+                        font-size: 32px;
+                        cursor: pointer;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">◀</button>
+                    <button id="btnSkiRight" style="
+                        width: 100px;
+                        height: 80px;
+                        background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+                        border: 3px solid #666;
+                        border-radius: 15px;
+                        color: white;
+                        font-size: 32px;
+                        cursor: pointer;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                        user-select: none;
+                        -webkit-tap-highlight-color: transparent;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">▶</button>
                 </div>
             </div>
         `;
@@ -624,16 +725,49 @@
         gameState = 'menu';
         draw();
 
-        // Event listeners
+        // Event listeners for canvas - click to start
         gameCanvas.addEventListener('click', handleClick);
-        gameCanvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            handleClick();
-        });
+
+        // Touch event listeners for canvas (swipe control during gameplay)
+        gameCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        gameCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        gameCanvas.addEventListener('touchend', handleTouchEnd, { passive: false });
 
         // Keyboard support
         document.addEventListener('keydown', handleKeyDown);
         document.addEventListener('keyup', handleKeyUp);
+
+        // On-screen button controls
+        const btnLeft = document.getElementById('btnSkiLeft');
+        const btnRight = document.getElementById('btnSkiRight');
+
+        // Mouse events
+        btnLeft.addEventListener('mousedown', () => handleButtonDown('ArrowLeft'));
+        btnLeft.addEventListener('mouseup', () => handleButtonUp('ArrowLeft'));
+        btnLeft.addEventListener('mouseleave', () => handleButtonUp('ArrowLeft'));
+
+        btnRight.addEventListener('mousedown', () => handleButtonDown('ArrowRight'));
+        btnRight.addEventListener('mouseup', () => handleButtonUp('ArrowRight'));
+        btnRight.addEventListener('mouseleave', () => handleButtonUp('ArrowRight'));
+
+        // Touch events for buttons
+        btnLeft.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleButtonDown('ArrowLeft');
+        });
+        btnLeft.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            handleButtonUp('ArrowLeft');
+        });
+
+        btnRight.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleButtonDown('ArrowRight');
+        });
+        btnRight.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            handleButtonUp('ArrowRight');
+        });
     };
 
     // Exit to menu
@@ -645,6 +779,13 @@
         // Remove keyboard listeners
         document.removeEventListener('keydown', handleKeyDown);
         document.removeEventListener('keyup', handleKeyUp);
+
+        // Remove touch event listeners
+        if (gameCanvas) {
+            gameCanvas.removeEventListener('touchstart', handleTouchStart);
+            gameCanvas.removeEventListener('touchmove', handleTouchMove);
+            gameCanvas.removeEventListener('touchend', handleTouchEnd);
+        }
 
         document.getElementById('downhillSkierGame').style.display = 'none';
         document.getElementById('gamesMenu').style.display = 'block';
