@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.5 loaded - Three-stage ghost exit: up 1, right, then to corridor');
+    console.log('🟡 Pac-Man v1.45.6 loaded - Fix ghost edge collision and wrapping bugs');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -291,6 +291,10 @@
                 // Snap to grid to ensure clean transition
                 ghost.x = Math.round(ghost.x / CELL_SIZE) * CELL_SIZE;
                 ghost.y = Math.round(ghost.y / CELL_SIZE) * CELL_SIZE;
+                // Update grid position after snapping
+                const gridPos = getGridPosition(ghost.x, ghost.y);
+                ghost.gridX = gridPos.gridX;
+                ghost.gridY = gridPos.gridY;
                 // Direction will be re-evaluated on next grid-aligned check
             }
         }
@@ -393,7 +397,7 @@
                 } else if (ghost.mode === 'eaten') {
                     // Head back to ghost house center
                     const ghostHouseX = 14;
-                    const ghostHouseY = 15;
+                    const ghostHouseY = 14;
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
 
@@ -553,7 +557,7 @@
                 // Choose best direction based on mode
                 if (ghost.mode === 'eaten') {
                     const ghostHouseX = 14;
-                    const ghostHouseY = 15;
+                    const ghostHouseY = 14;
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
                     validDirections.forEach(dir => {
@@ -621,12 +625,13 @@
                 console.error(`❌ ${ghost.name}: STUCK IN WALL at (${ghost.gridX}, ${ghost.gridY})! This should never happen!`);
                 // Emergency: teleport to ghost house and start exiting
                 ghost.x = 14 * CELL_SIZE;
-                ghost.y = 15 * CELL_SIZE;
+                ghost.y = 14 * CELL_SIZE;
                 ghost.gridX = 14;
-                ghost.gridY = 15;
+                ghost.gridY = 14;
                 ghost.mode = 'exiting'; // Start exiting from ghost house
                 ghost.eaten = false;
-                console.log(`  🚑 ${ghost.name}: Emergency teleport to ghost house (14, 15), now exiting`);
+                ghost.direction = { x: 0, y: -1 };
+                console.log(`  🚑 ${ghost.name}: Emergency teleport to ghost house (14, 14), now exiting`);
             }
         }
 
@@ -634,9 +639,11 @@
         if (ghost.x < 0) {
             console.log(`🌀 ${ghost.name}: Wrapping from left to right at y=${Math.round(ghost.y/CELL_SIZE)}`);
             ghost.x = GAME_WIDTH - CELL_SIZE;
+            ghost.gridX = Math.floor(ghost.x / CELL_SIZE);
         } else if (ghost.x >= GAME_WIDTH) {
             console.log(`🌀 ${ghost.name}: Wrapping from right to left at y=${Math.round(ghost.y/CELL_SIZE)}`);
             ghost.x = 0;
+            ghost.gridX = 0;
         }
     }
 
