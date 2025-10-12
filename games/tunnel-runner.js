@@ -205,10 +205,12 @@
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
                 const deviationOffset = PATH_DEVIATION * progress;
 
-                // Add angular divergence - top path goes up, bottom path goes down
-                const angleVariation = 3; // pixels per segment
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - angleVariation);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + angleVariation);
+                // Random angular divergence - each path varies independently between 3-30px
+                const topAngleVariation = 3 + Math.random() * 27; // 3-30px upward
+                const bottomAngleVariation = 3 + Math.random() * 27; // 3-30px downward
+
+                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
                 // Position divider with offset
@@ -221,16 +223,18 @@
                     splitSegmentsRemaining = FULL_SPLIT_DURATION;
                 }
             } else if (splitState === 'split') {
-                // Maintain expanded and deviated tunnel with continued angular divergence
+                // Maintain expanded and deviated tunnel with varied angular divergence
                 const dividerThickness = 15;
                 const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness + (PATH_DEVIATION * 2);
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth);
                 const deviationOffset = PATH_DEVIATION;
 
-                // Continue angling paths apart
-                const angleVariation = 2; // slightly less during full split
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - angleVariation);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + angleVariation);
+                // Random variation for each path - creates winding tunnels
+                const topAngleVariation = 3 + Math.random() * 27; // 3-30px
+                const bottomAngleVariation = 3 + Math.random() * 27; // 3-30px
+
+                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
                 // Keep divider positioned with full deviation
@@ -251,10 +255,12 @@
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
                 const deviationOffset = PATH_DEVIATION * progress;
 
-                // Bring paths back to horizontal alignment
-                const angleVariation = 2 * progress; // reduce angle as they merge
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset + angleVariation);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset - angleVariation);
+                // Reduce variation as paths merge back
+                const topAngleVariation = (3 + Math.random() * 27) * progress; // Scaled by progress
+                const bottomAngleVariation = (3 + Math.random() * 27) * progress;
+
+                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset + topAngleVariation);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset - bottomAngleVariation);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
                 // Bring divider back to center
