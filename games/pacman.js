@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.1 loaded - Ghosts regenerate in ghost house and exit to maze');
+    console.log('🟡 Pac-Man v1.45.2 loaded - Fixed ghost house exit to valid corridor');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -321,8 +321,8 @@
 
         // If exiting, navigate to ghost house exit
         if (ghost.mode === 'exiting') {
-            const exitX = 14; // Ghost house exit x
-            const exitY = 8;  // Ghost house exit y (just above ghost house)
+            const exitX = 15; // Ghost house exit x (right opening in corridor)
+            const exitY = 8;  // Ghost house exit y (corridor row with dots)
             const distToExit = Math.abs(ghost.gridX - exitX) + Math.abs(ghost.gridY - exitY);
             if (distToExit <= 1) { // Reached the exit
                 // Now free to chase Pac-Man
@@ -388,7 +388,7 @@
                     }
                 } else if (ghost.mode === 'exiting') {
                     // Head to ghost house exit
-                    const exitX = 14;
+                    const exitX = 15;
                     const exitY = 8;
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
@@ -516,7 +516,7 @@
                     });
                     ghost.direction = bestDir;
                 } else if (ghost.mode === 'exiting') {
-                    const exitX = 14;
+                    const exitX = 15;
                     const exitY = 8;
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
