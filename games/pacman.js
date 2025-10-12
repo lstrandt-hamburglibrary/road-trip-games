@@ -157,7 +157,9 @@
             y: 23,
             direction: DIR.NONE,
             nextDirection: DIR.NONE,
-            animation: 0
+            animation: 0,
+            moveCounter: 0,
+            moveDelay: 3 // Move every 3 frames (10 cells/sec at 30fps)
         };
     }
 
@@ -173,7 +175,9 @@
             direction: DIR.LEFT,
             mode: 'chase', // chase, frightened, eaten, exiting
             scatterTarget: scatterTarget,
-            animation: 0
+            animation: 0,
+            moveCounter: 0,
+            moveDelay: 4 // Move every 4 frames (7.5 cells/sec at 30fps)
         };
     }
 
@@ -336,6 +340,15 @@
 
     // Update Pac-Man
     function updatePacman() {
+        pacman.animation++;
+        pacman.moveCounter++;
+
+        // Only move when counter reaches delay
+        if (pacman.moveCounter < pacman.moveDelay) {
+            return;
+        }
+        pacman.moveCounter = 0;
+
         // Try to change direction if next direction is set
         if (pacman.nextDirection !== DIR.NONE) {
             const nextX = pacman.x + pacman.nextDirection.x;
@@ -355,12 +368,10 @@
             if (nextY === 14) {
                 if (nextX < 0) {
                     pacman.x = GRID_WIDTH - 1;
-                    pacman.animation++;
                     return;
                 }
                 if (nextX >= GRID_WIDTH) {
                     pacman.x = 0;
-                    pacman.animation++;
                     return;
                 }
             }
@@ -386,8 +397,6 @@
                 pacman.direction = DIR.NONE;
             }
         }
-
-        pacman.animation++;
     }
 
     // Activate power mode
@@ -414,7 +423,10 @@
     // Update ghosts
     function updateGhosts() {
         ghosts.forEach(ghost => {
-            // Check if reached target in special modes
+            ghost.animation++;
+            ghost.moveCounter++;
+
+            // Check if reached target in special modes (check every frame)
             if (ghost.mode === 'eaten' && ghost.x === 14 && ghost.y === 14) {
                 ghost.mode = 'exiting';
             }
@@ -422,6 +434,18 @@
             if (ghost.mode === 'exiting' && ghost.x === 14 && ghost.y === 11) {
                 ghost.mode = 'chase';
             }
+
+            // Only move when counter reaches delay
+            let currentDelay = ghost.moveDelay;
+            // Eaten ghosts move faster
+            if (ghost.mode === 'eaten') {
+                currentDelay = 2;
+            }
+
+            if (ghost.moveCounter < currentDelay) {
+                return; // Skip to next ghost
+            }
+            ghost.moveCounter = 0;
 
             // Choose direction at current position
             ghost.direction = chooseGhostDirection(ghost);
@@ -434,13 +458,11 @@
             if (nextY === 14) {
                 if (nextX < 0) {
                     ghost.x = GRID_WIDTH - 1;
-                    ghost.animation++;
-                    return;
+                    return; // Skip to next ghost
                 }
                 if (nextX >= GRID_WIDTH) {
                     ghost.x = 0;
-                    ghost.animation++;
-                    return;
+                    return; // Skip to next ghost
                 }
             }
 
@@ -448,8 +470,6 @@
                 ghost.x = nextX;
                 ghost.y = nextY;
             }
-
-            ghost.animation++;
         });
     }
 
