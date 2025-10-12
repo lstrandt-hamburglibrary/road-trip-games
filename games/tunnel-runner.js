@@ -17,6 +17,7 @@
     const MAX_TUNNEL_WIDTH = 240;
     const SEGMENT_WIDTH = 20;
     const OBSTACLE_CHANCE = 0.05; // 5% chance per segment
+    const SPLIT_CHANCE = 0.01; // 1% chance to start a tunnel split
 
     // Color palette for tunnel variations
     const TUNNEL_COLORS = [
@@ -41,14 +42,15 @@
     }
 
     // Create a tunnel segment
-    function createTunnelSegment(x, topHeight, bottomHeight, tunnelWidth, colorIndex, obstacles = []) {
+    function createTunnelSegment(x, topHeight, bottomHeight, tunnelWidth, colorIndex, obstacles = [], splitInfo = null) {
         return {
             x: x,
             topHeight: topHeight,
             bottomHeight: bottomHeight,
             tunnelWidth: tunnelWidth,
             colorIndex: colorIndex,
-            obstacles: obstacles
+            obstacles: obstacles,
+            splitInfo: splitInfo // { state: 'splitting'|'split'|'merging', progress: 0-1, dividerY: number }
         };
     }
 
@@ -116,6 +118,14 @@
     let segmentsSinceColorChange = 0;
     let currentColorIndex = 0;
 
+    // Track tunnel splits
+    let splitState = null; // null, 'splitting', 'split', 'merging'
+    let splitSegmentsRemaining = 0;
+    let splitDividerY = 0;
+    const SPLIT_DURATION = 20; // segments to split
+    const FULL_SPLIT_DURATION = 40; // segments fully split
+    const MERGE_DURATION = 20; // segments to merge
+
     // Update game state
     function update() {
         if (gameState !== 'playing') return;
@@ -157,13 +167,48 @@
                 segmentsSinceColorChange = 0;
             }
 
+            // Handle tunnel splits
+            let splitInfo = null;
+
+            if (splitState === null && Math.random() < SPLIT_CHANCE && score > 50) {
+                // Start a new split
+                splitState = 'splitting';
+                splitSegmentsRemaining = SPLIT_DURATION;
+                splitDividerY = newTopHeight + newTunnelWidth / 2;
+            }
+
+            if (splitState === 'splitting') {
+                const progress = 1 - (splitSegmentsRemaining / SPLIT_DURATION);
+                splitInfo = { state: 'splitting', progress: progress, dividerY: splitDividerY };
+                splitSegmentsRemaining--;
+                if (splitSegmentsRemaining <= 0) {
+                    splitState = 'split';
+                    splitSegmentsRemaining = FULL_SPLIT_DURATION;
+                }
+            } else if (splitState === 'split') {
+                splitInfo = { state: 'split', progress: 1, dividerY: splitDividerY };
+                splitSegmentsRemaining--;
+                if (splitSegmentsRemaining <= 0) {
+                    splitState = 'merging';
+                    splitSegmentsRemaining = MERGE_DURATION;
+                }
+            } else if (splitState === 'merging') {
+                const progress = splitSegmentsRemaining / MERGE_DURATION;
+                splitInfo = { state: 'merging', progress: progress, dividerY: splitDividerY };
+                splitSegmentsRemaining--;
+                if (splitSegmentsRemaining <= 0) {
+                    splitState = null;
+                }
+            }
+
             tunnelSegments.push(createTunnelSegment(
                 lastSegment.x + SEGMENT_WIDTH,
                 newTopHeight,
                 newBottomHeight,
                 newTunnelWidth,
                 currentColorIndex,
-                obstacles
+                obstacles,
+                splitInfo
             ));
 
             score++;
@@ -192,6 +237,19 @@
                     if (rocket.y + ROCKET_SIZE > obstacle.y - obstacle.length) {
                         gameOver();
                     }
+                }
+            }
+
+            // Check tunnel split divider
+            if (rocketSegment.splitInfo && rocketSegment.splitInfo.progress > 0) {
+                const dividerThickness = 15;
+                const dividerHalfHeight = (rocketSegment.tunnelWidth * rocketSegment.splitInfo.progress) / 2;
+                const dividerTop = rocketSegment.splitInfo.dividerY - dividerHalfHeight;
+                const dividerBottom = rocketSegment.splitInfo.dividerY + dividerHalfHeight;
+
+                // Check if rocket hits the divider
+                if (rocket.y + ROCKET_SIZE > dividerTop && rocket.y < dividerBottom) {
+                    gameOver();
                 }
             }
         }
@@ -246,6 +304,31 @@
             ctx.moveTo(segment.x, segment.bottomHeight);
             ctx.lineTo(segment.x + SEGMENT_WIDTH, segment.bottomHeight);
             ctx.stroke();
+
+            // Draw tunnel split divider
+            if (segment.splitInfo && segment.splitInfo.progress > 0) {
+                const dividerThickness = 15;
+                const dividerHalfHeight = (segment.tunnelWidth * segment.splitInfo.progress) / 2;
+                const dividerTop = segment.splitInfo.dividerY - dividerHalfHeight;
+                const dividerBottom = segment.splitInfo.dividerY + dividerHalfHeight;
+
+                // Draw the divider
+                ctx.fillStyle = color.wall;
+                ctx.fillRect(segment.x, dividerTop, SEGMENT_WIDTH + 1, dividerBottom - dividerTop);
+
+                // Draw divider edges
+                ctx.strokeStyle = color.edge;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(segment.x, dividerTop);
+                ctx.lineTo(segment.x + SEGMENT_WIDTH, dividerTop);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(segment.x, dividerBottom);
+                ctx.lineTo(segment.x + SEGMENT_WIDTH, dividerBottom);
+                ctx.stroke();
+            }
 
             // Draw obstacles
             for (let obstacle of segment.obstacles) {
@@ -337,10 +420,11 @@
         ctx.textAlign = 'center';
         ctx.fillText('🚀 TUNNEL RUNNER', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 100);
 
-        ctx.font = '22px Arial';
-        ctx.fillText('Navigate through the changing tunnel!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 40);
-        ctx.fillText('Avoid walls, obstacles, and narrow passages!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
-        ctx.fillText('Tap or hold to fly up', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30);
+        ctx.font = '20px Arial';
+        ctx.fillText('Navigate through the changing tunnel!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 50);
+        ctx.fillText('Avoid walls, obstacles, and narrow passages!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 25);
+        ctx.fillText('Choose your path when the tunnel splits!', GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        ctx.fillText('Tap or hold to fly up', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 35);
         ctx.fillText('Release to fall down', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 60);
 
         ctx.font = 'bold 32px Arial';
