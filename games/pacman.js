@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.44.1 loaded - Ghost AI debug enabled');
+    console.log('🟡 Pac-Man v1.44.2 loaded - Ghost AI debug + wall collision fix enabled');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -439,12 +439,78 @@
             ghost.x = newX;
             ghost.y = newY;
         } else {
-            // Align to grid if hitting wall
+            // Blocked - snap to grid and force direction re-evaluation
             if (frameCount % 60 === 0) {
-                console.log(`🚧 ${ghost.name}: Blocked at (${ghost.gridX}, ${ghost.gridY}), snapping to grid. Direction: (${ghost.direction.x}, ${ghost.direction.y})`);
+                console.log(`🚧 ${ghost.name}: BLOCKED at (${ghost.gridX}, ${ghost.gridY}), forcing direction re-evaluation. Current direction: (${ghost.direction.x}, ${ghost.direction.y})`);
             }
             ghost.x = ghost.gridX * CELL_SIZE;
             ghost.y = ghost.gridY * CELL_SIZE;
+
+            // Force re-evaluation by trying different directions immediately
+            const possibleDirections = [
+                { x: 0, y: -1 }, // up
+                { x: 0, y: 1 },  // down
+                { x: -1, y: 0 }, // left
+                { x: 1, y: 0 }   // right
+            ];
+
+            // Filter valid directions
+            const validDirections = possibleDirections.filter(dir => {
+                const nextX = ghost.gridX + dir.x;
+                const nextY = ghost.gridY + dir.y;
+                const isReverse = dir.x === -ghost.direction.x && dir.y === -ghost.direction.y;
+                return isValidPosition(nextX, nextY) && !isReverse;
+            });
+
+            if (validDirections.length > 0) {
+                // Choose best direction based on mode
+                if (ghost.mode === 'eaten') {
+                    const centerX = 14;
+                    const centerY = 15;
+                    let bestDir = validDirections[0];
+                    let bestDist = Infinity;
+                    validDirections.forEach(dir => {
+                        const nextX = ghost.gridX + dir.x;
+                        const nextY = ghost.gridY + dir.y;
+                        const dist = Math.sqrt(Math.pow(nextX - centerX, 2) + Math.pow(nextY - centerY, 2));
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            bestDir = dir;
+                        }
+                    });
+                    ghost.direction = bestDir;
+                } else if (ghost.mode === 'frightened') {
+                    ghost.direction = validDirections[Math.floor(Math.random() * validDirections.length)];
+                } else {
+                    // Chase Pac-Man
+                    const targetX = pacman.gridX;
+                    const targetY = pacman.gridY;
+                    let bestDir = validDirections[0];
+                    let bestDist = Infinity;
+                    validDirections.forEach(dir => {
+                        const nextX = ghost.gridX + dir.x;
+                        const nextY = ghost.gridY + dir.y;
+                        const dist = Math.sqrt(Math.pow(nextX - targetX, 2) + Math.pow(nextY - targetY, 2));
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            bestDir = dir;
+                        }
+                    });
+                    ghost.direction = bestDir;
+                }
+                if (frameCount % 60 === 0) {
+                    console.log(`  ✅ ${ghost.name}: New direction chosen: (${ghost.direction.x}, ${ghost.direction.y})`);
+                }
+            } else {
+                // No valid moves at all - ghost is stuck in a wall!
+                console.error(`❌ ${ghost.name}: STUCK IN WALL at (${ghost.gridX}, ${ghost.gridY})! This should never happen!`);
+                // Emergency: teleport to a safe starting position
+                ghost.x = 14 * CELL_SIZE;
+                ghost.y = 15 * CELL_SIZE;
+                ghost.gridX = 14;
+                ghost.gridY = 15;
+                console.log(`  🚑 ${ghost.name}: Emergency teleport to center (14, 15)`);
+            }
         }
 
         // Wrap around tunnels (same as Pac-Man)
