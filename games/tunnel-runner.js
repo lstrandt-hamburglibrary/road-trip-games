@@ -12,8 +12,11 @@
     const GAME_HEIGHT = 600;
     const ROCKET_SIZE = 30;
     const SCROLL_SPEED = 3;
-    const TUNNEL_WIDTH = 200;
+    const BASE_TUNNEL_WIDTH = 200;
+    const MIN_TUNNEL_WIDTH = 140;
+    const MAX_TUNNEL_WIDTH = 220;
     const SEGMENT_WIDTH = 20;
+    const OBSTACLE_CHANCE = 0.05; // 5% chance per segment
 
     // Rocket object
     function createRocket() {
@@ -28,12 +31,41 @@
     }
 
     // Create a tunnel segment
-    function createTunnelSegment(x, topHeight, bottomHeight) {
+    function createTunnelSegment(x, topHeight, bottomHeight, tunnelWidth, obstacles = []) {
         return {
             x: x,
             topHeight: topHeight,
-            bottomHeight: bottomHeight
+            bottomHeight: bottomHeight,
+            tunnelWidth: tunnelWidth,
+            obstacles: obstacles
         };
+    }
+
+    // Create random obstacles for a segment
+    function createObstacles(topHeight, bottomHeight) {
+        const obstacles = [];
+
+        if (Math.random() < OBSTACLE_CHANCE) {
+            // Random obstacle type
+            const type = Math.random() < 0.5 ? 'stalactite' : 'stalagmite';
+            const obstacleLength = 30 + Math.random() * 40; // 30-70 pixels
+
+            if (type === 'stalactite') {
+                obstacles.push({
+                    type: 'stalactite',
+                    y: topHeight,
+                    length: obstacleLength
+                });
+            } else {
+                obstacles.push({
+                    type: 'stalagmite',
+                    y: bottomHeight,
+                    length: obstacleLength
+                });
+            }
+        }
+
+        return obstacles;
     }
 
     // Initialize game
@@ -43,16 +75,24 @@
         score = 0;
 
         // Create initial tunnel segments
-        let currentTopHeight = GAME_HEIGHT / 2 - TUNNEL_WIDTH / 2;
-        let currentBottomHeight = GAME_HEIGHT / 2 + TUNNEL_WIDTH / 2;
+        let currentTunnelWidth = BASE_TUNNEL_WIDTH;
+        let currentTopHeight = GAME_HEIGHT / 2 - currentTunnelWidth / 2;
+        let currentBottomHeight = GAME_HEIGHT / 2 + currentTunnelWidth / 2;
 
         for (let i = 0; i < Math.ceil(GAME_WIDTH / SEGMENT_WIDTH) + 5; i++) {
             // Add some random variation to tunnel height
             const variation = (Math.random() - 0.5) * 10;
-            currentTopHeight = Math.max(50, Math.min(GAME_HEIGHT - TUNNEL_WIDTH - 50, currentTopHeight + variation));
-            currentBottomHeight = currentTopHeight + TUNNEL_WIDTH;
 
-            tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight));
+            // Gradually vary tunnel width
+            const widthVariation = (Math.random() - 0.5) * 3;
+            currentTunnelWidth = Math.max(MIN_TUNNEL_WIDTH, Math.min(MAX_TUNNEL_WIDTH, currentTunnelWidth + widthVariation));
+
+            currentTopHeight = Math.max(50, Math.min(GAME_HEIGHT - currentTunnelWidth - 50, currentTopHeight + variation));
+            currentBottomHeight = currentTopHeight + currentTunnelWidth;
+
+            const obstacles = i > 10 ? createObstacles(currentTopHeight, currentBottomHeight) : []; // No obstacles at start
+
+            tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight, currentTunnelWidth, obstacles));
         }
 
         gameState = 'playing';
@@ -83,13 +123,22 @@
             // Add new segment at the end
             const lastSegment = tunnelSegments[tunnelSegments.length - 1];
             const variation = (Math.random() - 0.5) * 15;
-            let newTopHeight = Math.max(50, Math.min(GAME_HEIGHT - TUNNEL_WIDTH - 50, lastSegment.topHeight + variation));
-            let newBottomHeight = newTopHeight + TUNNEL_WIDTH;
+
+            // Gradually vary tunnel width
+            const widthVariation = (Math.random() - 0.5) * 3;
+            let newTunnelWidth = Math.max(MIN_TUNNEL_WIDTH, Math.min(MAX_TUNNEL_WIDTH, lastSegment.tunnelWidth + widthVariation));
+
+            let newTopHeight = Math.max(50, Math.min(GAME_HEIGHT - newTunnelWidth - 50, lastSegment.topHeight + variation));
+            let newBottomHeight = newTopHeight + newTunnelWidth;
+
+            const obstacles = createObstacles(newTopHeight, newBottomHeight);
 
             tunnelSegments.push(createTunnelSegment(
                 lastSegment.x + SEGMENT_WIDTH,
                 newTopHeight,
-                newBottomHeight
+                newBottomHeight,
+                newTunnelWidth,
+                obstacles
             ));
 
             score++;
@@ -101,8 +150,24 @@
         );
 
         if (rocketSegment) {
+            // Check tunnel walls
             if (rocket.y < rocketSegment.topHeight || rocket.y + ROCKET_SIZE > rocketSegment.bottomHeight) {
                 gameOver();
+            }
+
+            // Check obstacles (stalactites and stalagmites)
+            for (let obstacle of rocketSegment.obstacles) {
+                if (obstacle.type === 'stalactite') {
+                    // Stalactite hangs from top
+                    if (rocket.y < obstacle.y + obstacle.length) {
+                        gameOver();
+                    }
+                } else if (obstacle.type === 'stalagmite') {
+                    // Stalagmite rises from bottom
+                    if (rocket.y + ROCKET_SIZE > obstacle.y - obstacle.length) {
+                        gameOver();
+                    }
+                }
             }
         }
 
@@ -154,6 +219,39 @@
             ctx.moveTo(segment.x, segment.bottomHeight);
             ctx.lineTo(segment.x + SEGMENT_WIDTH, segment.bottomHeight);
             ctx.stroke();
+
+            // Draw obstacles
+            for (let obstacle of segment.obstacles) {
+                ctx.fillStyle = '#9b59b6';
+
+                if (obstacle.type === 'stalactite') {
+                    // Draw stalactite (triangle pointing down)
+                    ctx.beginPath();
+                    ctx.moveTo(segment.x + SEGMENT_WIDTH / 2, obstacle.y);
+                    ctx.lineTo(segment.x, obstacle.y + obstacle.length);
+                    ctx.lineTo(segment.x + SEGMENT_WIDTH, obstacle.y + obstacle.length);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Add highlight
+                    ctx.strokeStyle = '#bb8fce';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                } else if (obstacle.type === 'stalagmite') {
+                    // Draw stalagmite (triangle pointing up)
+                    ctx.beginPath();
+                    ctx.moveTo(segment.x + SEGMENT_WIDTH / 2, obstacle.y);
+                    ctx.lineTo(segment.x, obstacle.y - obstacle.length);
+                    ctx.lineTo(segment.x + SEGMENT_WIDTH, obstacle.y - obstacle.length);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Add highlight
+                    ctx.strokeStyle = '#bb8fce';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
         }
     }
 
@@ -214,8 +312,9 @@
 
         ctx.font = '24px Arial';
         ctx.fillText('Navigate your rocket through the tunnel!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 40);
-        ctx.fillText('Tap or hold to fly up', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);
-        ctx.fillText('Release to fall down', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 40);
+        ctx.fillText('Avoid the walls and obstacles!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
+        ctx.fillText('Tap or hold to fly up', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30);
+        ctx.fillText('Release to fall down', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 60);
 
         ctx.font = 'bold 32px Arial';
         ctx.fillStyle = '#feca57';
