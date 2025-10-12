@@ -1,5 +1,5 @@
 // Service Worker for Road Trip Games
-const VERSION = '1.38.1';
+const VERSION = '1.38.2';
 const CACHE_NAME = `roadtrip-v${VERSION}`;
 const BYPASS_CACHE = true; // Always bypass cache to ensure updates are seen
 
