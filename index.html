@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.46.0';</script>
+    <script>window.APP_VERSION = '1.47.0';</script>
 
     <style>
         * {
@@ -413,11 +413,6 @@
                         <h3>⛷️ Downhill Skier</h3>
                         <p>Ski down the mountain avoiding trees!</p>
                     </div>
-
-                    <div class="feature-card" onclick="launchPacman()" style="background: linear-gradient(135deg, #FFFF00 0%, #FFD700 100%); color: #000;">
-                        <h3>🟡 Pac-Man</h3>
-                        <p>Eat dots and avoid ghosts in the maze!</p>
-                    </div>
                 </div>
             </div>
 
@@ -509,15 +504,6 @@
                     <button onclick="exitDownhillSkierToMenu()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
                 </div>
                 <div id="downhillSkierContent"></div>
-            </div>
-
-            <!-- Pac-Man Game Section (hidden by default) -->
-            <div id="pacmanGame" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2>🟡 Pac-Man</h2>
-                    <button onclick="exitPacmanToMenu()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
-                </div>
-                <div id="pacmanContent"></div>
             </div>
 
             <div class="roadmap">
@@ -844,7 +830,6 @@
     <script src="games/joust.js?v=1.32.0"></script>
     <script src="games/tunnel-runner.js?v=1.39.1"></script>
     <script src="games/downhill-skier.js?v=1.43.0"></script>
-    <script src="games/pacman.js?v=1.46.0"></script>
     <!-- <script src="games/trouble.js?v=1.27.1"></script> -->
 </body>
 </html>
