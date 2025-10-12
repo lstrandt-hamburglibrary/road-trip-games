@@ -817,8 +817,8 @@
 
     // Launch game
     window.launchPacman = function() {
-        document.getElementById('games-menu').classList.remove('active');
-        document.getElementById('pacman-game').classList.add('active');
+        document.getElementById('gamesMenu').style.display = 'none';
+        document.getElementById('pacmanGame').style.display = 'block';
 
         if (!animationFrameId) {
             initGame();
@@ -827,8 +827,8 @@
 
     // Exit game
     window.exitPacman = function() {
-        document.getElementById('pacman-game').classList.remove('active');
-        document.getElementById('games-menu').classList.add('active');
+        document.getElementById('pacmanGame').style.display = 'none';
+        document.getElementById('gamesMenu').style.display = 'block';
 
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
