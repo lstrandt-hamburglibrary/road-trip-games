@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.7 loaded - Smart snap-to-grid avoids walls');
+    console.log('🟡 Pac-Man v1.45.8 loaded - Smart snap in blocked logic');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -565,12 +565,19 @@
             ghost.x = newX;
             ghost.y = newY;
         } else {
-            // Blocked - snap to grid and force direction re-evaluation
+            // Blocked - snap to NEAREST VALID grid position and force direction re-evaluation
             if (frameCount % 60 === 0) {
-                console.log(`🚧 ${ghost.name}: BLOCKED at (${ghost.gridX}, ${ghost.gridY}), forcing direction re-evaluation. Current direction: (${ghost.direction.x}, ${ghost.direction.y})`);
+                console.log(`🚧 ${ghost.name}: BLOCKED at pixel (${ghost.x.toFixed(1)}, ${ghost.y.toFixed(1)}), grid (${ghost.gridX}, ${ghost.gridY})`);
             }
-            ghost.x = ghost.gridX * CELL_SIZE;
-            ghost.y = ghost.gridY * CELL_SIZE;
+            // Use smart snapping to avoid walls
+            const validPos = findNearestValidGridPosition(ghost.x, ghost.y);
+            ghost.x = validPos.x;
+            ghost.y = validPos.y;
+            ghost.gridX = validPos.gridX;
+            ghost.gridY = validPos.gridY;
+            if (frameCount % 60 === 0) {
+                console.log(`  ✅ Snapped to valid position: (${ghost.gridX}, ${ghost.gridY})`);
+            }
 
             // Force re-evaluation by trying different directions immediately
             const possibleDirections = [
