@@ -205,8 +205,10 @@
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
                 const deviationOffset = PATH_DEVIATION * progress;
 
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset);
+                // Add angular divergence - top path goes up, bottom path goes down
+                const angleVariation = 3; // pixels per segment
+                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - angleVariation);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + angleVariation);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
                 // Position divider with offset
@@ -219,14 +221,16 @@
                     splitSegmentsRemaining = FULL_SPLIT_DURATION;
                 }
             } else if (splitState === 'split') {
-                // Maintain expanded and deviated tunnel
+                // Maintain expanded and deviated tunnel with continued angular divergence
                 const dividerThickness = 15;
                 const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness + (PATH_DEVIATION * 2);
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth);
                 const deviationOffset = PATH_DEVIATION;
 
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset);
+                // Continue angling paths apart
+                const angleVariation = 2; // slightly less during full split
+                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - angleVariation);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + angleVariation);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
                 // Keep divider positioned with full deviation
@@ -247,8 +251,10 @@
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
                 const deviationOffset = PATH_DEVIATION * progress;
 
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset);
+                // Bring paths back to horizontal alignment
+                const angleVariation = 2 * progress; // reduce angle as they merge
+                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset + angleVariation);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset - angleVariation);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
                 // Bring divider back to center
