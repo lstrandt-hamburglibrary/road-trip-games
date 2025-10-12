@@ -317,6 +317,7 @@
                 ghost.mode = 'scatter';
                 ghost.speed = GHOST_SPEED;
                 ghost.eaten = false;
+                ghost.frightenedTimer = 0; // Reset timer to prevent issues
                 ghost.x = ghost.homeX * CELL_SIZE;
                 ghost.y = ghost.homeY * CELL_SIZE;
             }
@@ -448,11 +449,17 @@
             ghost.y = ghost.gridY * CELL_SIZE;
         }
 
-        // Wrap around tunnels
-        if (ghost.x < 0) {
-            ghost.x = GAME_WIDTH - CELL_SIZE;
-        } else if (ghost.x >= GAME_WIDTH) {
-            ghost.x = 0;
+        // Wrap around tunnels (only in tunnel row)
+        const TUNNEL_ROW = 13;
+        if (ghost.gridY === TUNNEL_ROW) {
+            if (ghost.x < 0) {
+                ghost.x = GAME_WIDTH - CELL_SIZE;
+            } else if (ghost.x >= GAME_WIDTH) {
+                ghost.x = 0;
+            }
+        } else {
+            // Keep ghost in bounds for non-tunnel rows
+            ghost.x = Math.max(CELL_SIZE, Math.min(GAME_WIDTH - CELL_SIZE * 2, ghost.x));
         }
     }
 
@@ -474,6 +481,7 @@
                     ghost.mode = 'eaten';
                     ghost.speed = GHOST_SPEED * 2;
                     ghost.eaten = true;
+                    ghost.frightenedTimer = 0; // Clear timer when eaten
                 } else if (ghost.mode !== 'eaten') {
                     // Pac-Man dies
                     lives--;
