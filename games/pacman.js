@@ -153,13 +153,14 @@
     // Pac-Man entity
     function createPacman() {
         return {
-            x: 14,
-            y: 23,
+            gridX: 14,
+            gridY: 23,
+            pixelX: 14 * TILE_SIZE,
+            pixelY: 23 * TILE_SIZE,
             direction: DIR.NONE,
             nextDirection: DIR.NONE,
-            animation: 0,
-            moveCounter: 0,
-            moveDelay: 3 // Move every 3 frames (10 cells/sec at 30fps)
+            speed: 2.5, // pixels per frame
+            animation: 0
         };
     }
 
@@ -168,16 +169,17 @@
         return {
             name: name,
             color: color,
-            x: startX,
-            y: startY,
+            gridX: startX,
+            gridY: startY,
+            pixelX: startX * TILE_SIZE,
+            pixelY: startY * TILE_SIZE,
             startX: startX,
             startY: startY,
             direction: DIR.LEFT,
             mode: 'chase', // chase, frightened, eaten, exiting
             scatterTarget: scatterTarget,
-            animation: 0,
-            moveCounter: 0,
-            moveDelay: 4 // Move every 4 frames (7.5 cells/sec at 30fps)
+            speed: 2.0, // pixels per frame
+            animation: 0
         };
     }
 
@@ -258,36 +260,36 @@
         // Chase mode - each ghost has unique targeting
         switch (ghost.name) {
             case 'Blinky': // Red - directly target Pac-Man
-                return { x: pacman.x, y: pacman.y };
+                return { x: pacman.gridX, y: pacman.gridY };
 
             case 'Pinky': // Pink - target 4 tiles ahead of Pac-Man
                 return {
-                    x: pacman.x + (pacman.direction.x * 4),
-                    y: pacman.y + (pacman.direction.y * 4)
+                    x: pacman.gridX + (pacman.direction.x * 4),
+                    y: pacman.gridY + (pacman.direction.y * 4)
                 };
 
             case 'Inky': // Cyan - complex targeting using Blinky
                 const blinky = ghosts.find(g => g.name === 'Blinky');
                 if (blinky) {
-                    const pivotX = pacman.x + (pacman.direction.x * 2);
-                    const pivotY = pacman.y + (pacman.direction.y * 2);
+                    const pivotX = pacman.gridX + (pacman.direction.x * 2);
+                    const pivotY = pacman.gridY + (pacman.direction.y * 2);
                     return {
-                        x: pivotX + (pivotX - blinky.x),
-                        y: pivotY + (pivotY - blinky.y)
+                        x: pivotX + (pivotX - blinky.gridX),
+                        y: pivotY + (pivotY - blinky.gridY)
                     };
                 }
-                return { x: pacman.x, y: pacman.y };
+                return { x: pacman.gridX, y: pacman.gridY };
 
             case 'Clyde': // Orange - chase when far, scatter when close
-                const dist = Math.abs(ghost.x - pacman.x) + Math.abs(ghost.y - pacman.y);
+                const dist = Math.abs(ghost.gridX - pacman.gridX) + Math.abs(ghost.gridY - pacman.gridY);
                 if (dist > 8) {
-                    return { x: pacman.x, y: pacman.y };
+                    return { x: pacman.gridX, y: pacman.gridY };
                 } else {
                     return ghost.scatterTarget;
                 }
 
             default:
-                return { x: pacman.x, y: pacman.y };
+                return { x: pacman.gridX, y: pacman.gridY };
         }
     }
 
@@ -297,7 +299,7 @@
 
         // Frightened mode - choose random valid direction
         if (ghost.mode === 'frightened') {
-            const available = getAvailableDirections(ghost.x, ghost.y, ghost.direction, true, ghost);
+            const available = getAvailableDirections(ghost.gridX, ghost.gridY, ghost.direction, true, ghost);
             if (available.length > 0) {
                 return available[Math.floor(Math.random() * available.length)];
             }
@@ -306,18 +308,18 @@
 
         // Eaten mode - use BFS pathfinding
         if (ghost.mode === 'eaten') {
-            const dir = findPathBFS(ghost.x, ghost.y, target.x, target.y, ghost);
+            const dir = findPathBFS(ghost.gridX, ghost.gridY, target.x, target.y, ghost);
             return dir !== DIR.NONE ? dir : ghost.direction;
         }
 
         // Exiting mode - move to exit
         if (ghost.mode === 'exiting') {
-            const dir = findPathBFS(ghost.x, ghost.y, target.x, target.y, ghost);
+            const dir = findPathBFS(ghost.gridX, ghost.gridY, target.x, target.y, ghost);
             return dir !== DIR.NONE ? dir : ghost.direction;
         }
 
         // Normal chase/scatter - choose direction that minimizes distance to target
-        const available = getAvailableDirections(ghost.x, ghost.y, ghost.direction, true, ghost);
+        const available = getAvailableDirections(ghost.gridX, ghost.gridY, ghost.direction, true, ghost);
         if (available.length === 0) {
             return ghost.direction;
         }
@@ -326,8 +328,8 @@
         let bestDist = Infinity;
 
         for (const dir of available) {
-            const nextX = ghost.x + dir.x;
-            const nextY = ghost.y + dir.y;
+            const nextX = ghost.gridX + dir.x;
+            const nextY = ghost.gridY + dir.y;
             const dist = Math.abs(nextX - target.x) + Math.abs(nextY - target.y);
             if (dist < bestDist) {
                 bestDist = dist;
@@ -338,59 +340,70 @@
         return bestDir;
     }
 
+    // Check if entity is aligned with grid
+    function isAlignedWithGrid(pixelX, pixelY) {
+        return Math.abs(pixelX % TILE_SIZE - TILE_SIZE / 2) < 2 &&
+               Math.abs(pixelY % TILE_SIZE - TILE_SIZE / 2) < 2;
+    }
+
     // Update Pac-Man
     function updatePacman() {
         pacman.animation++;
-        pacman.moveCounter++;
 
-        // Only move when counter reaches delay
-        if (pacman.moveCounter < pacman.moveDelay) {
-            return;
-        }
-        pacman.moveCounter = 0;
+        // Update grid position based on pixel position
+        pacman.gridX = Math.round(pacman.pixelX / TILE_SIZE);
+        pacman.gridY = Math.round(pacman.pixelY / TILE_SIZE);
 
-        // Try to change direction if next direction is set
-        if (pacman.nextDirection !== DIR.NONE) {
-            const nextX = pacman.x + pacman.nextDirection.x;
-            const nextY = pacman.y + pacman.nextDirection.y;
-            if (isWalkable(nextX, nextY)) {
+        // Try to change direction when aligned with grid
+        if (isAlignedWithGrid(pacman.pixelX, pacman.pixelY) && pacman.nextDirection !== DIR.NONE) {
+            const nextGridX = pacman.gridX + pacman.nextDirection.x;
+            const nextGridY = pacman.gridY + pacman.nextDirection.y;
+            if (isWalkable(nextGridX, nextGridY)) {
                 pacman.direction = pacman.nextDirection;
                 pacman.nextDirection = DIR.NONE;
+                // Snap to grid center
+                pacman.pixelX = pacman.gridX * TILE_SIZE;
+                pacman.pixelY = pacman.gridY * TILE_SIZE;
             }
         }
 
         // Move in current direction
         if (pacman.direction !== DIR.NONE) {
-            const nextX = pacman.x + pacman.direction.x;
-            const nextY = pacman.y + pacman.direction.y;
+            const newPixelX = pacman.pixelX + pacman.direction.x * pacman.speed;
+            const newPixelY = pacman.pixelY + pacman.direction.y * pacman.speed;
+            const newGridX = Math.round(newPixelX / TILE_SIZE);
+            const newGridY = Math.round(newPixelY / TILE_SIZE);
 
             // Handle tunnel wrapping
-            if (nextY === 14) {
-                if (nextX < 0) {
-                    pacman.x = GRID_WIDTH - 1;
+            if (newGridY === 14) {
+                if (newPixelX < 0) {
+                    pacman.pixelX = (GRID_WIDTH - 1) * TILE_SIZE;
                     return;
                 }
-                if (nextX >= GRID_WIDTH) {
-                    pacman.x = 0;
+                if (newPixelX >= GRID_WIDTH * TILE_SIZE) {
+                    pacman.pixelX = 0;
                     return;
                 }
             }
 
-            if (isWalkable(nextX, nextY)) {
-                pacman.x = nextX;
-                pacman.y = nextY;
+            // Check if we can move to the new position
+            if (isWalkable(newGridX, newGridY)) {
+                pacman.pixelX = newPixelX;
+                pacman.pixelY = newPixelY;
 
-                // Eat dot or power pellet
-                const tile = maze[nextY][nextX];
-                if (tile === TILE.DOT) {
-                    maze[nextY][nextX] = TILE.EMPTY;
-                    score += 10;
-                    dotsRemaining--;
-                } else if (tile === TILE.POWER) {
-                    maze[nextY][nextX] = TILE.EMPTY;
-                    score += 50;
-                    dotsRemaining--;
-                    activatePowerMode();
+                // Eat dot or power pellet (only when grid position changes)
+                if (pacman.gridX !== newGridX || pacman.gridY !== newGridY) {
+                    const tile = maze[newGridY][newGridX];
+                    if (tile === TILE.DOT) {
+                        maze[newGridY][newGridX] = TILE.EMPTY;
+                        score += 10;
+                        dotsRemaining--;
+                    } else if (tile === TILE.POWER) {
+                        maze[newGridY][newGridX] = TILE.EMPTY;
+                        score += 50;
+                        dotsRemaining--;
+                        activatePowerMode();
+                    }
                 }
             } else {
                 // Hit wall, stop
@@ -424,51 +437,63 @@
     function updateGhosts() {
         ghosts.forEach(ghost => {
             ghost.animation++;
-            ghost.moveCounter++;
 
-            // Check if reached target in special modes (check every frame)
-            if (ghost.mode === 'eaten' && ghost.x === 14 && ghost.y === 14) {
+            // Update grid position based on pixel position
+            ghost.gridX = Math.round(ghost.pixelX / TILE_SIZE);
+            ghost.gridY = Math.round(ghost.pixelY / TILE_SIZE);
+
+            // Check if reached target in special modes
+            if (ghost.mode === 'eaten' && ghost.gridX === 14 && ghost.gridY === 14) {
                 ghost.mode = 'exiting';
             }
 
-            if (ghost.mode === 'exiting' && ghost.x === 14 && ghost.y === 11) {
+            if (ghost.mode === 'exiting' && ghost.gridX === 14 && ghost.gridY === 11) {
                 ghost.mode = 'chase';
             }
 
-            // Only move when counter reaches delay
-            let currentDelay = ghost.moveDelay;
-            // Eaten ghosts move faster
+            // Choose direction when aligned with grid
+            if (isAlignedWithGrid(ghost.pixelX, ghost.pixelY)) {
+                const newDirection = chooseGhostDirection(ghost);
+                if (newDirection !== DIR.NONE) {
+                    ghost.direction = newDirection;
+                    // Snap to grid center
+                    ghost.pixelX = ghost.gridX * TILE_SIZE;
+                    ghost.pixelY = ghost.gridY * TILE_SIZE;
+                }
+            }
+
+            // Determine speed based on mode
+            let currentSpeed = ghost.speed;
             if (ghost.mode === 'eaten') {
-                currentDelay = 2;
+                currentSpeed = 3.5; // Faster when eaten
+            } else if (ghost.mode === 'frightened') {
+                currentSpeed = 1.5; // Slower when frightened
             }
 
-            if (ghost.moveCounter < currentDelay) {
-                return; // Skip to next ghost
-            }
-            ghost.moveCounter = 0;
+            // Move in current direction
+            if (ghost.direction !== DIR.NONE) {
+                const newPixelX = ghost.pixelX + ghost.direction.x * currentSpeed;
+                const newPixelY = ghost.pixelY + ghost.direction.y * currentSpeed;
+                const newGridX = Math.round(newPixelX / TILE_SIZE);
+                const newGridY = Math.round(newPixelY / TILE_SIZE);
 
-            // Choose direction at current position
-            ghost.direction = chooseGhostDirection(ghost);
-
-            // Move in chosen direction
-            let nextX = ghost.x + ghost.direction.x;
-            let nextY = ghost.y + ghost.direction.y;
-
-            // Handle tunnel wrapping
-            if (nextY === 14) {
-                if (nextX < 0) {
-                    ghost.x = GRID_WIDTH - 1;
-                    return; // Skip to next ghost
+                // Handle tunnel wrapping
+                if (newGridY === 14) {
+                    if (newPixelX < 0) {
+                        ghost.pixelX = (GRID_WIDTH - 1) * TILE_SIZE;
+                        return;
+                    }
+                    if (newPixelX >= GRID_WIDTH * TILE_SIZE) {
+                        ghost.pixelX = 0;
+                        return;
+                    }
                 }
-                if (nextX >= GRID_WIDTH) {
-                    ghost.x = 0;
-                    return; // Skip to next ghost
-                }
-            }
 
-            if (isWalkableForGhost(nextX, nextY, ghost)) {
-                ghost.x = nextX;
-                ghost.y = nextY;
+                // Check if we can move to the new position
+                if (isWalkableForGhost(newGridX, newGridY, ghost)) {
+                    ghost.pixelX = newPixelX;
+                    ghost.pixelY = newPixelY;
+                }
             }
         });
     }
@@ -476,7 +501,7 @@
     // Check collisions
     function checkCollisions() {
         ghosts.forEach(ghost => {
-            if (ghost.x === pacman.x && ghost.y === pacman.y) {
+            if (ghost.gridX === pacman.gridX && ghost.gridY === pacman.gridY) {
                 if (ghost.mode === 'frightened') {
                     // Eat ghost
                     ghost.mode = 'eaten';
@@ -577,8 +602,8 @@
 
     // Render Pac-Man
     function renderPacman() {
-        const px = pacman.x * TILE_SIZE + TILE_SIZE / 2;
-        const py = pacman.y * TILE_SIZE + TILE_SIZE / 2;
+        const px = pacman.pixelX;
+        const py = pacman.pixelY;
         const radius = TILE_SIZE / 2 - 2;
 
         // Mouth animation
@@ -612,8 +637,8 @@
 
     // Render ghost
     function renderGhost(ghost) {
-        const px = ghost.x * TILE_SIZE + TILE_SIZE / 2;
-        const py = ghost.y * TILE_SIZE + TILE_SIZE / 2;
+        const px = ghost.pixelX;
+        const py = ghost.pixelY;
         const radius = TILE_SIZE / 2 - 2;
 
         if (ghost.mode === 'eaten') {
