@@ -305,9 +305,9 @@
             // Check tunnel split divider
             if (rocketSegment.splitInfo && rocketSegment.splitInfo.progress > 0) {
                 const dividerThickness = 15;
-                const dividerHalfHeight = (rocketSegment.tunnelWidth * rocketSegment.splitInfo.progress) / 2;
-                const dividerTop = rocketSegment.splitInfo.dividerY - dividerHalfHeight;
-                const dividerBottom = rocketSegment.splitInfo.dividerY + dividerHalfHeight;
+                const dividerHalfThickness = dividerThickness / 2;
+                const dividerTop = rocketSegment.splitInfo.dividerY - (dividerHalfThickness * rocketSegment.splitInfo.progress);
+                const dividerBottom = rocketSegment.splitInfo.dividerY + (dividerHalfThickness * rocketSegment.splitInfo.progress);
 
                 // Check if rocket hits the divider
                 if (rocket.y + ROCKET_SIZE > dividerTop && rocket.y < dividerBottom) {
@@ -370,9 +370,9 @@
             // Draw tunnel split divider
             if (segment.splitInfo && segment.splitInfo.progress > 0) {
                 const dividerThickness = 15;
-                const dividerHalfHeight = (segment.tunnelWidth * segment.splitInfo.progress) / 2;
-                const dividerTop = segment.splitInfo.dividerY - dividerHalfHeight;
-                const dividerBottom = segment.splitInfo.dividerY + dividerHalfHeight;
+                const dividerHalfThickness = dividerThickness / 2;
+                const dividerTop = segment.splitInfo.dividerY - (dividerHalfThickness * segment.splitInfo.progress);
+                const dividerBottom = segment.splitInfo.dividerY + (dividerHalfThickness * segment.splitInfo.progress);
 
                 // Draw the divider
                 ctx.fillStyle = color.wall;
