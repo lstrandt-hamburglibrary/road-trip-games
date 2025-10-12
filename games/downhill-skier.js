@@ -14,18 +14,22 @@
     const GAME_HEIGHT = 600;
     const SKIER_WIDTH = 30;
     const SKIER_HEIGHT = 35;
-    const SCROLL_SPEED = 4;
+    const BASE_SCROLL_SPEED = 4;
     const SKIER_SPEED = 5;
     const SLOPE_WIDTH = 400;
     const SEGMENT_HEIGHT = 20;
     const TREE_SPAWN_CHANCE = 0.08; // 8% chance per segment
+    const ROCK_SPAWN_CHANCE = 0.05; // 5% chance per segment
     const MIN_TREE_SPACING = 60; // Minimum pixels between trees horizontally
+    const MIN_ROCK_SPACING = 80; // Minimum pixels between rocks horizontally
+
+    let currentScrollSpeed = BASE_SCROLL_SPEED;
 
     // Skier object
     function createSkier() {
         return {
             x: GAME_WIDTH / 2 - SKIER_WIDTH / 2,
-            y: 100,
+            y: GAME_HEIGHT / 2 - SKIER_HEIGHT / 2, // Middle of screen
             velocityX: 0,
             direction: 0 // -1 left, 0 none, 1 right
         };
@@ -43,9 +47,21 @@
     // Create a tree obstacle
     function createTree(x, y) {
         return {
+            type: 'tree',
             x: x,
             y: y,
             size: 25 + Math.random() * 15, // 25-40 pixels
+            hit: false
+        };
+    }
+
+    // Create a rock obstacle
+    function createRock(x, y) {
+        return {
+            type: 'rock',
+            x: x,
+            y: y,
+            size: 20 + Math.random() * 20, // 20-40 pixels
             hit: false
         };
     }
@@ -57,6 +73,7 @@
         trees = [];
         score = 0;
         keys = {};
+        currentScrollSpeed = BASE_SCROLL_SPEED;
 
         // Create initial slope segments
         let slopeLeft = (GAME_WIDTH - SLOPE_WIDTH) / 2;
@@ -68,40 +85,38 @@
             slopeLeft = Math.max(100, Math.min(GAME_WIDTH - SLOPE_WIDTH - 100, slopeLeft + variation));
             slopeRight = slopeLeft + SLOPE_WIDTH;
 
-            slopeSegments.push(createSlopeSegment(-i * SEGMENT_HEIGHT, slopeLeft, slopeRight));
+            slopeSegments.push(createSlopeSegment(GAME_HEIGHT + i * SEGMENT_HEIGHT, slopeLeft, slopeRight));
         }
 
         gameState = 'playing';
         gameLoop();
     }
 
-    // Track tree spawning
+    // Track tree and rock spawning
     let segmentsSinceLastTree = 0;
+    let segmentsSinceLastRock = 0;
     const MIN_TREE_SEGMENT_SPACING = 3; // Minimum segments between tree spawns
+    const MIN_ROCK_SEGMENT_SPACING = 2; // Minimum segments between rock spawns
 
-    // Spawn trees randomly
+    // Spawn obstacles randomly
     function spawnTreesForSegment(segment, isInitial = false) {
-        // Only spawn after minimum spacing and on random chance
+        const slopeWidth = segment.rightEdge - segment.leftEdge;
+
+        // Spawn trees
         if (!isInitial &&
             segmentsSinceLastTree >= MIN_TREE_SEGMENT_SPACING &&
             Math.random() < TREE_SPAWN_CHANCE) {
 
-            // Calculate available space for trees
-            const slopeWidth = segment.rightEdge - segment.leftEdge;
             const numTrees = Math.floor(Math.random() * 3) + 1; // 1-3 trees
-
-            // Try to place trees with spacing
             const positions = [];
+
             for (let i = 0; i < numTrees; i++) {
                 let attempts = 0;
                 let validPosition = false;
                 let treeX;
 
                 while (!validPosition && attempts < 10) {
-                    // Random position within slope, with some padding from edges
                     treeX = segment.leftEdge + 40 + Math.random() * (slopeWidth - 80);
-
-                    // Check spacing from other trees in this segment
                     validPosition = positions.every(pos => Math.abs(pos - treeX) >= MIN_TREE_SPACING);
                     attempts++;
                 }
@@ -115,6 +130,40 @@
             segmentsSinceLastTree = 0;
         } else {
             segmentsSinceLastTree++;
+        }
+
+        // Spawn rocks (only after score >= 300)
+        if (!isInitial &&
+            score >= 300 &&
+            segmentsSinceLastRock >= MIN_ROCK_SEGMENT_SPACING &&
+            Math.random() < ROCK_SPAWN_CHANCE) {
+
+            const numRocks = Math.floor(Math.random() * 2) + 1; // 1-2 rocks
+
+            for (let i = 0; i < numRocks; i++) {
+                let attempts = 0;
+                let validPosition = false;
+                let rockX;
+
+                while (!validPosition && attempts < 10) {
+                    rockX = segment.leftEdge + 30 + Math.random() * (slopeWidth - 60);
+
+                    // Check spacing from trees and other rocks
+                    const nearTree = trees.some(tree =>
+                        Math.abs(tree.y - segment.y) < 50 && Math.abs(tree.x - rockX) < MIN_ROCK_SPACING
+                    );
+                    validPosition = !nearTree;
+                    attempts++;
+                }
+
+                if (validPosition) {
+                    trees.push(createRock(rockX, segment.y));
+                }
+            }
+
+            segmentsSinceLastRock = 0;
+        } else {
+            segmentsSinceLastRock++;
         }
     }
 
@@ -136,27 +185,30 @@
 
         skier.x += skier.velocityX;
 
-        // Update slope segments (scroll down)
+        // Update speed based on score (increase every 100 points)
+        currentScrollSpeed = BASE_SCROLL_SPEED + Math.floor(score / 100) * 0.5;
+
+        // Update slope segments (scroll up - terrain moves up as skier goes down)
         for (let segment of slopeSegments) {
-            segment.y += SCROLL_SPEED;
+            segment.y -= currentScrollSpeed;
         }
 
-        // Update trees (scroll down)
+        // Update trees and rocks (scroll up)
         for (let tree of trees) {
-            tree.y += SCROLL_SPEED;
+            tree.y -= currentScrollSpeed;
         }
 
-        // Remove off-screen segments and add new ones at top
-        if (slopeSegments[0].y > GAME_HEIGHT) {
+        // Remove off-screen segments and add new ones at bottom
+        if (slopeSegments[0].y < -SEGMENT_HEIGHT) {
             slopeSegments.shift();
 
-            // Add new segment at the top
+            // Add new segment at the bottom
             const lastSegment = slopeSegments[slopeSegments.length - 1];
             const variation = (Math.random() - 0.5) * 6;
             let newSlopeLeft = Math.max(100, Math.min(GAME_WIDTH - SLOPE_WIDTH - 100, lastSegment.leftEdge + variation));
             let newSlopeRight = newSlopeLeft + SLOPE_WIDTH;
 
-            const newSegment = createSlopeSegment(lastSegment.y - SEGMENT_HEIGHT, newSlopeLeft, newSlopeRight);
+            const newSegment = createSlopeSegment(lastSegment.y + SEGMENT_HEIGHT, newSlopeLeft, newSlopeRight);
             slopeSegments.push(newSegment);
 
             // Spawn trees for new segment
@@ -166,7 +218,7 @@
         }
 
         // Remove off-screen trees
-        trees = trees.filter(tree => tree.y < GAME_HEIGHT + 50);
+        trees = trees.filter(tree => tree.y > -50);
 
         // Check collisions with slope edges
         const currentSegment = slopeSegments.find(seg =>
@@ -180,22 +232,23 @@
             }
         }
 
-        // Check collisions with trees
-        for (let tree of trees) {
-            if (tree.hit) continue;
+        // Check collisions with trees and rocks
+        for (let obstacle of trees) {
+            if (obstacle.hit) continue;
 
             // Simple circle collision detection
             const skierCenterX = skier.x + SKIER_WIDTH / 2;
             const skierCenterY = skier.y + SKIER_HEIGHT / 2;
-            const treeCenterX = tree.x;
-            const treeCenterY = tree.y;
+            const obstacleCenterX = obstacle.x;
+            const obstacleCenterY = obstacle.y;
 
             const distance = Math.sqrt(
-                Math.pow(skierCenterX - treeCenterX, 2) +
-                Math.pow(skierCenterY - treeCenterY, 2)
+                Math.pow(skierCenterX - obstacleCenterX, 2) +
+                Math.pow(skierCenterY - obstacleCenterY, 2)
             );
 
-            if (distance < (tree.size / 2 + SKIER_WIDTH / 2)) {
+            const collisionRadius = obstacle.type === 'tree' ? obstacle.size / 2 : obstacle.size / 2.5;
+            if (distance < (collisionRadius + SKIER_WIDTH / 2)) {
                 gameOver();
             }
         }
@@ -259,53 +312,87 @@
         }
     }
 
-    // Draw trees
+    // Draw trees and rocks
     function drawTrees() {
-        for (let tree of trees) {
-            // Draw tree as a triangle
-            const treeHeight = tree.size * 1.2;
+        for (let obstacle of trees) {
+            if (obstacle.type === 'tree') {
+                // Draw tree as a triangle
+                const treeHeight = obstacle.size * 1.2;
 
-            // Tree shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            ctx.beginPath();
-            ctx.ellipse(tree.x + 2, tree.y + 5, tree.size * 0.4, tree.size * 0.15, 0, 0, Math.PI * 2);
-            ctx.fill();
+                // Tree shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.beginPath();
+                ctx.ellipse(obstacle.x + 2, obstacle.y + 5, obstacle.size * 0.4, obstacle.size * 0.15, 0, 0, Math.PI * 2);
+                ctx.fill();
 
-            // Tree trunk
-            ctx.fillStyle = '#654321';
-            ctx.fillRect(tree.x - 4, tree.y - 10, 8, 15);
+                // Tree trunk
+                ctx.fillStyle = '#654321';
+                ctx.fillRect(obstacle.x - 4, obstacle.y - 10, 8, 15);
 
-            // Tree foliage (triangles)
-            ctx.fillStyle = '#2d5016';
-            ctx.strokeStyle = '#1a3010';
-            ctx.lineWidth = 2;
+                // Tree foliage (triangles)
+                ctx.fillStyle = '#2d5016';
+                ctx.strokeStyle = '#1a3010';
+                ctx.lineWidth = 2;
 
-            // Bottom triangle
-            ctx.beginPath();
-            ctx.moveTo(tree.x, tree.y - treeHeight);
-            ctx.lineTo(tree.x - tree.size / 2, tree.y - 10);
-            ctx.lineTo(tree.x + tree.size / 2, tree.y - 10);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+                // Bottom triangle
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x, obstacle.y - treeHeight);
+                ctx.lineTo(obstacle.x - obstacle.size / 2, obstacle.y - 10);
+                ctx.lineTo(obstacle.x + obstacle.size / 2, obstacle.y - 10);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
 
-            // Middle triangle
-            ctx.beginPath();
-            ctx.moveTo(tree.x, tree.y - treeHeight * 1.1);
-            ctx.lineTo(tree.x - tree.size / 2.5, tree.y - treeHeight * 0.4);
-            ctx.lineTo(tree.x + tree.size / 2.5, tree.y - treeHeight * 0.4);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+                // Middle triangle
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x, obstacle.y - treeHeight * 1.1);
+                ctx.lineTo(obstacle.x - obstacle.size / 2.5, obstacle.y - treeHeight * 0.4);
+                ctx.lineTo(obstacle.x + obstacle.size / 2.5, obstacle.y - treeHeight * 0.4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
 
-            // Top triangle
-            ctx.beginPath();
-            ctx.moveTo(tree.x, tree.y - treeHeight * 1.3);
-            ctx.lineTo(tree.x - tree.size / 3, tree.y - treeHeight * 0.7);
-            ctx.lineTo(tree.x + tree.size / 3, tree.y - treeHeight * 0.7);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+                // Top triangle
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x, obstacle.y - treeHeight * 1.3);
+                ctx.lineTo(obstacle.x - obstacle.size / 3, obstacle.y - treeHeight * 0.7);
+                ctx.lineTo(obstacle.x + obstacle.size / 3, obstacle.y - treeHeight * 0.7);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            } else if (obstacle.type === 'rock') {
+                // Draw rock as an irregular polygon
+                const rockSize = obstacle.size;
+
+                // Rock shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.ellipse(obstacle.x + 2, obstacle.y + 5, rockSize * 0.5, rockSize * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Rock body (irregular shape)
+                ctx.fillStyle = '#666666';
+                ctx.strokeStyle = '#444444';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x, obstacle.y - rockSize);
+                ctx.lineTo(obstacle.x + rockSize * 0.6, obstacle.y - rockSize * 0.3);
+                ctx.lineTo(obstacle.x + rockSize * 0.4, obstacle.y);
+                ctx.lineTo(obstacle.x - rockSize * 0.5, obstacle.y);
+                ctx.lineTo(obstacle.x - rockSize * 0.7, obstacle.y - rockSize * 0.4);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Rock highlights
+                ctx.fillStyle = '#888888';
+                ctx.beginPath();
+                ctx.moveTo(obstacle.x - rockSize * 0.2, obstacle.y - rockSize * 0.7);
+                ctx.lineTo(obstacle.x + rockSize * 0.3, obstacle.y - rockSize * 0.5);
+                ctx.lineTo(obstacle.x, obstacle.y - rockSize * 0.3);
+                ctx.closePath();
+                ctx.fill();
+            }
         }
     }
 
@@ -408,7 +495,8 @@
 
         ctx.font = '20px Arial';
         ctx.fillText('Ski down the mountain!', GAME_WIDTH / 2, 180);
-        ctx.fillText('Avoid the trees and stay on the slope!', GAME_WIDTH / 2, 210);
+        ctx.fillText('Avoid trees and rocks - stay on the slope!', GAME_WIDTH / 2, 210);
+        ctx.fillText('Game speeds up every 100 points!', GAME_WIDTH / 2, 235);
 
         ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#ff6b6b';
