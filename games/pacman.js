@@ -155,8 +155,8 @@
         return {
             gridX: 14,
             gridY: 23,
-            pixelX: 14 * TILE_SIZE,
-            pixelY: 23 * TILE_SIZE,
+            pixelX: 14 * TILE_SIZE + TILE_SIZE / 2,
+            pixelY: 23 * TILE_SIZE + TILE_SIZE / 2,
             direction: DIR.NONE,
             nextDirection: DIR.NONE,
             speed: 2.5, // pixels per frame
@@ -171,8 +171,8 @@
             color: color,
             gridX: startX,
             gridY: startY,
-            pixelX: startX * TILE_SIZE,
-            pixelY: startY * TILE_SIZE,
+            pixelX: startX * TILE_SIZE + TILE_SIZE / 2,
+            pixelY: startY * TILE_SIZE + TILE_SIZE / 2,
             startX: startX,
             startY: startY,
             direction: DIR.LEFT,
@@ -185,12 +185,21 @@
 
     // Initialize ghosts with unique personalities
     function createGhosts() {
-        return [
-            createGhost('Blinky', '#FF0000', 13, 11, { x: 25, y: 0 }),  // Red - direct chase
-            createGhost('Pinky', '#FFB8FF', 14, 14, { x: 2, y: 0 }),    // Pink - ambush
-            createGhost('Inky', '#00FFFF', 12, 14, { x: 27, y: 30 }),   // Cyan - complex
-            createGhost('Clyde', '#FFB851', 15, 14, { x: 0, y: 30 })    // Orange - shy
+        const ghosts = [
+            createGhost('Blinky', '#FF0000', 14, 11, { x: 25, y: 0 }),  // Red - starts outside, direct chase
+            createGhost('Pinky', '#FFB8FF', 14, 13, { x: 2, y: 0 }),    // Pink - in house, ambush
+            createGhost('Inky', '#00FFFF', 13, 13, { x: 27, y: 30 }),   // Cyan - in house, complex
+            createGhost('Clyde', '#FFB851', 15, 13, { x: 0, y: 30 })    // Orange - in house, shy
         ];
+
+        // Ghosts in the house should start in exiting mode
+        ghosts.forEach(ghost => {
+            if (ghost.gridY >= 12 && ghost.gridY <= 14) {
+                ghost.mode = 'exiting';
+            }
+        });
+
+        return ghosts;
     }
 
     // BFS pathfinding for eaten ghosts
@@ -350,9 +359,9 @@
     function updatePacman() {
         pacman.animation++;
 
-        // Update grid position based on pixel position
-        pacman.gridX = Math.round(pacman.pixelX / TILE_SIZE);
-        pacman.gridY = Math.round(pacman.pixelY / TILE_SIZE);
+        // Update grid position based on pixel position (centered entities)
+        pacman.gridX = Math.floor(pacman.pixelX / TILE_SIZE);
+        pacman.gridY = Math.floor(pacman.pixelY / TILE_SIZE);
 
         // Try to change direction when aligned with grid
         if (isAlignedWithGrid(pacman.pixelX, pacman.pixelY) && pacman.nextDirection !== DIR.NONE) {
@@ -362,8 +371,8 @@
                 pacman.direction = pacman.nextDirection;
                 pacman.nextDirection = DIR.NONE;
                 // Snap to grid center
-                pacman.pixelX = pacman.gridX * TILE_SIZE;
-                pacman.pixelY = pacman.gridY * TILE_SIZE;
+                pacman.pixelX = pacman.gridX * TILE_SIZE + TILE_SIZE / 2;
+                pacman.pixelY = pacman.gridY * TILE_SIZE + TILE_SIZE / 2;
             }
         }
 
@@ -371,17 +380,17 @@
         if (pacman.direction !== DIR.NONE) {
             const newPixelX = pacman.pixelX + pacman.direction.x * pacman.speed;
             const newPixelY = pacman.pixelY + pacman.direction.y * pacman.speed;
-            const newGridX = Math.round(newPixelX / TILE_SIZE);
-            const newGridY = Math.round(newPixelY / TILE_SIZE);
+            const newGridX = Math.floor(newPixelX / TILE_SIZE);
+            const newGridY = Math.floor(newPixelY / TILE_SIZE);
 
             // Handle tunnel wrapping
             if (newGridY === 14) {
                 if (newPixelX < 0) {
-                    pacman.pixelX = (GRID_WIDTH - 1) * TILE_SIZE;
+                    pacman.pixelX = (GRID_WIDTH - 1) * TILE_SIZE + TILE_SIZE / 2;
                     return;
                 }
                 if (newPixelX >= GRID_WIDTH * TILE_SIZE) {
-                    pacman.pixelX = 0;
+                    pacman.pixelX = TILE_SIZE / 2;
                     return;
                 }
             }
@@ -438,9 +447,9 @@
         ghosts.forEach(ghost => {
             ghost.animation++;
 
-            // Update grid position based on pixel position
-            ghost.gridX = Math.round(ghost.pixelX / TILE_SIZE);
-            ghost.gridY = Math.round(ghost.pixelY / TILE_SIZE);
+            // Update grid position based on pixel position (centered entities)
+            ghost.gridX = Math.floor(ghost.pixelX / TILE_SIZE);
+            ghost.gridY = Math.floor(ghost.pixelY / TILE_SIZE);
 
             // Check if reached target in special modes
             if (ghost.mode === 'eaten' && ghost.gridX === 14 && ghost.gridY === 14) {
@@ -457,8 +466,8 @@
                 if (newDirection !== DIR.NONE) {
                     ghost.direction = newDirection;
                     // Snap to grid center
-                    ghost.pixelX = ghost.gridX * TILE_SIZE;
-                    ghost.pixelY = ghost.gridY * TILE_SIZE;
+                    ghost.pixelX = ghost.gridX * TILE_SIZE + TILE_SIZE / 2;
+                    ghost.pixelY = ghost.gridY * TILE_SIZE + TILE_SIZE / 2;
                 }
             }
 
@@ -474,17 +483,17 @@
             if (ghost.direction !== DIR.NONE) {
                 const newPixelX = ghost.pixelX + ghost.direction.x * currentSpeed;
                 const newPixelY = ghost.pixelY + ghost.direction.y * currentSpeed;
-                const newGridX = Math.round(newPixelX / TILE_SIZE);
-                const newGridY = Math.round(newPixelY / TILE_SIZE);
+                const newGridX = Math.floor(newPixelX / TILE_SIZE);
+                const newGridY = Math.floor(newPixelY / TILE_SIZE);
 
                 // Handle tunnel wrapping
                 if (newGridY === 14) {
                     if (newPixelX < 0) {
-                        ghost.pixelX = (GRID_WIDTH - 1) * TILE_SIZE;
+                        ghost.pixelX = (GRID_WIDTH - 1) * TILE_SIZE + TILE_SIZE / 2;
                         return;
                     }
                     if (newPixelX >= GRID_WIDTH * TILE_SIZE) {
-                        ghost.pixelX = 0;
+                        ghost.pixelX = TILE_SIZE / 2;
                         return;
                     }
                 }
