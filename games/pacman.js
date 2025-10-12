@@ -1,5 +1,7 @@
 // Pac-Man Game
 (function() {
+    console.log('🟡 Pac-Man v1.44.1 loaded - Ghost AI debug enabled');
+
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
     let pacman;
@@ -104,8 +106,13 @@
 
     // Initialize game
     function initGame() {
+        console.log('🎮 Starting new Pac-Man game');
         pacman = createPacman();
         ghosts = GHOST_DATA.map(data => createGhost(data));
+        console.log('👻 Ghost starting positions:');
+        ghosts.forEach(g => {
+            console.log(`  - ${g.name}: (${g.gridX}, ${g.gridY}) - mode: ${g.mode}`);
+        });
         keys = {};
         frameCount = 0;
 
@@ -360,6 +367,11 @@
                         }
                     });
                     ghost.direction = bestDir;
+
+                    // Log pathfinding for eaten ghosts (every 30 frames)
+                    if (frameCount % 30 === 0) {
+                        console.log(`👻 ${ghost.name} (EYES): At (${ghost.gridX}, ${ghost.gridY}), heading to center (${centerX}, ${centerY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
+                    }
                 } else {
                     // Chase Pac-Man continuously
                     const targetX = pacman.gridX;
@@ -437,8 +449,10 @@
 
         // Wrap around tunnels (same as Pac-Man)
         if (ghost.x < 0) {
+            console.log(`🌀 ${ghost.name}: Wrapping from left to right at y=${Math.round(ghost.y/CELL_SIZE)}`);
             ghost.x = GAME_WIDTH - CELL_SIZE;
         } else if (ghost.x >= GAME_WIDTH) {
+            console.log(`🌀 ${ghost.name}: Wrapping from right to left at y=${Math.round(ghost.y/CELL_SIZE)}`);
             ghost.x = 0;
         }
     }
