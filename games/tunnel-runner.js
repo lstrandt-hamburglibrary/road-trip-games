@@ -13,10 +13,20 @@
     const ROCKET_SIZE = 30;
     const SCROLL_SPEED = 3;
     const BASE_TUNNEL_WIDTH = 200;
-    const MIN_TUNNEL_WIDTH = 140;
-    const MAX_TUNNEL_WIDTH = 220;
+    const MIN_TUNNEL_WIDTH = 120;
+    const MAX_TUNNEL_WIDTH = 240;
     const SEGMENT_WIDTH = 20;
     const OBSTACLE_CHANCE = 0.05; // 5% chance per segment
+
+    // Color palette for tunnel variations
+    const TUNNEL_COLORS = [
+        { wall: '#6c5ce7', edge: '#a29bfe', name: 'purple' },
+        { wall: '#00b894', edge: '#55efc4', name: 'green' },
+        { wall: '#0984e3', edge: '#74b9ff', name: 'blue' },
+        { wall: '#d63031', edge: '#ff7675', name: 'red' },
+        { wall: '#fdcb6e', edge: '#ffeaa7', name: 'yellow' },
+        { wall: '#e17055', edge: '#fab1a0', name: 'orange' }
+    ];
 
     // Rocket object
     function createRocket() {
@@ -31,12 +41,13 @@
     }
 
     // Create a tunnel segment
-    function createTunnelSegment(x, topHeight, bottomHeight, tunnelWidth, obstacles = []) {
+    function createTunnelSegment(x, topHeight, bottomHeight, tunnelWidth, colorIndex, obstacles = []) {
         return {
             x: x,
             topHeight: topHeight,
             bottomHeight: bottomHeight,
             tunnelWidth: tunnelWidth,
+            colorIndex: colorIndex,
             obstacles: obstacles
         };
     }
@@ -78,13 +89,15 @@
         let currentTunnelWidth = BASE_TUNNEL_WIDTH;
         let currentTopHeight = GAME_HEIGHT / 2 - currentTunnelWidth / 2;
         let currentBottomHeight = GAME_HEIGHT / 2 + currentTunnelWidth / 2;
+        let currentColorIndex = 0;
+        let segmentsSinceColorChange = 0;
 
         for (let i = 0; i < Math.ceil(GAME_WIDTH / SEGMENT_WIDTH) + 5; i++) {
             // Add some random variation to tunnel height
             const variation = (Math.random() - 0.5) * 10;
 
-            // Gradually vary tunnel width
-            const widthVariation = (Math.random() - 0.5) * 3;
+            // Gradually vary tunnel width - more dramatic changes
+            const widthVariation = (Math.random() - 0.5) * 8;
             currentTunnelWidth = Math.max(MIN_TUNNEL_WIDTH, Math.min(MAX_TUNNEL_WIDTH, currentTunnelWidth + widthVariation));
 
             currentTopHeight = Math.max(50, Math.min(GAME_HEIGHT - currentTunnelWidth - 50, currentTopHeight + variation));
@@ -92,12 +105,16 @@
 
             const obstacles = i > 10 ? createObstacles(currentTopHeight, currentBottomHeight) : []; // No obstacles at start
 
-            tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight, currentTunnelWidth, obstacles));
+            tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight, currentTunnelWidth, currentColorIndex, obstacles));
         }
 
         gameState = 'playing';
         gameLoop();
     }
+
+    // Track color changes
+    let segmentsSinceColorChange = 0;
+    let currentColorIndex = 0;
 
     // Update game state
     function update() {
@@ -124,8 +141,8 @@
             const lastSegment = tunnelSegments[tunnelSegments.length - 1];
             const variation = (Math.random() - 0.5) * 15;
 
-            // Gradually vary tunnel width
-            const widthVariation = (Math.random() - 0.5) * 3;
+            // Gradually vary tunnel width - more dramatic changes
+            const widthVariation = (Math.random() - 0.5) * 8;
             let newTunnelWidth = Math.max(MIN_TUNNEL_WIDTH, Math.min(MAX_TUNNEL_WIDTH, lastSegment.tunnelWidth + widthVariation));
 
             let newTopHeight = Math.max(50, Math.min(GAME_HEIGHT - newTunnelWidth - 50, lastSegment.topHeight + variation));
@@ -133,11 +150,19 @@
 
             const obstacles = createObstacles(newTopHeight, newBottomHeight);
 
+            // Change color every 50-100 segments
+            segmentsSinceColorChange++;
+            if (segmentsSinceColorChange > 50 + Math.random() * 50) {
+                currentColorIndex = (currentColorIndex + 1) % TUNNEL_COLORS.length;
+                segmentsSinceColorChange = 0;
+            }
+
             tunnelSegments.push(createTunnelSegment(
                 lastSegment.x + SEGMENT_WIDTH,
                 newTopHeight,
                 newBottomHeight,
                 newTunnelWidth,
+                currentColorIndex,
                 obstacles
             ));
 
@@ -198,17 +223,19 @@
 
     // Draw tunnel
     function drawTunnel() {
-        ctx.fillStyle = '#6c5ce7';
-
         for (let segment of tunnelSegments) {
+            // Get color for this segment
+            const color = TUNNEL_COLORS[segment.colorIndex];
+
             // Draw top wall
+            ctx.fillStyle = color.wall;
             ctx.fillRect(segment.x, 0, SEGMENT_WIDTH + 1, segment.topHeight);
 
             // Draw bottom wall
             ctx.fillRect(segment.x, segment.bottomHeight, SEGMENT_WIDTH + 1, GAME_HEIGHT - segment.bottomHeight);
 
             // Draw wall edges for visual effect
-            ctx.strokeStyle = '#a29bfe';
+            ctx.strokeStyle = color.edge;
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(segment.x, segment.topHeight);
@@ -310,9 +337,9 @@
         ctx.textAlign = 'center';
         ctx.fillText('🚀 TUNNEL RUNNER', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 100);
 
-        ctx.font = '24px Arial';
-        ctx.fillText('Navigate your rocket through the tunnel!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 40);
-        ctx.fillText('Avoid the walls and obstacles!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
+        ctx.font = '22px Arial';
+        ctx.fillText('Navigate through the changing tunnel!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 40);
+        ctx.fillText('Avoid walls, obstacles, and narrow passages!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
         ctx.fillText('Tap or hold to fly up', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30);
         ctx.fillText('Release to fall down', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 60);
 
