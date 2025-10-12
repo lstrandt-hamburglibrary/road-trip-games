@@ -449,17 +449,11 @@
             ghost.y = ghost.gridY * CELL_SIZE;
         }
 
-        // Wrap around tunnels (only in tunnel row)
-        const TUNNEL_ROW = 13;
-        if (ghost.gridY === TUNNEL_ROW) {
-            if (ghost.x < 0) {
-                ghost.x = GAME_WIDTH - CELL_SIZE;
-            } else if (ghost.x >= GAME_WIDTH) {
-                ghost.x = 0;
-            }
-        } else {
-            // Keep ghost in bounds for non-tunnel rows
-            ghost.x = Math.max(CELL_SIZE, Math.min(GAME_WIDTH - CELL_SIZE * 2, ghost.x));
+        // Wrap around tunnels (same as Pac-Man)
+        if (ghost.x < 0) {
+            ghost.x = GAME_WIDTH - CELL_SIZE;
+        } else if (ghost.x >= GAME_WIDTH) {
+            ghost.x = 0;
         }
     }
 
