@@ -94,37 +94,20 @@
             gridY: data.startY,
             startX: data.startX,
             startY: data.startY,
-            homeX: 6, // Open corridor for respawning
-            homeY: 20,
             direction: { x: 0, y: -1 },
             speed: GHOST_SPEED,
-            mode: 'chase', // scatter, chase, frightened, eaten
+            mode: 'chase', // chase, frightened, eaten
             frightenedTimer: 0,
-            eaten: false,
-            scatterTarget: null // Will be set based on ghost name
+            eaten: false
         };
     }
 
     // Initialize game
     function initGame() {
         pacman = createPacman();
-        ghosts = GHOST_DATA.map(data => {
-            const ghost = createGhost(data);
-            // Set scatter targets for each ghost (different corners of playable area)
-            if (ghost.name === 'Blinky') {
-                ghost.scatterTarget = { x: 25, y: 1 }; // Top-right corner
-            } else if (ghost.name === 'Pinky') {
-                ghost.scatterTarget = { x: 2, y: 1 }; // Top-left corner
-            } else if (ghost.name === 'Inky') {
-                ghost.scatterTarget = { x: 25, y: 29 }; // Bottom-right corner
-            } else if (ghost.name === 'Clyde') {
-                ghost.scatterTarget = { x: 2, y: 29 }; // Bottom-left corner
-            }
-            return ghost;
-        });
+        ghosts = GHOST_DATA.map(data => createGhost(data));
         keys = {};
         frameCount = 0;
-        modeTimer = 0; // Reset mode timer
 
         // Create dots and power pellets from maze
         dots = [];
@@ -288,18 +271,13 @@
         }
     }
 
-    // Track mode switching for variety
-    let modeTimer = 0;
-    const SCATTER_DURATION = 420; // 7 seconds
-    const CHASE_DURATION = 1200; // 20 seconds
-
     // Simple ghost AI
     function updateGhost(ghost) {
         // Update frightened timer
         if (ghost.mode === 'frightened') {
             ghost.frightenedTimer--;
             if (ghost.frightenedTimer <= 0) {
-                ghost.mode = 'scatter';
+                ghost.mode = 'chase';
                 ghost.speed = GHOST_SPEED;
                 // Snap to grid to ensure clean transition
                 ghost.x = Math.round(ghost.x / CELL_SIZE) * CELL_SIZE;
@@ -313,17 +291,19 @@
         ghost.gridX = gridPos.gridX;
         ghost.gridY = gridPos.gridY;
 
-        // If eaten, return to ghost house center to regenerate
+        // If eaten, return to center of maze to regenerate
         if (ghost.mode === 'eaten') {
-            const distToHome = Math.abs(ghost.gridX - ghost.homeX) + Math.abs(ghost.gridY - ghost.homeY);
-            if (distToHome <= 1) { // Within 1 tile of home
-                // Arrived at home - regenerate
-                ghost.mode = 'scatter';
+            const centerX = 14; // Center of 28-wide maze
+            const centerY = 15; // Roughly center height
+            const distToHome = Math.abs(ghost.gridX - centerX) + Math.abs(ghost.gridY - centerY);
+            if (distToHome <= 1) { // Within 1 tile of center
+                // Arrived at center - regenerate and resume chasing
+                ghost.mode = 'chase';
                 ghost.speed = GHOST_SPEED;
                 ghost.eaten = false;
                 ghost.frightenedTimer = 0; // Reset timer to prevent issues
-                ghost.x = ghost.homeX * CELL_SIZE;
-                ghost.y = ghost.homeY * CELL_SIZE;
+                ghost.x = centerX * CELL_SIZE;
+                ghost.y = centerY * CELL_SIZE;
             }
         }
 
@@ -361,16 +341,16 @@
                     // Random movement when frightened
                     ghost.direction = validDirections[Math.floor(Math.random() * validDirections.length)];
                 } else if (ghost.mode === 'eaten') {
-                    // Head back to ghost house center
-                    const targetX = ghost.homeX;
-                    const targetY = ghost.homeY;
+                    // Head back to center of maze
+                    const centerX = 14;
+                    const centerY = 15;
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
 
                     validDirections.forEach(dir => {
                         const nextX = ghost.gridX + dir.x;
                         const nextY = ghost.gridY + dir.y;
-                        const dist = Math.sqrt(Math.pow(nextX - targetX, 2) + Math.pow(nextY - targetY, 2));
+                        const dist = Math.sqrt(Math.pow(nextX - centerX, 2) + Math.pow(nextY - centerY, 2));
                         if (dist < bestDist) {
                             bestDist = dist;
                             bestDir = dir;
@@ -378,20 +358,11 @@
                     });
                     ghost.direction = bestDir;
                 } else {
-                    // Alternate between scatter and chase modes
-                    let targetX, targetY;
+                    // Chase Pac-Man continuously
+                    const targetX = pacman.gridX;
+                    const targetY = pacman.gridY;
 
-                    if (ghost.mode === 'scatter') {
-                        // Head to scatter corner
-                        targetX = ghost.scatterTarget.x;
-                        targetY = ghost.scatterTarget.y;
-                    } else {
-                        // Chase Pac-Man
-                        targetX = pacman.gridX;
-                        targetY = pacman.gridY;
-                    }
-
-                    // Find best direction toward target
+                    // Find best direction toward Pac-Man
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
 
@@ -500,23 +471,6 @@
         if (gameState !== 'playing') return;
 
         frameCount++;
-
-        // Switch between scatter and chase modes for variety
-        modeTimer++;
-        if (modeTimer > SCATTER_DURATION + CHASE_DURATION) {
-            modeTimer = 0;
-        }
-
-        // Update all non-frightened, non-eaten ghosts to scatter or chase
-        ghosts.forEach(ghost => {
-            if (ghost.mode !== 'frightened' && ghost.mode !== 'eaten') {
-                if (modeTimer < SCATTER_DURATION) {
-                    ghost.mode = 'scatter';
-                } else {
-                    ghost.mode = 'chase';
-                }
-            }
-        });
 
         updatePacman();
         ghosts.forEach(ghost => updateGhost(ghost));
