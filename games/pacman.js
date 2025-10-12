@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.3 loaded - Two-stage ghost exit to avoid wall barrier');
+    console.log('🟡 Pac-Man v1.45.5 loaded - Three-stage ghost exit: up 1, right, then to corridor');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -303,7 +303,7 @@
         // If eaten, return to ghost house center to regenerate
         if (ghost.mode === 'eaten') {
             const ghostHouseX = 14; // Center of ghost house
-            const ghostHouseY = 15; // Ghost house vertical center
+            const ghostHouseY = 14; // Ghost house vertical center (moved up from 15 to avoid tight corridor)
             const distToHome = Math.abs(ghost.gridX - ghostHouseX) + Math.abs(ghost.gridY - ghostHouseY);
             if (distToHome <= 1) { // Within 1 tile of ghost house center
                 // Arrived at ghost house - regenerate and start exiting
@@ -312,21 +312,47 @@
                 ghost.speed = GHOST_SPEED;
                 ghost.eaten = false;
                 ghost.frightenedTimer = 0;
+                // Snap to perfect grid alignment
                 ghost.x = ghostHouseX * CELL_SIZE;
                 ghost.y = ghostHouseY * CELL_SIZE;
                 ghost.gridX = ghostHouseX;
                 ghost.gridY = ghostHouseY;
+                // Set direction to move straight up initially
+                ghost.direction = { x: 0, y: -1 };
             }
         }
 
-        // If exiting, navigate to ghost house exit
+        // If exiting, navigate to ghost house exit with waypoints
         if (ghost.mode === 'exiting') {
-            const exitX = 15; // Ghost house exit x (right opening in corridor)
-            const exitY = 8;  // Ghost house exit y (corridor row with dots)
-            const distToExit = Math.abs(ghost.gridX - exitX) + Math.abs(ghost.gridY - exitY);
-            if (distToExit <= 1) { // Reached the exit
+            // Three-stage exit to avoid getting stuck:
+            // Stage 1: Move up one space from (14,14) to (14,13)
+            // Stage 2: Move right to (15,13) or beyond to exit narrow center
+            // Stage 3: Move to open corridor at (15,8)
+
+            let targetX, targetY;
+
+            if (ghost.gridY === 14) {
+                // Stage 1: At spawn, move up one space only
+                targetX = 14;
+                targetY = 13;
+            } else if (ghost.gridY === 13 && ghost.gridX === 14) {
+                // Stage 2: At (14,13), move right to exit narrow area
+                targetX = 16;
+                targetY = 13;
+            } else if (ghost.gridY >= 13) {
+                // Stage 2b: Continue moving right if still in lower area
+                targetX = 16;
+                targetY = 13;
+            } else {
+                // Stage 3: Now in upper area, head to exit corridor
+                targetX = 15;
+                targetY = 8;
+            }
+
+            const distToExit = Math.abs(ghost.gridX - targetX) + Math.abs(ghost.gridY - targetY);
+            if (distToExit === 0 && targetY === 8) { // Reached the final exit point
                 // Now free to chase Pac-Man
-                console.log(`🚪 ${ghost.name}: Exited ghost house at (${exitX}, ${exitY}), now chasing Pac-Man`);
+                console.log(`🚪 ${ghost.name}: Exited ghost house at (${targetX}, ${targetY}), now chasing Pac-Man`);
                 ghost.mode = 'chase';
             }
         }
@@ -387,14 +413,23 @@
                         console.log(`👻 ${ghost.name} (EYES): At (${ghost.gridX}, ${ghost.gridY}), heading to ghost house (${ghostHouseX}, ${ghostHouseY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
                     }
                 } else if (ghost.mode === 'exiting') {
-                    // Two-stage exit: first go to (14, 11) to avoid wall at row 12, then to exit
+                    // Three-stage exit: up 1, right, then to corridor
                     let targetX, targetY;
-                    if (ghost.gridY >= 12) {
-                        // Stage 1: Navigate to waypoint above wall barrier
+
+                    if (ghost.gridY === 14) {
+                        // Stage 1: Move up one space only
                         targetX = 14;
-                        targetY = 11;
+                        targetY = 13;
+                    } else if (ghost.gridY === 13 && ghost.gridX === 14) {
+                        // Stage 2: Move right to exit narrow area
+                        targetX = 16;
+                        targetY = 13;
+                    } else if (ghost.gridY >= 13) {
+                        // Stage 2b: Continue moving right if still in lower area
+                        targetX = 16;
+                        targetY = 13;
                     } else {
-                        // Stage 2: Navigate to actual exit in corridor
+                        // Stage 3: Head to exit corridor
                         targetX = 15;
                         targetY = 8;
                     }
@@ -415,8 +450,8 @@
 
                     // Log pathfinding for exiting ghosts (every 30 frames)
                     if (frameCount % 30 === 0) {
-                        const stage = ghost.gridY >= 12 ? 'Stage 1 (waypoint)' : 'Stage 2 (exit)';
-                        console.log(`🚪 ${ghost.name} (EXITING ${stage}): At (${ghost.gridX}, ${ghost.gridY}), heading to (${targetX}, ${targetY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
+                        const stage = ghost.gridY === 14 ? '1 (up)' : (ghost.gridY === 13 ? '2 (right)' : '3 (to corridor)');
+                        console.log(`🚪 ${ghost.name} (EXITING stage ${stage}): At (${ghost.gridX}, ${ghost.gridY}), heading to (${targetX}, ${targetY}), direction: (${bestDir.x}, ${bestDir.y})`);
                     }
                 } else {
                     // Chase Pac-Man continuously
@@ -464,6 +499,9 @@
         const newX = ghost.x + ghost.direction.x * speed;
         const newY = ghost.y + ghost.direction.y * speed;
 
+        // Exiting and eaten ghosts can pass through walls
+        const canPhaseThrough = ghost.mode === 'eaten' || ghost.mode === 'exiting';
+
         // Check all corners to ensure ghost stays in valid area
         const checkPositions = [
             { x: newX + 2, y: newY + 2 },
@@ -472,12 +510,15 @@
             { x: newX + CELL_SIZE - 3, y: newY + CELL_SIZE - 3 }
         ];
 
-        let canMove = true;
-        for (let pos of checkPositions) {
-            const checkGrid = getGridPosition(pos.x, pos.y);
-            if (!isValidPosition(checkGrid.gridX, checkGrid.gridY)) {
-                canMove = false;
-                break;
+        let canMove = canPhaseThrough; // Exiting/eaten ghosts can always move
+        if (!canPhaseThrough) {
+            canMove = true;
+            for (let pos of checkPositions) {
+                const checkGrid = getGridPosition(pos.x, pos.y);
+                if (!isValidPosition(checkGrid.gridX, checkGrid.gridY)) {
+                    canMove = false;
+                    break;
+                }
             }
         }
 
@@ -526,11 +567,17 @@
                     });
                     ghost.direction = bestDir;
                 } else if (ghost.mode === 'exiting') {
-                    // Two-stage exit: first go to (14, 11) to avoid wall at row 12, then to exit
+                    // Three-stage exit: up 1, right, then to corridor
                     let targetX, targetY;
-                    if (ghost.gridY >= 12) {
+                    if (ghost.gridY === 14) {
                         targetX = 14;
-                        targetY = 11;
+                        targetY = 13;
+                    } else if (ghost.gridY === 13 && ghost.gridX === 14) {
+                        targetX = 16;
+                        targetY = 13;
+                    } else if (ghost.gridY >= 13) {
+                        targetX = 16;
+                        targetY = 13;
                     } else {
                         targetX = 15;
                         targetY = 8;
