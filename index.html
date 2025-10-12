@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.35.2';</script>
+    <script>window.APP_VERSION = '1.36.0';</script>
 
     <style>
         * {
@@ -373,11 +373,6 @@
                         <p>Classic observation game</p>
                     </div>
 
-                    <div class="feature-card" onclick="launchTwentyQuestions()" style="background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%);">
-                        <h3>❓ 20 Questions</h3>
-                        <p>Guess what I'm thinking!</p>
-                    </div>
-
                     <div class="feature-card" onclick="launchWouldYouRather()" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
                         <h3>🤔 Would You Rather</h3>
                         <p>Funny and tough choices</p>
@@ -407,6 +402,11 @@
                     <div class="feature-card" onclick="launchJoust()" style="background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);">
                         <h3>🦤 Joust</h3>
                         <p>Ride your ostrich to defeat enemy riders!</p>
+                    </div>
+
+                    <div class="feature-card" onclick="launchTunnelRunner()" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);">
+                        <h3>🚀 Tunnel Runner</h3>
+                        <p>Fly your rocket through the tunnel!</p>
                     </div>
                 </div>
             </div>
@@ -454,15 +454,6 @@
                 <div id="othelloContent"></div>
             </div>
 
-            <!-- Twenty Questions Game Section (hidden by default) -->
-            <div id="twentyQuestionsGame" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2>❓ 20 Questions</h2>
-                    <button onclick="exitTwentyQuestionsToMenu()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
-                </div>
-                <div id="twentyQuestionsContent"></div>
-            </div>
-
             <!-- Would You Rather Game Section (hidden by default) -->
             <div id="wouldYouRatherGame" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -492,6 +483,15 @@
                 <div id="joustContent"></div>
             </div>
 
+            <!-- Tunnel Runner Game Section (hidden by default) -->
+            <div id="tunnelRunnerGame" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>🚀 Tunnel Runner</h2>
+                    <button onclick="exitTunnelRunnerToMenu()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
+                </div>
+                <div id="tunnelRunnerContent"></div>
+            </div>
+
             <div class="roadmap">
                 <h2>🗺️ Development Roadmap</h2>
 
@@ -517,7 +517,7 @@
                     <h3>🎯 Up Next</h3>
                     <ul class="roadmap-list">
                         <li class="planned">
-                            <span>🎮 Classic Road Trip Games (I Spy, 20 Questions, Would You Rather)</span>
+                            <span>🎮 Classic Road Trip Games (I Spy, Would You Rather)</span>
                             <span class="status-badge planned">Planned</span>
                         </li>
                     </ul>
@@ -810,11 +810,11 @@
     <script src="games/war.js?v=1.17.0"></script>
     <script src="games/trash.js?v=1.17.0"></script>
     <script src="games/othello.js?v=1.19.0"></script>
-    <script src="games/twenty-questions.js?v=1.35.2"></script>
     <script src="games/would-you-rather.js?v=1.21.1"></script>
     <script src="games/dots-and-boxes.js?v=1.28.3"></script>
     <script src="games/guess-who.js?v=1.31.1"></script>
     <script src="games/joust.js?v=1.32.0"></script>
+    <script src="games/tunnel-runner.js?v=1.36.0"></script>
     <!-- <script src="games/trouble.js?v=1.27.1"></script> -->
 </body>
 </html>
