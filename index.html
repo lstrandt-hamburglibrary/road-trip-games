@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.39.1';</script>
+    <script>window.APP_VERSION = '1.40.0';</script>
 
     <style>
         * {
@@ -408,6 +408,11 @@
                         <h3>🚀 Tunnel Runner</h3>
                         <p>Fly your rocket through the tunnel!</p>
                     </div>
+
+                    <div class="feature-card" onclick="launchDownhillSkier()" style="background: linear-gradient(135deg, #00b4d8 0%, #90e0ef 100%);">
+                        <h3>⛷️ Downhill Skier</h3>
+                        <p>Ski down the mountain avoiding trees!</p>
+                    </div>
                 </div>
             </div>
 
@@ -490,6 +495,15 @@
                     <button onclick="exitTunnelRunnerToMenu()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
                 </div>
                 <div id="tunnelRunnerContent"></div>
+            </div>
+
+            <!-- Downhill Skier Game Section (hidden by default) -->
+            <div id="downhillSkierGame" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>⛷️ Downhill Skier</h2>
+                    <button onclick="exitDownhillSkierToMenu()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
+                </div>
+                <div id="downhillSkierContent"></div>
             </div>
 
             <div class="roadmap">
@@ -815,6 +829,7 @@
     <script src="games/guess-who.js?v=1.31.1"></script>
     <script src="games/joust.js?v=1.32.0"></script>
     <script src="games/tunnel-runner.js?v=1.39.1"></script>
+    <script src="games/downhill-skier.js?v=1.40.0"></script>
     <!-- <script src="games/trouble.js?v=1.27.1"></script> -->
 </body>
 </html>
