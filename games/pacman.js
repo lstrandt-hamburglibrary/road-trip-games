@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.44.2 loaded - Ghost AI debug + wall collision fix enabled');
+    console.log('🟡 Pac-Man v1.45.0 loaded - Ghosts respawn in top corridor');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -300,20 +300,22 @@
         ghost.gridX = gridPos.gridX;
         ghost.gridY = gridPos.gridY;
 
-        // If eaten, return to center of maze to regenerate
+        // If eaten, return to top-center corridor to regenerate
         if (ghost.mode === 'eaten') {
-            const centerX = 14; // Center of 28-wide maze
-            const centerY = 15; // Roughly center height
-            const distToHome = Math.abs(ghost.gridX - centerX) + Math.abs(ghost.gridY - centerY);
-            if (distToHome <= 1) { // Within 1 tile of center
-                // Arrived at center - regenerate and resume chasing
-                console.log(`💀 ${ghost.name}: Regenerated at center (${centerX}, ${centerY}), resuming chase mode`);
+            const respawnX = 14; // Center of 28-wide maze
+            const respawnY = 5;  // Top corridor (safe open area with no walls)
+            const distToHome = Math.abs(ghost.gridX - respawnX) + Math.abs(ghost.gridY - respawnY);
+            if (distToHome <= 1) { // Within 1 tile of respawn point
+                // Arrived at respawn - regenerate and resume chasing
+                console.log(`💀 ${ghost.name}: Regenerated at top corridor (${respawnX}, ${respawnY}), resuming chase mode`);
                 ghost.mode = 'chase';
                 ghost.speed = GHOST_SPEED;
                 ghost.eaten = false;
                 ghost.frightenedTimer = 0; // Reset timer to prevent issues
-                ghost.x = centerX * CELL_SIZE;
-                ghost.y = centerY * CELL_SIZE;
+                ghost.x = respawnX * CELL_SIZE;
+                ghost.y = respawnY * CELL_SIZE;
+                ghost.gridX = respawnX;
+                ghost.gridY = respawnY;
             }
         }
 
@@ -351,16 +353,16 @@
                     // Random movement when frightened
                     ghost.direction = validDirections[Math.floor(Math.random() * validDirections.length)];
                 } else if (ghost.mode === 'eaten') {
-                    // Head back to center of maze
-                    const centerX = 14;
-                    const centerY = 15;
+                    // Head back to top corridor respawn point
+                    const respawnX = 14;
+                    const respawnY = 5;
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
 
                     validDirections.forEach(dir => {
                         const nextX = ghost.gridX + dir.x;
                         const nextY = ghost.gridY + dir.y;
-                        const dist = Math.sqrt(Math.pow(nextX - centerX, 2) + Math.pow(nextY - centerY, 2));
+                        const dist = Math.sqrt(Math.pow(nextX - respawnX, 2) + Math.pow(nextY - respawnY, 2));
                         if (dist < bestDist) {
                             bestDist = dist;
                             bestDir = dir;
@@ -370,7 +372,7 @@
 
                     // Log pathfinding for eaten ghosts (every 30 frames)
                     if (frameCount % 30 === 0) {
-                        console.log(`👻 ${ghost.name} (EYES): At (${ghost.gridX}, ${ghost.gridY}), heading to center (${centerX}, ${centerY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
+                        console.log(`👻 ${ghost.name} (EYES): At (${ghost.gridX}, ${ghost.gridY}), heading to top corridor (${respawnX}, ${respawnY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
                     }
                 } else {
                     // Chase Pac-Man continuously
@@ -465,14 +467,14 @@
             if (validDirections.length > 0) {
                 // Choose best direction based on mode
                 if (ghost.mode === 'eaten') {
-                    const centerX = 14;
-                    const centerY = 15;
+                    const respawnX = 14;
+                    const respawnY = 5;
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
                     validDirections.forEach(dir => {
                         const nextX = ghost.gridX + dir.x;
                         const nextY = ghost.gridY + dir.y;
-                        const dist = Math.sqrt(Math.pow(nextX - centerX, 2) + Math.pow(nextY - centerY, 2));
+                        const dist = Math.sqrt(Math.pow(nextX - respawnX, 2) + Math.pow(nextY - respawnY, 2));
                         if (dist < bestDist) {
                             bestDist = dist;
                             bestDir = dir;
@@ -504,12 +506,12 @@
             } else {
                 // No valid moves at all - ghost is stuck in a wall!
                 console.error(`❌ ${ghost.name}: STUCK IN WALL at (${ghost.gridX}, ${ghost.gridY})! This should never happen!`);
-                // Emergency: teleport to a safe starting position
+                // Emergency: teleport to safe top corridor
                 ghost.x = 14 * CELL_SIZE;
-                ghost.y = 15 * CELL_SIZE;
+                ghost.y = 5 * CELL_SIZE;
                 ghost.gridX = 14;
-                ghost.gridY = 15;
-                console.log(`  🚑 ${ghost.name}: Emergency teleport to center (14, 15)`);
+                ghost.gridY = 5;
+                console.log(`  🚑 ${ghost.name}: Emergency teleport to top corridor (14, 5)`);
             }
         }
 
