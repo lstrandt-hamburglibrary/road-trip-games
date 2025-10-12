@@ -25,6 +25,7 @@
 
     // Platform positions (y-coordinates) - Classic Joust layout
     const PLATFORM_DATA = [
+        { y: 520, width: 700, x: 50 },   // Bottom platform (above lava)
         { y: 450, width: 400, x: 200 },  // Center platform
         { y: 350, width: 200, x: 50 },   // Left middle
         { y: 350, width: 200, x: 550 },  // Right middle
@@ -150,10 +151,11 @@
                 }
             });
 
-            // Don't let enemies fall into lava - they bounce back up
+            // Don't let enemies fall into lava - they fly back up aggressively
             if (this.y + this.height > CANVAS_HEIGHT - 50) {
                 this.y = CANVAS_HEIGHT - 50 - this.height;
-                this.velocityY = FLAP_POWER * 0.5; // Bounce up
+                this.velocityY = FLAP_POWER * 0.8; // Strong upward bounce
+                this.flapTimer = 0; // Reset flap timer to flap again soon
             }
 
             // Top boundary
@@ -263,12 +265,12 @@
     function spawnWave() {
         const enemyCount = 2 + gameState.wave;
 
-        // Wave 1: Spawn enemies in horizontal line near bottom (classic Joust)
+        // Wave 1: Spawn enemies in horizontal line on bottom platform (classic Joust)
         if (gameState.wave === 1) {
-            const spacing = CANVAS_WIDTH / (enemyCount + 1);
+            const spacing = 700 / (enemyCount + 1); // Spread across bottom platform
             for (let i = 0; i < enemyCount; i++) {
-                const x = spacing * (i + 1);
-                const y = CANVAS_HEIGHT - 120; // Just above lava
+                const x = 50 + spacing * (i + 1); // Start from left edge of bottom platform
+                const y = 520 - 45; // Standing on bottom platform
                 gameState.enemies.push(new Enemy(gameState.wave, x, y));
             }
         } else {
