@@ -55,10 +55,19 @@
     }
 
     // Create random obstacles for a segment
-    function createObstacles(topHeight, bottomHeight) {
+    function createObstacles(topHeight, bottomHeight, tunnelWidth, canSpawn) {
         const obstacles = [];
 
-        if (Math.random() < OBSTACLE_CHANCE) {
+        // Only spawn obstacles if:
+        // 1. Enough segments have passed since last obstacle
+        // 2. Tunnel is wide enough (at least 160 pixels)
+        // 3. Not during a split
+        // 4. Random chance triggers
+        if (canSpawn &&
+            segmentsSinceLastObstacle >= MIN_OBSTACLE_SPACING &&
+            tunnelWidth >= 160 &&
+            Math.random() < OBSTACLE_CHANCE) {
+
             // Random obstacle type
             const type = Math.random() < 0.5 ? 'stalactite' : 'stalagmite';
             const obstacleLength = 30 + Math.random() * 40; // 30-70 pixels
@@ -76,6 +85,10 @@
                     length: obstacleLength
                 });
             }
+
+            segmentsSinceLastObstacle = 0; // Reset counter
+        } else {
+            segmentsSinceLastObstacle++;
         }
 
         return obstacles;
@@ -105,7 +118,7 @@
             currentTopHeight = Math.max(50, Math.min(GAME_HEIGHT - currentTunnelWidth - 50, currentTopHeight + variation));
             currentBottomHeight = currentTopHeight + currentTunnelWidth;
 
-            const obstacles = i > 10 ? createObstacles(currentTopHeight, currentBottomHeight) : []; // No obstacles at start
+            const obstacles = i > 10 ? createObstacles(currentTopHeight, currentBottomHeight, currentTunnelWidth, true) : []; // No obstacles at start
 
             tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight, currentTunnelWidth, currentColorIndex, obstacles));
         }
@@ -125,6 +138,10 @@
     const SPLIT_DURATION = 20; // segments to split
     const FULL_SPLIT_DURATION = 40; // segments fully split
     const MERGE_DURATION = 20; // segments to merge
+
+    // Track obstacle spacing
+    let segmentsSinceLastObstacle = 0;
+    const MIN_OBSTACLE_SPACING = 15; // minimum segments between obstacles
 
     // Update game state
     function update() {
@@ -157,8 +174,6 @@
 
             let newTopHeight = Math.max(50, Math.min(GAME_HEIGHT - newTunnelWidth - 50, lastSegment.topHeight + variation));
             let newBottomHeight = newTopHeight + newTunnelWidth;
-
-            const obstacles = createObstacles(newTopHeight, newBottomHeight);
 
             // Change color every 50-100 segments
             segmentsSinceColorChange++;
@@ -200,6 +215,10 @@
                     splitState = null;
                 }
             }
+
+            // Create obstacles (but not during splits)
+            const canSpawnObstacle = splitState === null;
+            const obstacles = createObstacles(newTopHeight, newBottomHeight, newTunnelWidth, canSpawnObstacle);
 
             tunnelSegments.push(createTunnelSegment(
                 lastSegment.x + SEGMENT_WIDTH,
