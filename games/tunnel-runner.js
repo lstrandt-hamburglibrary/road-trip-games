@@ -196,17 +196,21 @@
             if (splitState === 'splitting') {
                 const progress = 1 - (splitSegmentsRemaining / SPLIT_DURATION);
 
-                // Expand tunnel walls to ensure both paths remain navigable
+                // Calculate required total width for two 80px paths + 15px divider = 175px
                 const dividerThickness = 15;
-                const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness;
+                const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness; // 175px
+
+                // Expand tunnel to meet required width
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
 
                 newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2));
                 newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2));
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
-                // Update divider position to stay centered in expanded tunnel
-                splitDividerY = newTopHeight + (newTunnelWidth / 2);
+                // Position divider to give exactly MIN_PATH_WIDTH to top path
+                // Top path: topHeight to (dividerY - 7.5) should be 80px
+                // So dividerY = topHeight + 80 + 7.5
+                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2);
                 splitInfo = { state: 'splitting', progress: progress, dividerY: splitDividerY };
 
                 splitSegmentsRemaining--;
@@ -215,7 +219,7 @@
                     splitSegmentsRemaining = FULL_SPLIT_DURATION;
                 }
             } else if (splitState === 'split') {
-                // Maintain expanded tunnel
+                // Maintain expanded tunnel at required width
                 const dividerThickness = 15;
                 const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness;
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth);
@@ -224,8 +228,8 @@
                 newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2));
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
-                // Update divider position to stay centered
-                splitDividerY = newTopHeight + (newTunnelWidth / 2);
+                // Keep divider positioned for equal paths
+                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2);
                 splitInfo = { state: 'split', progress: 1, dividerY: splitDividerY };
 
                 splitSegmentsRemaining--;
@@ -236,7 +240,7 @@
             } else if (splitState === 'merging') {
                 const progress = splitSegmentsRemaining / MERGE_DURATION;
 
-                // Gradually contract tunnel back to normal
+                // Gradually contract tunnel back
                 const dividerThickness = 15;
                 const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness;
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
@@ -245,8 +249,8 @@
                 newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2));
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
-                // Update divider position to stay centered
-                splitDividerY = newTopHeight + (newTunnelWidth / 2);
+                // Maintain proper divider position during merge
+                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2);
                 splitInfo = { state: 'merging', progress: progress, dividerY: splitDividerY };
 
                 splitSegmentsRemaining--;
