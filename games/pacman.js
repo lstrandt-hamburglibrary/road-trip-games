@@ -301,6 +301,10 @@
             if (ghost.frightenedTimer <= 0) {
                 ghost.mode = 'scatter';
                 ghost.speed = GHOST_SPEED;
+                // Snap to grid to ensure clean transition
+                ghost.x = Math.round(ghost.x / CELL_SIZE) * CELL_SIZE;
+                ghost.y = Math.round(ghost.y / CELL_SIZE) * CELL_SIZE;
+                // Direction will be re-evaluated on next grid-aligned check
             }
         }
 
