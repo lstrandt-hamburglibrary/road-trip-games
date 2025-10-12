@@ -126,17 +126,22 @@
             this.velocityY = 0;
             this.velocityX = (Math.random() < 0.5 ? -1 : 1) * (2 + wave * 0.3);
             this.direction = this.velocityX > 0 ? 1 : -1;
-            this.flapTimer = 0;
-            this.flapInterval = 30 + Math.random() * 30;
+            this.flapTimer = Math.random() * 20; // Random start time for varied flapping
+            this.flapInterval = 20 + Math.random() * 25;
         }
 
         update() {
-            // AI flapping
+            // AI flapping - more aggressive and frequent
             this.flapTimer++;
-            if (this.flapTimer >= this.flapInterval) {
-                this.velocityY = FLAP_POWER * 0.7;
+
+            // Flap more frequently when falling or at lower heights
+            const shouldFlapMore = this.y > CANVAS_HEIGHT - 200 || this.velocityY > 5;
+            const flapThreshold = shouldFlapMore ? this.flapInterval * 0.6 : this.flapInterval;
+
+            if (this.flapTimer >= flapThreshold) {
+                this.velocityY = FLAP_POWER * (0.6 + Math.random() * 0.3); // Variable flap strength
                 this.flapTimer = 0;
-                this.flapInterval = 30 + Math.random() * 30;
+                this.flapInterval = 20 + Math.random() * 25; // More frequent flapping
             }
 
             // Apply gravity
@@ -166,11 +171,12 @@
                 }
             });
 
-            // Don't let enemies fall into lava - they fly back up aggressively
+            // Don't let enemies fall into lava - they fly back up very aggressively
             if (this.y + this.height > CANVAS_HEIGHT - 50) {
                 this.y = CANVAS_HEIGHT - 50 - this.height;
-                this.velocityY = FLAP_POWER * 0.8; // Strong upward bounce
-                this.flapTimer = 0; // Reset flap timer to flap again soon
+                this.velocityY = FLAP_POWER * 1.2; // Very strong upward boost
+                this.flapTimer = 0; // Reset flap timer to flap again immediately
+                this.flapInterval = 15; // Quick successive flaps to get away from lava
             }
 
             // Top boundary
