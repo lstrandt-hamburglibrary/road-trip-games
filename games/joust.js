@@ -23,16 +23,31 @@
         animationId: null
     };
 
-    // Platform positions (y-coordinates) - Classic Joust layout
-    const PLATFORM_DATA = [
-        { y: 520, width: 700, x: 50 },   // Bottom platform (above lava)
-        { y: 450, width: 400, x: 200 },  // Center platform
-        { y: 350, width: 200, x: 50 },   // Left middle
-        { y: 350, width: 200, x: 550 },  // Right middle
-        { y: 250, width: 250, x: 275 },  // Upper center
-        { y: 150, width: 150, x: 100 },  // Top left
-        { y: 150, width: 150, x: 550 }   // Top right
-    ];
+    // Platform layouts for different waves
+    const WAVE_PLATFORMS = {
+        1: [
+            { y: 520, width: 800, x: 0 }     // Full width bottom platform
+        ],
+        2: [
+            { y: 520, width: 600, x: 100 },  // Shorter bottom platform
+            { y: 350, width: 200, x: 50 },   // Left middle
+            { y: 350, width: 200, x: 550 }   // Right middle
+        ],
+        3: [
+            { y: 520, width: 400, x: 200 },  // Even shorter bottom
+            { y: 400, width: 250, x: 50 },   // Left lower
+            { y: 400, width: 250, x: 500 },  // Right lower
+            { y: 250, width: 300, x: 250 }   // Upper center
+        ],
+        4: [
+            { y: 450, width: 400, x: 200 },  // Center platform
+            { y: 350, width: 200, x: 50 },   // Left middle
+            { y: 350, width: 200, x: 550 },  // Right middle
+            { y: 250, width: 250, x: 275 },  // Upper center
+            { y: 150, width: 150, x: 100 },  // Top left
+            { y: 150, width: 150, x: 550 }   // Top right
+        ]
+    };
 
     class Player {
         constructor() {
@@ -250,27 +265,37 @@
             animationId: null
         };
 
+        loadPlatformsForWave(1);
+        spawnWave();
+    }
+
+    function loadPlatformsForWave(wave) {
+        // Clear existing platforms
+        gameState.platforms = [];
+
+        // Get platform layout for this wave (or use wave 4 layout for waves 5+)
+        const platformData = WAVE_PLATFORMS[wave] || WAVE_PLATFORMS[4];
+
         // Create platforms
-        PLATFORM_DATA.forEach(data => {
+        platformData.forEach(data => {
             gameState.platforms.push({
                 x: data.x || 0,
                 y: data.y,
                 width: data.width
             });
         });
-
-        spawnWave();
     }
 
     function spawnWave() {
         const enemyCount = 2 + gameState.wave;
 
-        // Wave 1: Spawn enemies in horizontal line on bottom platform (classic Joust)
-        if (gameState.wave === 1) {
-            const spacing = 700 / (enemyCount + 1); // Spread across bottom platform
+        // Waves 1-2: Spawn enemies in horizontal line on bottom platform
+        if (gameState.wave === 1 || gameState.wave === 2) {
+            const bottomPlatform = gameState.platforms[0]; // Bottom platform is always first
+            const spacing = bottomPlatform.width / (enemyCount + 1);
             for (let i = 0; i < enemyCount; i++) {
-                const x = 50 + spacing * (i + 1); // Start from left edge of bottom platform
-                const y = 520 - 45; // Standing on bottom platform
+                const x = bottomPlatform.x + spacing * (i + 1);
+                const y = bottomPlatform.y - 45; // Standing on bottom platform
                 gameState.enemies.push(new Enemy(gameState.wave, x, y));
             }
         } else {
@@ -321,6 +346,7 @@
         if (gameState.enemies.length === 0 && gameState.eggs.length === 0) {
             gameState.wave++;
             gameState.score += 500; // Bonus for completing wave
+            loadPlatformsForWave(gameState.wave); // Load new platforms for next wave
             spawnWave();
         }
     }
