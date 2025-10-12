@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.6 loaded - Fix ghost edge collision and wrapping bugs');
+    console.log('🟡 Pac-Man v1.45.7 loaded - Smart snap-to-grid avoids walls');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -160,6 +160,41 @@
         return x % CELL_SIZE === 0 && y % CELL_SIZE === 0;
     }
 
+    // Find nearest valid (non-wall) grid position
+    function findNearestValidGridPosition(x, y) {
+        // Try the rounded position first
+        let gridX = Math.round(x / CELL_SIZE);
+        let gridY = Math.round(y / CELL_SIZE);
+
+        if (isValidPosition(gridX, gridY)) {
+            return { x: gridX * CELL_SIZE, y: gridY * CELL_SIZE, gridX, gridY };
+        }
+
+        // If rounded position is a wall, try floor and ceil
+        const floorX = Math.floor(x / CELL_SIZE);
+        const ceilX = Math.ceil(x / CELL_SIZE);
+        const floorY = Math.floor(y / CELL_SIZE);
+        const ceilY = Math.ceil(y / CELL_SIZE);
+
+        // Try all nearby positions in order of distance
+        const candidates = [
+            { gridX: floorX, gridY: floorY },
+            { gridX: ceilX, gridY: floorY },
+            { gridX: floorX, gridY: ceilY },
+            { gridX: ceilX, gridY: ceilY }
+        ];
+
+        for (let pos of candidates) {
+            if (isValidPosition(pos.gridX, pos.gridY)) {
+                return { x: pos.gridX * CELL_SIZE, y: pos.gridY * CELL_SIZE, gridX: pos.gridX, gridY: pos.gridY };
+            }
+        }
+
+        // Shouldn't reach here, but fallback to current position
+        console.error(`⚠️ Could not find valid position near (${x}, ${y})`);
+        return { x, y, gridX: Math.floor(x / CELL_SIZE), gridY: Math.floor(y / CELL_SIZE) };
+    }
+
     // Update Pac-Man
     function updatePacman() {
         // Update mouth animation
@@ -285,16 +320,16 @@
         if (ghost.mode === 'frightened') {
             ghost.frightenedTimer--;
             if (ghost.frightenedTimer <= 0) {
-                console.log(`👻 ${ghost.name}: Frightened mode ended, switching to chase at (${Math.round(ghost.x/CELL_SIZE)}, ${Math.round(ghost.y/CELL_SIZE)})`);
+                console.log(`👻 ${ghost.name}: Frightened mode ended at pixel (${ghost.x.toFixed(1)}, ${ghost.y.toFixed(1)})`);
                 ghost.mode = 'chase';
                 ghost.speed = GHOST_SPEED;
-                // Snap to grid to ensure clean transition
-                ghost.x = Math.round(ghost.x / CELL_SIZE) * CELL_SIZE;
-                ghost.y = Math.round(ghost.y / CELL_SIZE) * CELL_SIZE;
-                // Update grid position after snapping
-                const gridPos = getGridPosition(ghost.x, ghost.y);
-                ghost.gridX = gridPos.gridX;
-                ghost.gridY = gridPos.gridY;
+                // Snap to NEAREST VALID grid position to avoid walls
+                const validPos = findNearestValidGridPosition(ghost.x, ghost.y);
+                ghost.x = validPos.x;
+                ghost.y = validPos.y;
+                ghost.gridX = validPos.gridX;
+                ghost.gridY = validPos.gridY;
+                console.log(`  ✅ Snapped to valid position: (${ghost.gridX}, ${ghost.gridY})`);
                 // Direction will be re-evaluated on next grid-aligned check
             }
         }
