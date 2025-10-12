@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.2 loaded - Fixed ghost house exit to valid corridor');
+    console.log('🟡 Pac-Man v1.45.3 loaded - Two-stage ghost exit to avoid wall barrier');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -387,16 +387,25 @@
                         console.log(`👻 ${ghost.name} (EYES): At (${ghost.gridX}, ${ghost.gridY}), heading to ghost house (${ghostHouseX}, ${ghostHouseY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
                     }
                 } else if (ghost.mode === 'exiting') {
-                    // Head to ghost house exit
-                    const exitX = 15;
-                    const exitY = 8;
+                    // Two-stage exit: first go to (14, 11) to avoid wall at row 12, then to exit
+                    let targetX, targetY;
+                    if (ghost.gridY >= 12) {
+                        // Stage 1: Navigate to waypoint above wall barrier
+                        targetX = 14;
+                        targetY = 11;
+                    } else {
+                        // Stage 2: Navigate to actual exit in corridor
+                        targetX = 15;
+                        targetY = 8;
+                    }
+
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
 
                     validDirections.forEach(dir => {
                         const nextX = ghost.gridX + dir.x;
                         const nextY = ghost.gridY + dir.y;
-                        const dist = Math.sqrt(Math.pow(nextX - exitX, 2) + Math.pow(nextY - exitY, 2));
+                        const dist = Math.sqrt(Math.pow(nextX - targetX, 2) + Math.pow(nextY - targetY, 2));
                         if (dist < bestDist) {
                             bestDist = dist;
                             bestDir = dir;
@@ -406,7 +415,8 @@
 
                     // Log pathfinding for exiting ghosts (every 30 frames)
                     if (frameCount % 30 === 0) {
-                        console.log(`🚪 ${ghost.name} (EXITING): At (${ghost.gridX}, ${ghost.gridY}), heading to exit (${exitX}, ${exitY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
+                        const stage = ghost.gridY >= 12 ? 'Stage 1 (waypoint)' : 'Stage 2 (exit)';
+                        console.log(`🚪 ${ghost.name} (EXITING ${stage}): At (${ghost.gridX}, ${ghost.gridY}), heading to (${targetX}, ${targetY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
                     }
                 } else {
                     // Chase Pac-Man continuously
@@ -516,14 +526,21 @@
                     });
                     ghost.direction = bestDir;
                 } else if (ghost.mode === 'exiting') {
-                    const exitX = 15;
-                    const exitY = 8;
+                    // Two-stage exit: first go to (14, 11) to avoid wall at row 12, then to exit
+                    let targetX, targetY;
+                    if (ghost.gridY >= 12) {
+                        targetX = 14;
+                        targetY = 11;
+                    } else {
+                        targetX = 15;
+                        targetY = 8;
+                    }
                     let bestDir = validDirections[0];
                     let bestDist = Infinity;
                     validDirections.forEach(dir => {
                         const nextX = ghost.gridX + dir.x;
                         const nextY = ghost.gridY + dir.y;
-                        const dist = Math.sqrt(Math.pow(nextX - exitX, 2) + Math.pow(nextY - exitY, 2));
+                        const dist = Math.sqrt(Math.pow(nextX - targetX, 2) + Math.pow(nextY - targetY, 2));
                         if (dist < bestDist) {
                             bestDist = dist;
                             bestDir = dir;
