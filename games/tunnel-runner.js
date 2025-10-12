@@ -21,8 +21,9 @@
             x: 150,
             y: GAME_HEIGHT / 2,
             velocity: 0,
-            gravity: 0.5,
-            lift: -10
+            gravity: 0.25,
+            lift: -4.5,
+            maxVelocity: 6
         };
     }
 
@@ -64,6 +65,10 @@
 
         // Update rocket physics
         rocket.velocity += rocket.gravity;
+
+        // Cap velocity to prevent going too fast
+        rocket.velocity = Math.max(-rocket.maxVelocity, Math.min(rocket.maxVelocity, rocket.velocity));
+
         rocket.y += rocket.velocity;
 
         // Update tunnel segments (scroll left)
