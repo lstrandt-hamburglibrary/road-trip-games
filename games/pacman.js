@@ -1,6 +1,6 @@
 // Pac-Man Game
 (function() {
-    console.log('🟡 Pac-Man v1.45.8 loaded - Smart snap in blocked logic');
+    console.log('🟡 Pac-Man v1.45.9 loaded - Fixed ghost wrapping and eaten ghost pathfinding');
 
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver, levelComplete
@@ -430,7 +430,7 @@
                     // Random movement when frightened
                     ghost.direction = validDirections[Math.floor(Math.random() * validDirections.length)];
                 } else if (ghost.mode === 'eaten') {
-                    // Head back to ghost house center
+                    // Head back to ghost house center - prioritize vertical movement first
                     const ghostHouseX = 14;
                     const ghostHouseY = 14;
                     let bestDir = validDirections[0];
@@ -439,7 +439,16 @@
                     validDirections.forEach(dir => {
                         const nextX = ghost.gridX + dir.x;
                         const nextY = ghost.gridY + dir.y;
-                        const dist = Math.sqrt(Math.pow(nextX - ghostHouseX, 2) + Math.pow(nextY - ghostHouseY, 2));
+
+                        // Penalize going to edges (x < 3 or x > 24) heavily to avoid tunnel/wrap issues
+                        let edgePenalty = 0;
+                        if (nextX < 3 || nextX > 24) {
+                            edgePenalty = 1000;
+                        }
+
+                        // Manhattan distance (more predictable than Euclidean for grid)
+                        const dist = Math.abs(nextX - ghostHouseX) + Math.abs(nextY - ghostHouseY) + edgePenalty;
+
                         if (dist < bestDist) {
                             bestDist = dist;
                             bestDir = dir;
@@ -449,7 +458,7 @@
 
                     // Log pathfinding for eaten ghosts (every 30 frames)
                     if (frameCount % 30 === 0) {
-                        console.log(`👻 ${ghost.name} (EYES): At (${ghost.gridX}, ${ghost.gridY}), heading to ghost house (${ghostHouseX}, ${ghostHouseY}), distance: ${Math.round(bestDist)}, direction: (${bestDir.x}, ${bestDir.y})`);
+                        console.log(`👻 ${ghost.name} (EYES): At (${ghost.gridX}, ${ghost.gridY}), heading to ghost house (${ghostHouseX}, ${ghostHouseY}), direction: (${bestDir.x}, ${bestDir.y})`);
                     }
                 } else if (ghost.mode === 'exiting') {
                     // Three-stage exit: up 1, right, then to corridor
@@ -605,7 +614,16 @@
                     validDirections.forEach(dir => {
                         const nextX = ghost.gridX + dir.x;
                         const nextY = ghost.gridY + dir.y;
-                        const dist = Math.sqrt(Math.pow(nextX - ghostHouseX, 2) + Math.pow(nextY - ghostHouseY, 2));
+
+                        // Penalize going to edges to avoid tunnel/wrap issues
+                        let edgePenalty = 0;
+                        if (nextX < 3 || nextX > 24) {
+                            edgePenalty = 1000;
+                        }
+
+                        // Manhattan distance (more predictable than Euclidean for grid)
+                        const dist = Math.abs(nextX - ghostHouseX) + Math.abs(nextY - ghostHouseY) + edgePenalty;
+
                         if (dist < bestDist) {
                             bestDist = dist;
                             bestDir = dir;
@@ -677,15 +695,29 @@
             }
         }
 
-        // Wrap around tunnels (same as Pac-Man)
-        if (ghost.x < 0) {
-            console.log(`🌀 ${ghost.name}: Wrapping from left to right at y=${Math.round(ghost.y/CELL_SIZE)}`);
-            ghost.x = GAME_WIDTH - CELL_SIZE;
-            ghost.gridX = Math.floor(ghost.x / CELL_SIZE);
-        } else if (ghost.x >= GAME_WIDTH) {
-            console.log(`🌀 ${ghost.name}: Wrapping from right to left at y=${Math.round(ghost.y/CELL_SIZE)}`);
-            ghost.x = 0;
-            ghost.gridX = 0;
+        // Wrap around tunnels (only on tunnel row 14)
+        const tunnelRow = 14;
+        const currentRow = Math.round(ghost.y / CELL_SIZE);
+
+        if (currentRow === tunnelRow) {
+            if (ghost.x < 0) {
+                console.log(`🌀 ${ghost.name}: Wrapping from left to right at y=${currentRow}`);
+                ghost.x = GAME_WIDTH - CELL_SIZE;
+                ghost.gridX = Math.floor(ghost.x / CELL_SIZE);
+            } else if (ghost.x >= GAME_WIDTH) {
+                console.log(`🌀 ${ghost.name}: Wrapping from right to left at y=${currentRow}`);
+                ghost.x = 0;
+                ghost.gridX = 0;
+            }
+        } else {
+            // Not on tunnel row - prevent going out of bounds
+            if (ghost.x < 0) {
+                ghost.x = 0;
+                ghost.gridX = 0;
+            } else if (ghost.x >= GAME_WIDTH) {
+                ghost.x = GAME_WIDTH - CELL_SIZE;
+                ghost.gridX = Math.floor(ghost.x / CELL_SIZE);
+            }
         }
     }
 
