@@ -96,15 +96,15 @@
             ctx.font = '40px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🕊️', 0, 0);
+            ctx.fillText('🦤', 0, 0);
             ctx.restore();
         }
     }
 
     class Enemy {
-        constructor(wave) {
-            this.x = Math.random() < 0.5 ? 0 : CANVAS_WIDTH;
-            this.y = Math.random() * 300 + 100;
+        constructor(wave, x = null, y = null) {
+            this.x = x !== null ? x : (Math.random() < 0.5 ? 0 : CANVAS_WIDTH);
+            this.y = y !== null ? y : (Math.random() * 300 + 100);
             this.width = 40;
             this.height = 40;
             this.velocityY = 0;
@@ -177,7 +177,7 @@
             ctx.font = '40px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('🦇', 0, 0);
+            ctx.fillText('🦅', 0, 0);
             ctx.restore();
         }
     }
@@ -262,8 +262,20 @@
 
     function spawnWave() {
         const enemyCount = 2 + gameState.wave;
-        for (let i = 0; i < enemyCount; i++) {
-            gameState.enemies.push(new Enemy(gameState.wave));
+
+        // Wave 1: Spawn enemies in horizontal line near bottom (classic Joust)
+        if (gameState.wave === 1) {
+            const spacing = CANVAS_WIDTH / (enemyCount + 1);
+            for (let i = 0; i < enemyCount; i++) {
+                const x = spacing * (i + 1);
+                const y = CANVAS_HEIGHT - 120; // Just above lava
+                gameState.enemies.push(new Enemy(gameState.wave, x, y));
+            }
+        } else {
+            // Other waves: Random spawning
+            for (let i = 0; i < enemyCount; i++) {
+                gameState.enemies.push(new Enemy(gameState.wave));
+            }
         }
     }
 
@@ -462,7 +474,7 @@
                     <button onclick="exitJoust()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
                         ← Back
                     </button>
-                    <h2 style="margin: 0; font-size: 1.5rem;">🕊️ Joust</h2>
+                    <h2 style="margin: 0; font-size: 1.5rem;">🦤 Joust</h2>
                     <button onclick="restartJoust()" style="background: #3498db; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-size: 1rem;">
                         🔄 Play Again
                     </button>
@@ -490,7 +502,7 @@
                 <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
                     <h4 style="color: #333; margin-bottom: 1rem;">How to Play:</h4>
                     <ul style="color: #666; text-align: left; line-height: 1.8;">
-                        <li>🕊️ Flap to fly and fight enemy riders!</li>
+                        <li>🦤 Ride your ostrich and joust enemy riders!</li>
                         <li>⚔️ Defeat enemies by hitting them from ABOVE</li>
                         <li>🥚 Collect eggs before they hatch into new enemies</li>
                         <li>🌋 Don't touch the lava at the bottom!</li>
