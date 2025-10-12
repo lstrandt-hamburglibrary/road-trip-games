@@ -15,6 +15,7 @@
         platforms: [],
         score: 0,
         wave: 1,
+        lives: 3,
         gameOver: false,
         gameStarted: false,
         keys: {},
@@ -26,7 +27,10 @@
     // Platform layouts for different waves
     const WAVE_PLATFORMS = {
         1: [
-            { y: 520, width: 800, x: 0 }     // Full width bottom platform
+            { y: 520, width: 800, x: 0 },    // Full width bottom platform
+            { y: 380, width: 250, x: 50 },   // Left platform
+            { y: 380, width: 250, x: 500 },  // Right platform
+            { y: 240, width: 200, x: 300 }   // Upper center platform
         ],
         2: [
             { y: 520, width: 600, x: 100 },  // Shorter bottom platform
@@ -58,6 +62,8 @@
             this.velocityY = 0;
             this.velocityX = 0;
             this.direction = 1; // 1 for right, -1 for left
+            this.invincible = false;
+            this.invincibleTimer = 0;
         }
 
         flap() {
@@ -65,6 +71,17 @@
         }
 
         update() {
+            // Update invincibility timer
+            if (this.invincible) {
+                this.invincibleTimer--;
+                if (this.invincibleTimer <= 0) {
+                    this.invincible = false;
+                }
+            }
+
+            // Apply friction to horizontal movement (momentum decay)
+            this.velocityX *= 0.92;
+
             // Apply gravity
             this.velocityY += GRAVITY;
 
@@ -79,21 +96,31 @@
             // Check platform collisions
             let onPlatform = false;
             gameState.platforms.forEach(platform => {
-                if (this.velocityY > 0 && // Falling
-                    this.y + this.height >= platform.y &&
-                    this.y + this.height <= platform.y + 15 &&
-                    this.x + this.width > platform.x &&
-                    this.x < platform.x + platform.width) {
-                    this.y = platform.y - this.height;
-                    this.velocityY = 0;
-                    onPlatform = true;
+                // Check if player overlaps with platform horizontally
+                if (this.x + this.width > platform.x && this.x < platform.x + platform.width) {
+
+                    // Landing on top of platform (falling down)
+                    if (this.velocityY > 0 &&
+                        this.y + this.height >= platform.y &&
+                        this.y + this.height <= platform.y + 15) {
+                        this.y = platform.y - this.height;
+                        this.velocityY = 0;
+                        onPlatform = true;
+                    }
+
+                    // Hitting platform from below (flying up)
+                    else if (this.velocityY < 0 &&
+                        this.y <= platform.y + 15 &&
+                        this.y >= platform.y) {
+                        this.y = platform.y + 15;
+                        this.velocityY = 0;
+                    }
                 }
             });
 
-            // Lava boundary - game over if player touches lava
-            if (this.y + this.height > CANVAS_HEIGHT - 50) {
-                gameState.gameOver = true;
-                gameState.gameStarted = false;
+            // Lava boundary - lose a life if player touches lava (unless invincible)
+            if (!this.invincible && this.y + this.height > CANVAS_HEIGHT - 50) {
+                this.loseLife();
             }
 
             // Top boundary
@@ -103,16 +130,71 @@
             }
         }
 
+        loseLife() {
+            gameState.lives--;
+            if (gameState.lives <= 0) {
+                gameState.gameOver = true;
+                gameState.gameStarted = false;
+            } else {
+                // Respawn player at center of a middle platform with invincibility
+                // Pick a safe platform (prefer upper-middle platforms, not bottom)
+                let spawnPlatform = gameState.platforms[1]; // Usually a middle platform
+                if (!spawnPlatform) {
+                    spawnPlatform = gameState.platforms[0]; // Fallback to first platform
+                }
+
+                this.x = spawnPlatform.x + (spawnPlatform.width / 2) - (this.width / 2);
+                this.y = spawnPlatform.y - this.height;
+                this.velocityY = 0;
+                this.velocityX = 0;
+                this.invincible = true;
+                this.invincibleTimer = 120; // 2 seconds at 60fps
+            }
+        }
+
         draw(ctx) {
+            // Blink when invincible (draw every other 10 frames)
+            if (this.invincible && Math.floor(this.invincibleTimer / 10) % 2 === 0) {
+                return; // Don't draw (blink effect)
+            }
+
             ctx.save();
             ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-            if (this.direction === -1) {
-                ctx.scale(-1, 1);
+
+            // Draw simple directional sprite (larger)
+            ctx.fillStyle = '#FFD700'; // Gold color for player
+
+            if (this.direction === 1) {
+                // Facing right - draw triangle pointing right
+                ctx.beginPath();
+                ctx.moveTo(-22, -18);  // Top left
+                ctx.lineTo(-22, 18);   // Bottom left
+                ctx.lineTo(22, 0);     // Right point
+                ctx.closePath();
+                ctx.fill();
+
+                // Add eye
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(8, -4, 3, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Facing left - draw triangle pointing left
+                ctx.beginPath();
+                ctx.moveTo(22, -18);   // Top right
+                ctx.lineTo(22, 18);    // Bottom right
+                ctx.lineTo(-22, 0);    // Left point
+                ctx.closePath();
+                ctx.fillStyle = '#FFD700';
+                ctx.fill();
+
+                // Add eye
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(-8, -4, 3, 0, Math.PI * 2);
+                ctx.fill();
             }
-            ctx.font = '40px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🦤', 0, 0);
+
             ctx.restore();
         }
     }
@@ -128,20 +210,34 @@
             this.direction = this.velocityX > 0 ? 1 : -1;
             this.flapTimer = Math.random() * 20; // Random start time for varied flapping
             this.flapInterval = 20 + Math.random() * 25;
+            this.targetHeight = 150 + Math.random() * 300; // Target height to patrol around
+            this.targetChangeTimer = Math.random() * 180; // Change target every 3 seconds
         }
 
         update() {
-            // AI flapping - more aggressive and frequent
+            // Change target height periodically
+            this.targetChangeTimer--;
+            if (this.targetChangeTimer <= 0) {
+                this.targetHeight = 150 + Math.random() * 300;
+                this.targetChangeTimer = 120 + Math.random() * 120; // 2-4 seconds
+            }
+
+            // AI flapping - patrol around target height
             this.flapTimer++;
 
-            // Flap more frequently when falling or at lower heights
-            const shouldFlapMore = this.y > CANVAS_HEIGHT - 200 || this.velocityY > 5;
-            const flapThreshold = shouldFlapMore ? this.flapInterval * 0.6 : this.flapInterval;
+            // Determine if should flap based on target height
+            const aboveTarget = this.y < this.targetHeight - 50;
+            const belowTarget = this.y > this.targetHeight + 50;
+            const tooLow = this.y > CANVAS_HEIGHT - 200;
 
-            if (this.flapTimer >= flapThreshold) {
-                this.velocityY = FLAP_POWER * (0.6 + Math.random() * 0.3); // Variable flap strength
+            // Flap when below target or too low, but not when above target
+            const shouldFlap = (belowTarget || tooLow) && !aboveTarget;
+            const flapThreshold = shouldFlap ? this.flapInterval * 0.7 : this.flapInterval * 1.5;
+
+            if (this.flapTimer >= flapThreshold && shouldFlap) {
+                this.velocityY = FLAP_POWER * (0.6 + Math.random() * 0.3);
                 this.flapTimer = 0;
-                this.flapInterval = 20 + Math.random() * 25; // More frequent flapping
+                this.flapInterval = 20 + Math.random() * 25;
             }
 
             // Apply gravity
@@ -161,13 +257,24 @@
 
             // Check platform collisions
             gameState.platforms.forEach(platform => {
-                if (this.velocityY > 0 &&
-                    this.y + this.height >= platform.y &&
-                    this.y + this.height <= platform.y + 15 &&
-                    this.x + this.width > platform.x &&
-                    this.x < platform.x + platform.width) {
-                    this.y = platform.y - this.height;
-                    this.velocityY = 0;
+                // Check if enemy overlaps with platform horizontally
+                if (this.x + this.width > platform.x && this.x < platform.x + platform.width) {
+
+                    // Landing on top of platform (falling down)
+                    if (this.velocityY > 0 &&
+                        this.y + this.height >= platform.y &&
+                        this.y + this.height <= platform.y + 15) {
+                        this.y = platform.y - this.height;
+                        this.velocityY = 0;
+                    }
+
+                    // Hitting platform from below (flying up)
+                    else if (this.velocityY < 0 &&
+                        this.y <= platform.y + 15 &&
+                        this.y >= platform.y) {
+                        this.y = platform.y + 15;
+                        this.velocityY = 0;
+                    }
                 }
             });
 
@@ -194,13 +301,41 @@
         draw(ctx) {
             ctx.save();
             ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-            if (this.direction === -1) {
-                ctx.scale(-1, 1);
+
+            // Draw red triangle enemy (larger)
+            ctx.fillStyle = '#FF4444'; // Red color for enemies
+
+            if (this.direction === 1) {
+                // Facing right - draw triangle pointing right
+                ctx.beginPath();
+                ctx.moveTo(-22, -18);  // Top left
+                ctx.lineTo(-22, 18);   // Bottom left
+                ctx.lineTo(22, 0);     // Right point
+                ctx.closePath();
+                ctx.fill();
+
+                // Add eye
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(8, -4, 3, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Facing left - draw triangle pointing left
+                ctx.beginPath();
+                ctx.moveTo(22, -18);   // Top right
+                ctx.lineTo(22, 18);    // Bottom right
+                ctx.lineTo(-22, 0);    // Left point
+                ctx.closePath();
+                ctx.fillStyle = '#FF4444';
+                ctx.fill();
+
+                // Add eye
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(-8, -4, 3, 0, Math.PI * 2);
+                ctx.fill();
             }
-            ctx.font = '40px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🦅', 0, 0);
+
             ctx.restore();
         }
     }
@@ -263,6 +398,7 @@
             platforms: [],
             score: 0,
             wave: 1,
+            lives: 3,
             gameOver: false,
             gameStarted: false,
             keys: {},
@@ -315,12 +451,15 @@
     function checkCollisions() {
         const player = gameState.player;
 
-        // Check enemy collisions
+        // Check enemy collisions - using proper AABB collision detection
         for (let i = gameState.enemies.length - 1; i >= 0; i--) {
             const enemy = gameState.enemies[i];
 
-            if (Math.abs(player.x - enemy.x) < 35 &&
-                Math.abs(player.y - enemy.y) < 35) {
+            // Proper bounding box collision detection
+            if (player.x < enemy.x + enemy.width &&
+                player.x + player.width > enemy.x &&
+                player.y < enemy.y + enemy.height &&
+                player.y + player.height > enemy.y) {
 
                 // Check who is higher
                 if (player.y < enemy.y - 10) {
@@ -328,20 +467,27 @@
                     gameState.eggs.push(new Egg(enemy.x, enemy.y));
                     gameState.enemies.splice(i, 1);
                     gameState.score += 100;
+
+                    // Bounce player upward
+                    player.velocityY = FLAP_POWER * 0.7; // Bounce effect
                 } else if (enemy.y < player.y - 10) {
-                    // Enemy wins - game over
-                    gameState.gameOver = true;
-                    gameState.gameStarted = false;
+                    // Enemy wins - lose a life (unless invincible)
+                    if (!player.invincible) {
+                        player.loseLife();
+                    }
                 }
             }
         }
 
-        // Check egg collisions
+        // Check egg collisions - using proper AABB collision detection
         for (let i = gameState.eggs.length - 1; i >= 0; i--) {
             const egg = gameState.eggs[i];
 
-            if (Math.abs(player.x - egg.x) < 30 &&
-                Math.abs(player.y - egg.y) < 30) {
+            // Proper bounding box collision detection
+            if (player.x < egg.x + egg.width &&
+                player.x + player.width > egg.x &&
+                player.y < egg.y + egg.height &&
+                player.y + player.height > egg.y) {
                 egg.collected = true;
                 gameState.eggs.splice(i, 1);
                 gameState.score += 250;
@@ -360,15 +506,20 @@
     function update() {
         if (!gameState.gameStarted || gameState.gameOver) return;
 
-        // Update player
-        gameState.player.velocityX = 0;
+        // Update player - add momentum instead of instant movement
         if (gameState.keys['ArrowLeft'] || gameState.keys['a']) {
-            gameState.player.velocityX = -MOVE_SPEED;
-            gameState.player.direction = -1;
+            gameState.player.velocityX -= 0.5; // Accelerate left
+            if (gameState.player.velocityX < -MOVE_SPEED) {
+                gameState.player.velocityX = -MOVE_SPEED; // Cap speed
+            }
+            gameState.player.direction = -1; // Face left when moving left
         }
         if (gameState.keys['ArrowRight'] || gameState.keys['d']) {
-            gameState.player.velocityX = MOVE_SPEED;
-            gameState.player.direction = 1;
+            gameState.player.velocityX += 0.5; // Accelerate right
+            if (gameState.player.velocityX > MOVE_SPEED) {
+                gameState.player.velocityX = MOVE_SPEED; // Cap speed
+            }
+            gameState.player.direction = 1; // Face right when moving right
         }
 
         gameState.player.update();
@@ -395,9 +546,34 @@
     function draw() {
         const ctx = gameState.ctx;
 
-        // Clear canvas - black background like classic Joust
-        ctx.fillStyle = '#000000';
+        // Draw stone/rock background
+        ctx.fillStyle = '#2a2a2a';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // Add stone texture pattern
+        ctx.fillStyle = 'rgba(40, 40, 40, 0.5)';
+        for (let y = 0; y < CANVAS_HEIGHT; y += 40) {
+            for (let x = 0; x < CANVAS_WIDTH; x += 40) {
+                const offset = (y / 40) % 2 === 0 ? 20 : 0;
+                ctx.fillRect(x + offset, y, 38, 38);
+            }
+        }
+
+        // Add darker stone lines
+        ctx.strokeStyle = 'rgba(20, 20, 20, 0.8)';
+        ctx.lineWidth = 2;
+        for (let y = 0; y < CANVAS_HEIGHT; y += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(CANVAS_WIDTH, y);
+            ctx.stroke();
+        }
+        for (let x = 0; x < CANVAS_WIDTH; x += 40) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, CANVAS_HEIGHT);
+            ctx.stroke();
+        }
 
         // Draw lava at bottom
         ctx.fillStyle = '#ff0000';
@@ -439,6 +615,7 @@
         ctx.textAlign = 'left';
         ctx.fillText(`Score: ${gameState.score}`, 20, 40);
         ctx.fillText(`Wave: ${gameState.wave}`, 20, 70);
+        ctx.fillText(`Lives: ${gameState.lives}`, 20, 100);
 
         if (gameState.gameOver) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
