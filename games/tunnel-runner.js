@@ -205,9 +205,9 @@
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
                 const deviationOffset = PATH_DEVIATION * progress;
 
-                // Random angular divergence - each path varies independently between 3-30px
-                const topAngleVariation = 3 + Math.random() * 27; // 3-30px upward
-                const bottomAngleVariation = 3 + Math.random() * 27; // 3-30px downward
+                // Random angular divergence - top path varies 5-20px, bottom drops MUCH more (10-50px)
+                const topAngleVariation = (Math.random() - 0.5) * 30; // -15 to +15px (winding)
+                const bottomAngleVariation = 10 + Math.random() * 40; // 10-50px downward (steep drop)
 
                 newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
                 newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
@@ -229,9 +229,9 @@
                 const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth);
                 const deviationOffset = PATH_DEVIATION;
 
-                // Random variation for each path - creates winding tunnels
-                const topAngleVariation = 3 + Math.random() * 27; // 3-30px
-                const bottomAngleVariation = 3 + Math.random() * 27; // 3-30px
+                // Random variation - top winds around, bottom continues dropping dramatically
+                const topAngleVariation = (Math.random() - 0.5) * 30; // -15 to +15px (winding)
+                const bottomAngleVariation = 10 + Math.random() * 40; // 10-50px downward (steep)
 
                 newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
                 newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
@@ -256,11 +256,11 @@
                 const deviationOffset = PATH_DEVIATION * progress;
 
                 // Reduce variation as paths merge back
-                const topAngleVariation = (3 + Math.random() * 27) * progress; // Scaled by progress
-                const bottomAngleVariation = (3 + Math.random() * 27) * progress;
+                const topAngleVariation = ((Math.random() - 0.5) * 30) * progress; // Scaled by progress
+                const bottomAngleVariation = (10 + Math.random() * 40) * progress; // Scaled by progress
 
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset + topAngleVariation);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset - bottomAngleVariation);
+                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
                 // Bring divider back to center
