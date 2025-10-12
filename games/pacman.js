@@ -246,6 +246,7 @@
             if (distance < CELL_SIZE / 2) {
                 powerPellets.splice(i, 1);
                 score += POWER_PELLET_POINTS;
+                console.log(`💊 Power Pellet eaten! Ghosts entering frightened mode for ${POWER_PELLET_DURATION} frames`);
                 // Make ghosts frightened
                 ghosts.forEach(ghost => {
                     if (ghost.mode !== 'eaten') {
@@ -277,6 +278,7 @@
         if (ghost.mode === 'frightened') {
             ghost.frightenedTimer--;
             if (ghost.frightenedTimer <= 0) {
+                console.log(`👻 ${ghost.name}: Frightened mode ended, switching to chase at (${Math.round(ghost.x/CELL_SIZE)}, ${Math.round(ghost.y/CELL_SIZE)})`);
                 ghost.mode = 'chase';
                 ghost.speed = GHOST_SPEED;
                 // Snap to grid to ensure clean transition
@@ -298,6 +300,7 @@
             const distToHome = Math.abs(ghost.gridX - centerX) + Math.abs(ghost.gridY - centerY);
             if (distToHome <= 1) { // Within 1 tile of center
                 // Arrived at center - regenerate and resume chasing
+                console.log(`💀 ${ghost.name}: Regenerated at center (${centerX}, ${centerY}), resuming chase mode`);
                 ghost.mode = 'chase';
                 ghost.speed = GHOST_SPEED;
                 ghost.eaten = false;
@@ -376,6 +379,11 @@
                         }
                     });
                     ghost.direction = bestDir;
+
+                    // Log chasing decision (only every 60 frames to avoid spam)
+                    if (frameCount % 60 === 0) {
+                        console.log(`🎯 ${ghost.name}: At (${ghost.gridX}, ${ghost.gridY}), chasing Pac-Man at (${targetX}, ${targetY}), distance: ${Math.round(bestDist)}`);
+                    }
                 }
             } else if (validDirections.length === 0) {
                 // Fallback: if no valid directions (shouldn't happen), try to find any non-wall direction
@@ -420,6 +428,9 @@
             ghost.y = newY;
         } else {
             // Align to grid if hitting wall
+            if (frameCount % 60 === 0) {
+                console.log(`🚧 ${ghost.name}: Blocked at (${ghost.gridX}, ${ghost.gridY}), snapping to grid. Direction: (${ghost.direction.x}, ${ghost.direction.y})`);
+            }
             ghost.x = ghost.gridX * CELL_SIZE;
             ghost.y = ghost.gridY * CELL_SIZE;
         }
@@ -447,6 +458,7 @@
                     // Eat ghost
                     score += GHOST_POINTS[Math.min(ghostsEatenThisPowerPellet, 3)];
                     ghostsEatenThisPowerPellet++;
+                    console.log(`🍴 Pac-Man ate ${ghost.name} at (${ghost.gridX}, ${ghost.gridY})! Now returning to center as eyes.`);
                     ghost.mode = 'eaten';
                     ghost.speed = GHOST_SPEED * 2;
                     ghost.eaten = true;
