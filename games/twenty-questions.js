@@ -369,24 +369,23 @@
         // Object-specific questions
         { question: "Is it electronic?", property: 'isElectronic' },
         { question: "Is it a vehicle?", property: 'isVehicle' },
+        { question: "Can it move on its own?", property: 'canMove' },
         { question: "Do people use it every day?", property: 'usedDaily' },
-        { question: "Can you hold it in your hand?", property: 'size', value: 'small' },
+        { question: "Is it a tool?", property: 'isTool' },
+        { question: "Is it furniture?", property: 'isFurniture' },
+        { question: "Can you wear it?", property: 'isClothing' },
+        { question: "Is it used for entertainment?", property: 'forEntertainment' },
         { question: "Is it made of metal?", property: 'material', value: 'metal' },
         { question: "Is it made of wood?", property: 'material', value: 'wood' },
         { question: "Is it made of plastic?", property: 'material', value: 'plastic' },
         { question: "Is it made of fabric?", property: 'material', value: 'fabric' },
         { question: "Is it made of glass?", property: 'material', value: 'glass' },
         { question: "Is it made of paper?", property: 'material', value: 'paper' },
-        { question: "Is it a tool?", property: 'isTool' },
-        { question: "Is it furniture?", property: 'isFurniture' },
-        { question: "Can you wear it?", property: 'isClothing' },
-        { question: "Is it used for entertainment?", property: 'forEntertainment' },
 
         // Size questions
+        { question: "Can you hold it in your hand?", property: 'size', value: 'small' },
+        { question: "Is it about the size of a person?", property: 'size', value: 'medium' },
         { question: "Is it bigger than a person?", property: 'size', value: 'large' },
-        { question: "Is it smaller than your hand?", property: 'size', value: 'small' },
-        { question: "Can it fit in a backpack?", property: 'size', value: 'small' },
-        { question: "Is it bigger than a car?", property: 'size', value: 'huge' },
 
         // Place-specific questions
         { question: "Is it indoors?", property: 'isIndoors' },
