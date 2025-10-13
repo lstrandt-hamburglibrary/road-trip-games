@@ -159,7 +159,7 @@
             pixelY: 23 * TILE_SIZE + TILE_SIZE / 2,
             direction: DIR.NONE,
             nextDirection: DIR.NONE,
-            speed: 2.5, // pixels per frame
+            speed: 3.5, // pixels per frame (~105 px/sec at 30fps)
             animation: 0
         };
     }
@@ -178,7 +178,7 @@
             direction: DIR.LEFT,
             mode: 'chase', // chase, frightened, eaten, exiting
             scatterTarget: scatterTarget,
-            speed: 2.0, // pixels per frame
+            speed: 3.0, // pixels per frame (~90 px/sec at 30fps)
             animation: 0
         };
     }
@@ -469,9 +469,9 @@
             // Determine speed based on mode
             let currentSpeed = ghost.speed;
             if (ghost.mode === 'eaten') {
-                currentSpeed = 3.5; // Faster when eaten
+                currentSpeed = 5.0; // Faster when eaten (~150 px/sec)
             } else if (ghost.mode === 'frightened') {
-                currentSpeed = 1.5; // Slower when frightened
+                currentSpeed = 2.0; // Slower when frightened (~60 px/sec)
             }
 
             // Move in current direction
