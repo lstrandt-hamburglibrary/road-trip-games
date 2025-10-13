@@ -1,12 +1,19 @@
 // Downhill Skier Game - Vertical scrolling skiing game
 (function() {
     let gameCanvas, ctx;
-    let gameState = 'menu'; // menu, playing, gameOver
+    let gameState = 'menu'; // menu, modeSelect, playing, gameOver
+    let gameMode = 'downhill'; // downhill, slalom
     let skier;
     let slopeSegments = [];
     let trees = [];
+    let gates = []; // Slalom gates
     let score = 0;
     let highScore = parseInt(localStorage.getItem('downhillSkierHighScore') || '0');
+    let bestSlalomTime = parseFloat(localStorage.getItem('downhillSkierBestSlalom') || '999.9');
+    let gameTime = 0; // Time in seconds
+    let gatesPassed = 0;
+    let gatesMissed = 0;
+    let totalGates = 0;
     let animationId;
     let keys = {};
 
@@ -22,8 +29,13 @@
     const ROCK_SPAWN_CHANCE = 0.05; // 5% chance per segment
     const MIN_TREE_SPACING = 60; // Minimum pixels between trees horizontally
     const MIN_ROCK_SPACING = 80; // Minimum pixels between rocks horizontally
+    const GATE_SPACING = 150; // Vertical spacing between slalom gates
+    const GATE_WIDTH = 80; // Distance between left and right poles
+    const POLE_HEIGHT = 50; // Height of flagpoles
+    const GATE_PENALTY_TIME = 5.0; // 5 seconds penalty for missing gate
 
     let currentScrollSpeed = BASE_SCROLL_SPEED;
+    let lastGateY = 0; // Track last gate position
 
     // Skier object
     function createSkier() {
@@ -66,14 +78,31 @@
         };
     }
 
+    // Create a slalom gate (pair of poles)
+    function createGate(centerX, y) {
+        return {
+            leftPoleX: centerX - GATE_WIDTH / 2,
+            rightPoleX: centerX + GATE_WIDTH / 2,
+            y: y,
+            passed: false,
+            missed: false
+        };
+    }
+
     // Initialize game
     function initGame() {
         skier = createSkier();
         slopeSegments = [];
         trees = [];
+        gates = [];
         score = 0;
+        gameTime = 0;
+        gatesPassed = 0;
+        gatesMissed = 0;
+        totalGates = 0;
         keys = {};
         currentScrollSpeed = BASE_SCROLL_SPEED;
+        lastGateY = GAME_HEIGHT + 100; // Start gates below screen
 
         // Create initial slope segments
         let slopeLeft = (GAME_WIDTH - SLOPE_WIDTH) / 2;
@@ -86,6 +115,18 @@
             slopeRight = slopeLeft + SLOPE_WIDTH;
 
             slopeSegments.push(createSlopeSegment(GAME_HEIGHT + i * SEGMENT_HEIGHT, slopeLeft, slopeRight));
+        }
+
+        // Create initial gates for slalom mode
+        if (gameMode === 'slalom') {
+            const centerX = GAME_WIDTH / 2;
+            for (let i = 0; i < 10; i++) {
+                const gateY = GAME_HEIGHT + 200 + i * GATE_SPACING;
+                const offset = (Math.random() - 0.5) * 100; // Vary gate positions
+                gates.push(createGate(centerX + offset, gateY));
+                totalGates++;
+                lastGateY = gateY;
+            }
         }
 
         gameState = 'playing';
@@ -102,10 +143,17 @@
     function spawnTreesForSegment(segment, isInitial = false) {
         const slopeWidth = segment.rightEdge - segment.leftEdge;
 
-        // Spawn trees
+        // Check if there's a gate near this segment in slalom mode
+        const nearGate = gameMode === 'slalom' && gates.some(gate =>
+            Math.abs(gate.y - segment.y) < 100
+        );
+
+        // Spawn trees (reduced in slalom mode, avoid near gates)
+        const treeChance = gameMode === 'slalom' ? TREE_SPAWN_CHANCE * 0.5 : TREE_SPAWN_CHANCE;
         if (!isInitial &&
+            !nearGate &&
             segmentsSinceLastTree >= MIN_TREE_SEGMENT_SPACING &&
-            Math.random() < TREE_SPAWN_CHANCE) {
+            Math.random() < treeChance) {
 
             const numTrees = Math.floor(Math.random() * 3) + 1; // 1-3 trees
             const positions = [];
@@ -171,6 +219,9 @@
     function update() {
         if (gameState !== 'playing') return;
 
+        // Update game time (roughly 60fps, so add 1/60 seconds)
+        gameTime += 1/60;
+
         // Update skier movement based on arrow keys
         if (keys['ArrowLeft']) {
             skier.velocityX = -SKIER_SPEED;
@@ -198,6 +249,23 @@
             tree.y -= currentScrollSpeed;
         }
 
+        // Update gates (scroll up) in slalom mode
+        if (gameMode === 'slalom') {
+            for (let gate of gates) {
+                gate.y -= currentScrollSpeed;
+            }
+
+            // Check if we need to spawn a new gate
+            if (lastGateY - gates[gates.length - 1].y < GATE_SPACING * 5) {
+                const centerX = GAME_WIDTH / 2;
+                const offset = (Math.random() - 0.5) * 120; // Vary gate positions
+                const newGateY = lastGateY + GATE_SPACING;
+                gates.push(createGate(centerX + offset, newGateY));
+                totalGates++;
+                lastGateY = newGateY;
+            }
+        }
+
         // Remove off-screen segments and add new ones at bottom
         if (slopeSegments[0].y < -SEGMENT_HEIGHT) {
             slopeSegments.shift();
@@ -219,6 +287,35 @@
 
         // Remove off-screen trees
         trees = trees.filter(tree => tree.y > -50);
+
+        // Remove off-screen gates and check for gate pass/miss
+        if (gameMode === 'slalom') {
+            gates = gates.filter(gate => {
+                if (gate.y < -50) {
+                    return false; // Remove off-screen gate
+                }
+
+                // Check if skier is passing through gate zone
+                const skierCenterY = skier.y + SKIER_HEIGHT / 2;
+                const skierCenterX = skier.x + SKIER_WIDTH / 2;
+
+                if (!gate.passed && !gate.missed && skierCenterY > gate.y - 20 && skierCenterY < gate.y + 20) {
+                    // Skier is at gate level - check if passed through
+                    if (skierCenterX > gate.leftPoleX && skierCenterX < gate.rightPoleX) {
+                        // Passed through successfully!
+                        gate.passed = true;
+                        gatesPassed++;
+                    } else if (skierCenterY > gate.y) {
+                        // Missed the gate
+                        gate.missed = true;
+                        gatesMissed++;
+                        gameTime += GATE_PENALTY_TIME; // Add penalty time
+                    }
+                }
+
+                return true; // Keep gate
+            });
+        }
 
         // Check collisions with slope edges
         const currentSegment = slopeSegments.find(seg =>
@@ -265,13 +362,21 @@
         } else if (gameState === 'playing') {
             drawSlope();
             drawTrees();
+            if (gameMode === 'slalom') {
+                drawGates();
+            }
             drawSkier();
             drawScore();
         } else if (gameState === 'gameOver') {
             drawSlope();
             drawTrees();
+            if (gameMode === 'slalom') {
+                drawGates();
+            }
             drawSkier();
             drawGameOver();
+        } else if (gameState === 'modeSelect') {
+            drawModeSelect();
         }
     }
 
@@ -396,6 +501,49 @@
         }
     }
 
+    // Draw slalom gates
+    function drawGates() {
+        for (let gate of gates) {
+            // Draw left pole (red)
+            ctx.fillStyle = '#DC143C';
+            ctx.fillRect(gate.leftPoleX - 3, gate.y - POLE_HEIGHT, 6, POLE_HEIGHT);
+
+            // Left flag
+            ctx.fillStyle = gate.passed ? '#90EE90' : gate.missed ? '#FFB6C1' : '#FF6B6B';
+            ctx.beginPath();
+            ctx.moveTo(gate.leftPoleX + 3, gate.y - POLE_HEIGHT);
+            ctx.lineTo(gate.leftPoleX + 20, gate.y - POLE_HEIGHT + 8);
+            ctx.lineTo(gate.leftPoleX + 3, gate.y - POLE_HEIGHT + 16);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw right pole (blue)
+            ctx.fillStyle = '#4169E1';
+            ctx.fillRect(gate.rightPoleX - 3, gate.y - POLE_HEIGHT, 6, POLE_HEIGHT);
+
+            // Right flag
+            ctx.fillStyle = gate.passed ? '#90EE90' : gate.missed ? '#FFB6C1' : '#6B9BFF';
+            ctx.beginPath();
+            ctx.moveTo(gate.rightPoleX - 3, gate.y - POLE_HEIGHT);
+            ctx.lineTo(gate.rightPoleX - 20, gate.y - POLE_HEIGHT + 8);
+            ctx.lineTo(gate.rightPoleX - 3, gate.y - POLE_HEIGHT + 16);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw dotted line between poles to show gate
+            if (!gate.passed && !gate.missed) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(gate.leftPoleX, gate.y - POLE_HEIGHT / 2);
+                ctx.lineTo(gate.rightPoleX, gate.y - POLE_HEIGHT / 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+    }
+
     // Draw skier
     function drawSkier() {
         ctx.save();
@@ -441,8 +589,19 @@
         ctx.fillStyle = '#333';
         ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'left';
-        ctx.fillText(`Distance: ${score}`, 20, 40);
-        ctx.fillText(`High: ${highScore}`, 20, 70);
+
+        if (gameMode === 'downhill') {
+            ctx.fillText(`Distance: ${score}`, 20, 40);
+            ctx.fillText(`High: ${highScore}`, 20, 70);
+        } else if (gameMode === 'slalom') {
+            const displayTime = gameTime.toFixed(1);
+            ctx.fillText(`Time: ${displayTime}s`, 20, 40);
+            ctx.fillText(`Gates: ${gatesPassed}/${totalGates}`, 20, 70);
+            ctx.fillText(`Missed: ${gatesMissed}`, 20, 100);
+            if (bestSlalomTime < 999) {
+                ctx.fillText(`Best: ${bestSlalomTime.toFixed(1)}s`, 20, 130);
+            }
+        }
     }
 
     // Draw menu
@@ -495,21 +654,87 @@
 
         ctx.font = '20px Arial';
         ctx.fillText('Ski down the mountain!', GAME_WIDTH / 2, 180);
-        ctx.fillText('Avoid trees and rocks - stay on the slope!', GAME_WIDTH / 2, 210);
-        ctx.fillText('Game speeds up every 100 points!', GAME_WIDTH / 2, 235);
 
         ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#ff6b6b';
-        ctx.fillText('← → Arrow Keys to Move', GAME_WIDTH / 2, 270);
+        ctx.fillText('← → Arrow Keys to Move', GAME_WIDTH / 2, 220);
 
         ctx.font = 'bold 32px Arial';
         ctx.fillStyle = '#2d5016';
-        ctx.fillText('CLICK TO START', GAME_WIDTH / 2, 350);
+        ctx.fillText('CLICK TO CHOOSE MODE', GAME_WIDTH / 2, 300);
 
-        if (highScore > 0) {
-            ctx.font = '20px Arial';
+        if (highScore > 0 || bestSlalomTime < 999) {
+            ctx.font = 'bold 22px Arial';
             ctx.fillStyle = '#333';
-            ctx.fillText(`Best Distance: ${highScore}`, GAME_WIDTH / 2, 400);
+            ctx.fillText('Best Scores:', GAME_WIDTH / 2, 370);
+            if (highScore > 0) {
+                ctx.font = '18px Arial';
+                ctx.fillText(`Downhill Distance: ${highScore}`, GAME_WIDTH / 2, 400);
+            }
+            if (bestSlalomTime < 999) {
+                ctx.font = '18px Arial';
+                ctx.fillText(`Slalom Time: ${bestSlalomTime.toFixed(1)}s`, GAME_WIDTH / 2, 425);
+            }
+        }
+    }
+
+    // Draw mode selection
+    function drawModeSelect() {
+        // Draw background slope
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(200, 0, 400, GAME_HEIGHT);
+
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 42px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('SELECT MODE', GAME_WIDTH / 2, 80);
+
+        // Downhill mode box
+        ctx.fillStyle = '#4169E1';
+        ctx.fillRect(150, 150, 220, 180);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 28px Arial';
+        ctx.fillText('DOWNHILL', 260, 195);
+        ctx.font = '16px Arial';
+        ctx.fillText('Pure speed!', 260, 225);
+        ctx.fillText('Avoid obstacles', 260, 250);
+        ctx.fillText('Go for distance', 260, 275);
+        ctx.font = 'bold 18px Arial';
+        ctx.fillStyle = '#FFD700';
+        ctx.fillText('CLICK HERE', 260, 310);
+
+        // Slalom mode box
+        ctx.fillStyle = '#DC143C';
+        ctx.fillRect(430, 150, 220, 180);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 28px Arial';
+        ctx.fillText('SLALOM', 540, 195);
+        ctx.font = '16px Arial';
+        ctx.fillText('Pass the gates!', 540, 225);
+        ctx.fillText('Time-based race', 540, 250);
+        ctx.fillText('Avoid penalties', 540, 275);
+        ctx.font = 'bold 18px Arial';
+        ctx.fillStyle = '#FFD700';
+        ctx.fillText('CLICK HERE', 540, 310);
+
+        // Instructions
+        ctx.fillStyle = '#333';
+        ctx.font = '18px Arial';
+        ctx.fillText('Click a mode to begin your run!', GAME_WIDTH / 2, 400);
+
+        // Best scores
+        if (highScore > 0 || bestSlalomTime < 999) {
+            ctx.font = 'bold 20px Arial';
+            ctx.fillStyle = '#2d5016';
+            ctx.fillText('Your Best Times:', GAME_WIDTH / 2, 470);
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#333';
+            if (highScore > 0) {
+                ctx.fillText(`Downhill: ${highScore}m`, GAME_WIDTH / 2 - 100, 500);
+            }
+            if (bestSlalomTime < 999) {
+                ctx.fillText(`Slalom: ${bestSlalomTime.toFixed(1)}s`, GAME_WIDTH / 2 + 100, 500);
+            }
         }
     }
 
@@ -522,20 +747,38 @@
         ctx.fillStyle = '#d63031';
         ctx.font = 'bold 48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('CRASHED!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 60);
+        ctx.fillText('CRASHED!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 80);
 
         ctx.fillStyle = '#333';
         ctx.font = '32px Arial';
-        ctx.fillText(`Distance: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2);
 
-        if (score > highScore) {
-            ctx.fillStyle = '#00b894';
-            ctx.font = 'bold 28px Arial';
-            ctx.fillText('🎉 NEW RECORD! 🎉', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
-        } else {
-            ctx.fillStyle = '#333';
+        if (gameMode === 'downhill') {
+            ctx.fillText(`Distance: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
+
+            if (score > highScore) {
+                ctx.fillStyle = '#00b894';
+                ctx.font = 'bold 28px Arial';
+                ctx.fillText('🎉 NEW RECORD! 🎉', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30);
+            } else {
+                ctx.fillStyle = '#333';
+                ctx.font = '24px Arial';
+                ctx.fillText(`Best Distance: ${highScore}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 30);
+            }
+        } else if (gameMode === 'slalom') {
+            const finalTime = gameTime.toFixed(1);
+            ctx.fillText(`Time: ${finalTime}s`, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30);
             ctx.font = '24px Arial';
-            ctx.fillText(`Best Distance: ${highScore}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+            ctx.fillText(`Gates: ${gatesPassed}/${totalGates} (Missed: ${gatesMissed})`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 5);
+
+            if (gatesPassed === totalGates && gameTime < bestSlalomTime) {
+                ctx.fillStyle = '#00b894';
+                ctx.font = 'bold 28px Arial';
+                ctx.fillText('🎉 NEW BEST TIME! 🎉', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+            } else if (bestSlalomTime < 999) {
+                ctx.fillStyle = '#333';
+                ctx.font = '22px Arial';
+                ctx.fillText(`Best Time: ${bestSlalomTime.toFixed(1)}s`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+            }
         }
 
         ctx.font = 'bold 28px Arial';
@@ -547,9 +790,17 @@
     function gameOver() {
         gameState = 'gameOver';
 
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('downhillSkierHighScore', highScore.toString());
+        if (gameMode === 'downhill') {
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('downhillSkierHighScore', highScore.toString());
+            }
+        } else if (gameMode === 'slalom') {
+            // Only count as best time if all gates were passed
+            if (gatesPassed === totalGates && gameTime < bestSlalomTime) {
+                bestSlalomTime = gameTime;
+                localStorage.setItem('downhillSkierBestSlalom', bestSlalomTime.toFixed(1));
+            }
         }
 
         cancelAnimationFrame(animationId);
@@ -566,9 +817,31 @@
     }
 
     // Handle input
-    function handleClick() {
-        if (gameState === 'menu' || gameState === 'gameOver') {
-            initGame();
+    function handleClick(event) {
+        if (gameState === 'menu') {
+            gameState = 'modeSelect';
+            draw();
+        } else if (gameState === 'modeSelect') {
+            // Get click coordinates relative to canvas
+            const rect = gameCanvas.getBoundingClientRect();
+            const scaleX = GAME_WIDTH / rect.width;
+            const scaleY = GAME_HEIGHT / rect.height;
+            const clickX = (event.clientX - rect.left) * scaleX;
+            const clickY = (event.clientY - rect.top) * scaleY;
+
+            // Check if clicked on Downhill box (150, 150, 220, 180)
+            if (clickX >= 150 && clickX <= 370 && clickY >= 150 && clickY <= 330) {
+                gameMode = 'downhill';
+                initGame();
+            }
+            // Check if clicked on Slalom box (430, 150, 220, 180)
+            else if (clickX >= 430 && clickX <= 650 && clickY >= 150 && clickY <= 330) {
+                gameMode = 'slalom';
+                initGame();
+            }
+        } else if (gameState === 'gameOver') {
+            gameState = 'modeSelect';
+            draw();
         }
     }
 
@@ -598,10 +871,15 @@
         touchStartX = touch.clientX;
         touchStartY = touch.clientY;
 
-        // Start game on tap if in menu or game over
-        if (gameState === 'menu' || gameState === 'gameOver') {
+        // Start game on tap if in menu, mode select, or game over
+        if (gameState === 'menu' || gameState === 'modeSelect' || gameState === 'gameOver') {
             e.preventDefault();
-            handleClick();
+            // Create a synthetic event object for handleClick
+            const syntheticEvent = {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            };
+            handleClick(syntheticEvent);
         } else if (gameState === 'playing') {
             isTouchMoving = false;
         }
