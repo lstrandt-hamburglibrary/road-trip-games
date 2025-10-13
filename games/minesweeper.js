@@ -299,11 +299,31 @@
     function renderGame() {
         const content = document.getElementById('minesweeperContent');
 
-        // Calculate cell size based on difficulty
-        const cellSize = gameState.difficulty === 'expert' ? 25 : 30;
+        // Calculate cell size based on difficulty and available screen width
+        // Reserve space for borders, padding, and margins (about 100px total)
+        const availableWidth = Math.min(window.innerWidth - 100, 1200);
+
+        // Calculate optimal cell size to fit screen
+        let maxCellSize;
+        if (gameState.difficulty === 'beginner') {
+            maxCellSize = 30;
+        } else if (gameState.difficulty === 'intermediate') {
+            maxCellSize = 24;
+        } else { // expert
+            maxCellSize = 20;
+        }
+
+        // Ensure board fits on screen
+        const calculatedSize = Math.floor(availableWidth / gameState.cols);
+        const cellSize = Math.min(maxCellSize, Math.max(15, calculatedSize));
+
+        // Scale UI elements for smaller boards
+        const counterFontSize = Math.min(24, cellSize + 6);
+        const buttonSize = Math.min(50, cellSize * 1.8);
+        const buttonFontSize = Math.min(32, cellSize * 1.2);
 
         content.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1rem;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 0.5rem; max-width: 100%; overflow-x: auto;">
                 <!-- Difficulty Selection -->
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
                     <button onclick="changeDifficulty('beginner')" style="
@@ -339,63 +359,72 @@
                 <div style="
                     background: #c0c0c0;
                     border: 3px solid #808080;
-                    padding: 0.5rem 1rem;
+                    padding: 0.5rem;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
                     width: ${cellSize * gameState.cols + 4}px;
+                    max-width: 100%;
                     box-sizing: border-box;
+                    gap: 0.5rem;
                 ">
                     <div style="
                         background: #000;
                         color: #f00;
                         font-family: 'Courier New', monospace;
-                        font-size: 24px;
+                        font-size: ${counterFontSize}px;
                         font-weight: bold;
                         padding: 0.25rem 0.5rem;
                         border: 2px inset #808080;
+                        min-width: ${counterFontSize * 2}px;
+                        text-align: center;
                     ">${String(Math.max(0, gameState.minesRemaining)).padStart(3, '0')}</div>
 
                     <button onclick="initMinesweeper()" style="
                         background: #c0c0c0;
                         border: 3px outset #fff;
-                        font-size: 32px;
-                        width: 50px;
-                        height: 50px;
+                        font-size: ${buttonFontSize}px;
+                        width: ${buttonSize}px;
+                        height: ${buttonSize}px;
                         cursor: pointer;
                         padding: 0;
+                        flex-shrink: 0;
                     ">${gameState.gameOver ? (gameState.won ? '😎' : '😵') : '🙂'}</button>
 
                     <div style="
                         background: #000;
                         color: #f00;
                         font-family: 'Courier New', monospace;
-                        font-size: 24px;
+                        font-size: ${counterFontSize}px;
                         font-weight: bold;
                         padding: 0.25rem 0.5rem;
                         border: 2px inset #808080;
+                        min-width: ${counterFontSize * 2}px;
+                        text-align: center;
                     " id="minesweeperTimer">${String(gameState.timer).padStart(3, '0')}</div>
                 </div>
 
-                <!-- Game Grid -->
-                <div style="
-                    display: inline-block;
-                    background: #c0c0c0;
-                    border: 3px solid #808080;
-                    padding: 4px;
-                ">
+                <!-- Game Grid Container with scroll -->
+                <div style="max-width: 100%; overflow-x: auto;">
                     <div style="
-                        display: grid;
-                        grid-template-columns: repeat(${gameState.cols}, ${cellSize}px);
-                        gap: 0;
+                        display: inline-block;
                         background: #c0c0c0;
+                        border: 3px solid #808080;
+                        padding: 4px;
                     ">
-                        ${renderGrid(cellSize)}
+                        <div style="
+                            display: grid;
+                            grid-template-columns: repeat(${gameState.cols}, ${cellSize}px);
+                            gap: 0;
+                            background: #c0c0c0;
+                        ">
+                            ${renderGrid(cellSize)}
+                        </div>
                     </div>
                 </div>
 
                 <!-- Instructions -->
-                <div style="text-align: center; color: #666; font-size: 0.9rem; max-width: 600px;">
+                <div style="text-align: center; color: #666; font-size: 0.85rem; max-width: 600px; padding: 0 1rem;">
                     <p><strong>Left-click</strong> to reveal | <strong>Right-click</strong> to flag | <strong>Middle-click</strong> on numbers to chord</p>
                     <p style="margin-top: 0.25rem;">💡 First click is always safe! Numbers show adjacent mine count.</p>
                 </div>
