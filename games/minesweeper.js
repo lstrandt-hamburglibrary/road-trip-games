@@ -300,21 +300,27 @@
         const content = document.getElementById('minesweeperContent');
 
         // Calculate cell size based on difficulty and available screen width
-        // Reserve space for borders, padding, and margins (about 40px total)
-        const availableWidth = Math.min(window.innerWidth - 40, 1200);
+        // Account for all borders, padding, and margins:
+        // - Grid border: 6px (3px each side)
+        // - Grid padding: 4px (2px each side)
+        // - Outer padding: ~10px
+        // - Info bar gap and other spacing: ~10px
+        const reservedSpace = 60;
+        const availableWidth = Math.min(window.innerWidth - reservedSpace, 1200);
 
         // Calculate optimal cell size to fit screen
         let maxCellSize;
         if (gameState.difficulty === 'beginner') {
             maxCellSize = 30;
         } else if (gameState.difficulty === 'intermediate') {
-            maxCellSize = 24;
+            maxCellSize = 22;  // Reduced from 24 to ensure fit
         } else { // expert
             maxCellSize = 20;
         }
 
-        // Ensure board fits on screen
-        const calculatedSize = Math.floor(availableWidth / gameState.cols);
+        // Ensure board fits on screen - account for grid borders/padding in width calculation
+        const gridBorderPadding = 14;  // 6px border + 4px padding + 4px safety margin
+        const calculatedSize = Math.floor((availableWidth - gridBorderPadding) / gameState.cols);
         const cellSize = Math.min(maxCellSize, Math.max(15, calculatedSize));
 
         // Scale UI elements for smaller boards
