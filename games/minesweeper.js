@@ -6,7 +6,7 @@
     const DIFFICULTIES = {
         beginner: { rows: 9, cols: 9, mines: 10 },
         intermediate: { rows: 16, cols: 16, mines: 40 },
-        expert: { rows: 16, cols: 30, mines: 99 }
+        expert: { rows: 30, cols: 16, mines: 99 }
     };
 
     // Game state
@@ -352,7 +352,7 @@
                         border-radius: 8px;
                         cursor: pointer;
                         font-weight: bold;
-                    ">Expert (16x30)</button>
+                    ">Expert (30x16)</button>
                 </div>
 
                 <!-- Game Info Bar -->
