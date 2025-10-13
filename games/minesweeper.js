@@ -300,8 +300,8 @@
         const content = document.getElementById('minesweeperContent');
 
         // Calculate cell size based on difficulty and available screen width
-        // Reserve space for borders, padding, and margins (about 100px total)
-        const availableWidth = Math.min(window.innerWidth - 100, 1200);
+        // Reserve space for borders, padding, and margins (about 40px total)
+        const availableWidth = Math.min(window.innerWidth - 40, 1200);
 
         // Calculate optimal cell size to fit screen
         let maxCellSize;
@@ -323,7 +323,7 @@
         const buttonFontSize = Math.min(32, cellSize * 1.2);
 
         content.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 0.5rem; max-width: 100%; overflow-x: auto;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.25rem; max-width: 100%; overflow-x: hidden;">
                 <!-- Difficulty Selection -->
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
                     <button onclick="changeDifficulty('beginner')" style="
@@ -359,7 +359,7 @@
                 <div style="
                     background: #c0c0c0;
                     border: 3px solid #808080;
-                    padding: 0.5rem;
+                    padding: 0.25rem;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
@@ -404,13 +404,13 @@
                     " id="minesweeperTimer">${String(gameState.timer).padStart(3, '0')}</div>
                 </div>
 
-                <!-- Game Grid Container with scroll -->
-                <div style="max-width: 100%; overflow-x: auto;">
+                <!-- Game Grid Container -->
+                <div style="max-width: 100%; overflow-x: hidden;">
                     <div style="
                         display: inline-block;
                         background: #c0c0c0;
                         border: 3px solid #808080;
-                        padding: 4px;
+                        padding: 2px;
                     ">
                         <div style="
                             display: grid;
@@ -424,9 +424,9 @@
                 </div>
 
                 <!-- Instructions -->
-                <div style="text-align: center; color: #666; font-size: 0.85rem; max-width: 600px; padding: 0 1rem;">
+                <div style="text-align: center; color: #666; font-size: 0.8rem; max-width: 600px; padding: 0 0.25rem;">
                     <p><strong>Left-click</strong> to reveal | <strong>Right-click</strong> to flag | <strong>Middle-click</strong> on numbers to chord</p>
-                    <p style="margin-top: 0.25rem;">💡 First click is always safe! Numbers show adjacent mine count.</p>
+                    <p style="margin-top: 0.15rem;">💡 First click is always safe! Numbers show adjacent mine count.</p>
                 </div>
             </div>
         `;
