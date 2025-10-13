@@ -351,8 +351,8 @@
 
     // Check if entity is aligned with grid
     function isAlignedWithGrid(pixelX, pixelY) {
-        return Math.abs(pixelX % TILE_SIZE - TILE_SIZE / 2) < 2 &&
-               Math.abs(pixelY % TILE_SIZE - TILE_SIZE / 2) < 2;
+        return Math.abs(pixelX % TILE_SIZE - TILE_SIZE / 2) < 3 &&
+               Math.abs(pixelY % TILE_SIZE - TILE_SIZE / 2) < 3;
     }
 
     // Update Pac-Man
@@ -427,17 +427,10 @@
         powerModeTimer = POWER_MODE_DURATION;
 
         // Make all non-eaten ghosts frightened
+        // They continue in their current direction until next intersection
         ghosts.forEach(ghost => {
             if (ghost.mode !== 'eaten' && ghost.mode !== 'exiting') {
                 ghost.mode = 'frightened';
-                // Reverse direction
-                ghost.direction = {
-                    x: -ghost.direction.x,
-                    y: -ghost.direction.y,
-                    name: ghost.direction.name === 'UP' ? 'DOWN' :
-                          ghost.direction.name === 'DOWN' ? 'UP' :
-                          ghost.direction.name === 'LEFT' ? 'RIGHT' : 'LEFT'
-                };
             }
         });
     }
