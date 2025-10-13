@@ -895,8 +895,11 @@
     // Handle mobile touch controls
     function handleMobileControl(e) {
         const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        // Account for canvas scaling on mobile
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         // Control pad is in bottom-right corner
         const padX = CANVAS_WIDTH - 120;
@@ -952,6 +955,12 @@
         ctx = canvas.getContext('2d');
         canvas.width = CANVAS_WIDTH;
         canvas.height = CANVAS_HEIGHT + 40; // Extra space for UI
+
+        // Make canvas responsive for mobile
+        canvas.style.maxWidth = '100%';
+        canvas.style.height = 'auto';
+        canvas.style.display = 'block';
+        canvas.style.margin = '0 auto';
 
         createMaze();
         pacman = createPacman();
