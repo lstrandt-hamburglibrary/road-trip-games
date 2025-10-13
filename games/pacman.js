@@ -729,6 +729,55 @@
         }
     }
 
+    // Render mobile controls
+    function renderMobileControls() {
+        const padX = CANVAS_WIDTH - 120;
+        const padY = CANVAS_HEIGHT - 120;
+        const buttonSize = 35;
+        const buttonGap = 5;
+
+        // Semi-transparent background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.fillRect(padX - 5, padY - 5, buttonSize * 3 + buttonGap * 2 + 10, buttonSize * 3 + buttonGap * 2 + 10);
+
+        // Button style
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 2;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+
+        // Up button
+        ctx.fillRect(padX + buttonSize + buttonGap, padY, buttonSize, buttonSize);
+        ctx.strokeRect(padX + buttonSize + buttonGap, padY, buttonSize, buttonSize);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('▲', padX + buttonSize + buttonGap + buttonSize / 2, padY + buttonSize / 2);
+
+        // Down button
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.fillRect(padX + buttonSize + buttonGap, padY + buttonSize * 2 + buttonGap * 2, buttonSize, buttonSize);
+        ctx.strokeRect(padX + buttonSize + buttonGap, padY + buttonSize * 2 + buttonGap * 2, buttonSize, buttonSize);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('▼', padX + buttonSize + buttonGap + buttonSize / 2, padY + buttonSize * 2 + buttonGap * 2 + buttonSize / 2);
+
+        // Left button
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.fillRect(padX, padY + buttonSize + buttonGap, buttonSize, buttonSize);
+        ctx.strokeRect(padX, padY + buttonSize + buttonGap, buttonSize, buttonSize);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('◀', padX + buttonSize / 2, padY + buttonSize + buttonGap + buttonSize / 2);
+
+        // Right button
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.fillRect(padX + buttonSize * 2 + buttonGap * 2, padY + buttonSize + buttonGap, buttonSize, buttonSize);
+        ctx.strokeRect(padX + buttonSize * 2 + buttonGap * 2, padY + buttonSize + buttonGap, buttonSize, buttonSize);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('▶', padX + buttonSize * 2 + buttonGap * 2 + buttonSize / 2, padY + buttonSize + buttonGap + buttonSize / 2);
+
+        ctx.textBaseline = 'alphabetic'; // Reset baseline
+    }
+
     // Render game
     function render() {
         // Clear canvas
@@ -743,13 +792,14 @@
 
             ctx.fillStyle = '#FFFFFF';
             ctx.font = '18px Arial';
-            ctx.fillText('Use Arrow Keys to Move', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
+            ctx.fillText('Use Arrow Keys or Touch Controls', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
             ctx.fillText('Eat all dots to win!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
             ctx.fillText('Click to Start', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
         } else if (gameState === 'playing' || gameState === 'paused') {
             renderMaze();
             renderPacman();
             ghosts.forEach(renderGhost);
+            renderMobileControls();
             renderUI();
 
             if (gameState === 'paused') {
@@ -831,11 +881,48 @@
     }
 
     // Handle canvas click
-    function handleClick() {
+    function handleClick(e) {
         if (gameState === 'menu' || gameState === 'gameover') {
             startGame();
         } else if (gameState === 'paused') {
             gameState = 'playing';
+        } else if (gameState === 'playing') {
+            // Check if click is on mobile controls
+            handleMobileControl(e);
+        }
+    }
+
+    // Handle mobile touch controls
+    function handleMobileControl(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Control pad is in bottom-right corner
+        const padX = CANVAS_WIDTH - 120;
+        const padY = CANVAS_HEIGHT - 120;
+        const buttonSize = 35;
+        const buttonGap = 5;
+
+        // Up button
+        if (x >= padX + buttonSize + buttonGap && x <= padX + buttonSize * 2 + buttonGap &&
+            y >= padY && y <= padY + buttonSize) {
+            pacman.nextDirection = DIR.UP;
+        }
+        // Down button
+        else if (x >= padX + buttonSize + buttonGap && x <= padX + buttonSize * 2 + buttonGap &&
+                 y >= padY + buttonSize * 2 + buttonGap * 2 && y <= padY + buttonSize * 3 + buttonGap * 2) {
+            pacman.nextDirection = DIR.DOWN;
+        }
+        // Left button
+        else if (x >= padX && x <= padX + buttonSize &&
+                 y >= padY + buttonSize + buttonGap && y <= padY + buttonSize * 2 + buttonGap) {
+            pacman.nextDirection = DIR.LEFT;
+        }
+        // Right button
+        else if (x >= padX + buttonSize * 2 + buttonGap * 2 && x <= padX + buttonSize * 3 + buttonGap * 2 &&
+                 y >= padY + buttonSize + buttonGap && y <= padY + buttonSize * 2 + buttonGap) {
+            pacman.nextDirection = DIR.RIGHT;
         }
     }
 
@@ -873,9 +960,21 @@
         // Event listeners
         document.addEventListener('keydown', handleKeyDown);
         canvas.addEventListener('click', handleClick);
+        canvas.addEventListener('touchstart', handleTouch);
 
         // Start game loop
         gameLoop(0);
+    }
+
+    // Handle touch events for mobile
+    function handleTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('click', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        handleClick(mouseEvent);
     }
 
     // Launch game
