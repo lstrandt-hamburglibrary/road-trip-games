@@ -274,8 +274,20 @@
             skier.x += skier.velocityX;
         }
 
-        // Calculate base scroll speed with score progression
-        let baseSpeed = BASE_SCROLL_SPEED + Math.floor(score / 100) * 0.5;
+        // Calculate base scroll speed with multiple acceleration factors
+        // 1. Distance-based acceleration (every 100m adds speed)
+        let distanceBonus = Math.floor(score / 100) * 1.0; // Increased from 0.5 to 1.0
+
+        // 2. Time-based continuous acceleration (adds speed every 10 seconds)
+        let timeBonus = Math.floor(gameTime / 10) * 0.5;
+
+        // 3. Gradual continuous acceleration (small increase per second)
+        let gradualBonus = gameTime * 0.02; // Adds 0.02 speed per second
+
+        let baseSpeed = BASE_SCROLL_SPEED + distanceBonus + timeBonus + gradualBonus;
+
+        // Cap maximum speed to keep game playable
+        baseSpeed = Math.min(baseSpeed, BASE_SCROLL_SPEED * 3); // Max 3x starting speed
 
         // Reduce speed when turning (Atari Ski mechanic)
         if (skier.direction !== 0) {
