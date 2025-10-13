@@ -206,8 +206,9 @@
                 this.x = this.homeX + formationOffsetX;
                 this.y = this.homeY;
 
-                // Random chance to start diving
-                if (Math.random() < 0.001) {
+                // Random chance to start diving (limited by max diving enemies)
+                const divingCount = gameState.enemies.filter(e => e.alive && e.diving).length;
+                if (divingCount < 2 && Math.random() < 0.0002) {
                     this.startDive();
                 }
             }
@@ -227,14 +228,14 @@
         }
 
         updateDive() {
-            this.divePhase += 0.02;  // Slowed from 0.05 to 0.02
+            this.divePhase += 0.01;  // Slowed further: 0.05 → 0.02 → 0.01
 
             // S-curve dive pattern
             const progress = this.divePhase;
             const curveOffset = Math.sin(progress * Math.PI * 2) * 80;
 
             this.x = this.diveStartX + curveOffset;
-            this.y = this.diveStartY + progress * 180;  // Slowed from 300 to 180
+            this.y = this.diveStartY + progress * 100;  // Slowed further: 300 → 180 → 100
 
             // Return to formation or die off screen
             if (this.y > CANVAS_HEIGHT + 50) {
