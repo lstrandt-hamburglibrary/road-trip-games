@@ -47,7 +47,8 @@
         animationId: null,
         formationOffsetX: 0,
         formationDirection: 1,
-        keys: {}
+        keys: {},
+        shootCooldown: 0
     };
 
     // Player object
@@ -298,6 +299,7 @@
         gameState.gameOver = false;
         gameState.formationOffsetX = 0;
         gameState.formationDirection = 1;
+        gameState.shootCooldown = 0;
 
         // Create starfield
         gameState.stars = [];
@@ -337,8 +339,7 @@
         document.addEventListener('keydown', (e) => {
             gameState.keys[e.key] = true;
 
-            if (e.key === ' ' && !gameState.bullet && !gameState.gameOver) {
-                shoot();
+            if (e.key === ' ') {
                 e.preventDefault();
             }
 
@@ -368,6 +369,14 @@
         }
         if (gameState.keys['ArrowRight'] || gameState.keys['d']) {
             gameState.player.moveRight();
+        }
+
+        // Auto-fire when holding space
+        if (gameState.keys[' '] && !gameState.gameOver) {
+            if (gameState.shootCooldown <= 0 && !gameState.bullet) {
+                shoot();
+                gameState.shootCooldown = 15; // Cooldown frames between shots
+            }
         }
     }
 
@@ -436,6 +445,11 @@
 
     function update() {
         if (gameState.gameOver || gameState.paused) return;
+
+        // Decrement shoot cooldown
+        if (gameState.shootCooldown > 0) {
+            gameState.shootCooldown--;
+        }
 
         handleInput();
         updateFormation();
