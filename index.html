@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.56.0';</script>
+    <script>window.APP_VERSION = '1.56.1';</script>
 
     <style>
         * {
@@ -561,6 +561,13 @@
                         <p style="margin-top: 0.5rem;">💡 Diving enemies are worth 2x points!</p>
                     </div>
                 </div>
+
+                <!-- Mobile Touch Controls -->
+                <div id="galaxianControls" style="display: flex; justify-content: center; align-items: center; margin-top: 2rem; gap: 1rem;">
+                    <button id="galaxianBtnLeft" style="width: 80px; height: 80px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation;">◀</button>
+                    <button id="galaxianBtnFire" style="width: 80px; height: 80px; background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); color: white; border: none; border-radius: 50%; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; font-weight: bold;">FIRE</button>
+                    <button id="galaxianBtnRight" style="width: 80px; height: 80px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation;">▶</button>
+                </div>
             </div>
 
             <!-- Galaga Game Section (hidden by default) -->
@@ -576,6 +583,13 @@
                         <p style="margin-top: 0.5rem;">✨ <strong>Boss Galaga</strong> can capture your ship - rescue it for <strong>Dual Fighter</strong> mode!</p>
                         <p style="margin-top: 0.25rem;">🎯 Every 3rd stage is a <strong>Challenge Stage</strong></p>
                     </div>
+                </div>
+
+                <!-- Mobile Touch Controls -->
+                <div id="galagaControls" style="display: flex; justify-content: center; align-items: center; margin-top: 2rem; gap: 1rem;">
+                    <button id="galagaBtnLeft" style="width: 80px; height: 80px; background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation;">◀</button>
+                    <button id="galagaBtnFire" style="width: 80px; height: 80px; background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); color: white; border: none; border-radius: 50%; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; font-weight: bold;">FIRE</button>
+                    <button id="galagaBtnRight" style="width: 80px; height: 80px; background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation;">▶</button>
                 </div>
             </div>
 
@@ -905,7 +919,7 @@
     <script src="games/downhill-skier.js?v=1.53.1"></script>
     <script src="games/pacman.js?v=1.50.1"></script>
     <script src="games/trouble.js?v=1.51.0"></script>
-    <script src="games/galaxian.js?v=1.55.3"></script>
-    <script src="games/galaga.js?v=1.56.0"></script>
+    <script src="games/galaxian.js?v=1.56.1"></script>
+    <script src="games/galaga.js?v=1.56.1"></script>
 </body>
 </html>

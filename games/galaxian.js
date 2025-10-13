@@ -543,11 +543,76 @@
         gameState.animationId = requestAnimationFrame(gameLoop);
     }
 
+    // Setup mobile touch controls
+    function setupMobileControls() {
+        const btnLeft = document.getElementById('galaxianBtnLeft');
+        const btnRight = document.getElementById('galaxianBtnRight');
+        const btnFire = document.getElementById('galaxianBtnFire');
+
+        if (btnLeft) {
+            btnLeft.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowLeft'] = true;
+            });
+            btnLeft.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowLeft'] = false;
+            });
+            btnLeft.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowLeft'] = true;
+            });
+            btnLeft.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowLeft'] = false;
+            });
+        }
+
+        if (btnRight) {
+            btnRight.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowRight'] = true;
+            });
+            btnRight.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowRight'] = false;
+            });
+            btnRight.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowRight'] = true;
+            });
+            btnRight.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                gameState.keys['ArrowRight'] = false;
+            });
+        }
+
+        if (btnFire) {
+            btnFire.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                gameState.keys[' '] = true;
+            });
+            btnFire.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                gameState.keys[' '] = false;
+            });
+            btnFire.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                gameState.keys[' '] = true;
+            });
+            btnFire.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                gameState.keys[' '] = false;
+            });
+        }
+    }
+
     // Launch Galaxian
     window.launchGalaxian = function() {
         document.getElementById('gamesMenu').style.display = 'none';
         document.getElementById('galaxianGame').style.display = 'block';
         initGame();
+        setupMobileControls();
     };
 
     // Exit to menu
