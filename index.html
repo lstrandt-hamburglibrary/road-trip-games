@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.57.0';</script>
+    <script>window.APP_VERSION = '1.57.1';</script>
 
     <style>
         * {
@@ -554,8 +554,8 @@
                     <h2>🚀 Galaxian</h2>
                     <button onclick="exitGalaxian()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
                 </div>
-                <div style="text-align: center;">
-                    <canvas id="galaxianCanvas"></canvas>
+                <div style="text-align: center; max-width: 100%; overflow: hidden;">
+                    <canvas id="galaxianCanvas" style="max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
                     <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
                         <p><strong>Arrow Keys / A-D</strong> to move | <strong>Space</strong> to shoot</p>
                         <p style="margin-top: 0.5rem;">💡 Diving enemies are worth 2x points!</p>
@@ -578,8 +578,8 @@
                     <h2>👾 Galaga</h2>
                     <button onclick="exitGalaga()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
                 </div>
-                <div style="text-align: center;">
-                    <canvas id="galagaCanvas"></canvas>
+                <div style="text-align: center; max-width: 100%; overflow: hidden;">
+                    <canvas id="galagaCanvas" style="max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
                     <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
                         <p><strong>Arrow Keys / A-D</strong> to move | <strong>Space</strong> to shoot (auto-fire!)</p>
                         <p style="margin-top: 0.5rem;">✨ <strong>Boss Galaga</strong> can capture your ship - rescue it for <strong>Dual Fighter</strong> mode!</p>
