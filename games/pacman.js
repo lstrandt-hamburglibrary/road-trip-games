@@ -457,10 +457,12 @@
             if (isAlignedWithGrid(ghost.pixelX, ghost.pixelY)) {
                 const newDirection = chooseGhostDirection(ghost);
                 if (newDirection !== DIR.NONE) {
+                    // Only snap to grid center when changing direction
+                    if (newDirection.name !== ghost.direction.name) {
+                        ghost.pixelX = ghost.gridX * TILE_SIZE + TILE_SIZE / 2;
+                        ghost.pixelY = ghost.gridY * TILE_SIZE + TILE_SIZE / 2;
+                    }
                     ghost.direction = newDirection;
-                    // Snap to grid center
-                    ghost.pixelX = ghost.gridX * TILE_SIZE + TILE_SIZE / 2;
-                    ghost.pixelY = ghost.gridY * TILE_SIZE + TILE_SIZE / 2;
                 }
             }
 
