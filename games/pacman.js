@@ -365,12 +365,20 @@
 
         // Try to change direction when aligned with grid
         if (isAlignedWithGrid(pacman.pixelX, pacman.pixelY) && pacman.nextDirection !== DIR.NONE) {
+            // Make sure we're in a valid position before changing direction
+            if (!isWalkable(pacman.gridX, pacman.gridY)) {
+                // We're in a wall somehow - snap to nearest walkable tile center
+                pacman.pixelX = pacman.gridX * TILE_SIZE + TILE_SIZE / 2;
+                pacman.pixelY = pacman.gridY * TILE_SIZE + TILE_SIZE / 2;
+                return;
+            }
+
             const nextGridX = pacman.gridX + pacman.nextDirection.x;
             const nextGridY = pacman.gridY + pacman.nextDirection.y;
             if (isWalkable(nextGridX, nextGridY)) {
                 pacman.direction = pacman.nextDirection;
                 pacman.nextDirection = DIR.NONE;
-                // Snap to grid center
+                // Snap to grid center for clean direction change
                 pacman.pixelX = pacman.gridX * TILE_SIZE + TILE_SIZE / 2;
                 pacman.pixelY = pacman.gridY * TILE_SIZE + TILE_SIZE / 2;
             }
@@ -415,8 +423,10 @@
                     }
                 }
             } else {
-                // Hit wall, stop
+                // Hit wall, stop and snap to center of current tile to prevent getting stuck
                 pacman.direction = DIR.NONE;
+                pacman.pixelX = pacman.gridX * TILE_SIZE + TILE_SIZE / 2;
+                pacman.pixelY = pacman.gridY * TILE_SIZE + TILE_SIZE / 2;
             }
         }
     }
@@ -497,6 +507,10 @@
                 if (isWalkableForGhost(newGridX, newGridY, ghost)) {
                     ghost.pixelX = newPixelX;
                     ghost.pixelY = newPixelY;
+                } else {
+                    // Hit obstacle, snap to center to prevent getting stuck
+                    ghost.pixelX = ghost.gridX * TILE_SIZE + TILE_SIZE / 2;
+                    ghost.pixelY = ghost.gridY * TILE_SIZE + TILE_SIZE / 2;
                 }
             }
         });
