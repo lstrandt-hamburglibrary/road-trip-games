@@ -29,8 +29,8 @@
     const ROCK_SPAWN_CHANCE = 0.05; // 5% chance per segment
     const MIN_TREE_SPACING = 60; // Minimum pixels between trees horizontally
     const MIN_ROCK_SPACING = 80; // Minimum pixels between rocks horizontally
-    const GATE_SPACING = 150; // Vertical spacing between slalom gates
-    const GATE_WIDTH = 80; // Distance between left and right poles
+    const GATE_SPACING = 200; // Vertical spacing between slalom gates
+    const GATE_WIDTH = 120; // Distance between left and right poles
     const POLE_HEIGHT = 50; // Height of flagpoles
     const GATE_PENALTY_TIME = 5.0; // 5 seconds penalty for missing gate
 
@@ -43,7 +43,10 @@
             x: GAME_WIDTH / 2 - SKIER_WIDTH / 2,
             y: GAME_HEIGHT / 2 - SKIER_HEIGHT / 2, // Middle of screen
             velocityX: 0,
-            direction: 0 // -1 left, 0 none, 1 right
+            direction: 0, // -1 left, 0 none, 1 right
+            crashed: false,
+            crashRecoveryTime: 0,
+            crashCount: 0 // Track number of crashes
         };
     }
 
@@ -86,6 +89,17 @@
             y: y,
             passed: false,
             missed: false
+        };
+    }
+
+    // Create a mogul (bump)
+    function createMogul(x, y) {
+        return {
+            type: 'mogul',
+            x: x,
+            y: y,
+            size: 15 + Math.random() * 10, // 15-25 pixels
+            hit: false
         };
     }
 
@@ -213,6 +227,20 @@
         } else {
             segmentsSinceLastRock++;
         }
+
+        // Spawn moguls (after score >= 100)
+        if (!isInitial &&
+            !nearGate &&
+            score >= 100 &&
+            Math.random() < 0.04) {  // 4% chance
+
+            const numMoguls = Math.floor(Math.random() * 2) + 1; // 1-2 moguls
+
+            for (let i = 0; i < numMoguls; i++) {
+                const mogulX = segment.leftEdge + 40 + Math.random() * (slopeWidth - 80);
+                trees.push(createMogul(mogulX, segment.y));
+            }
+        }
     }
 
     // Update game state
@@ -222,22 +250,44 @@
         // Update game time (roughly 60fps, so add 1/60 seconds)
         gameTime += 1/60;
 
-        // Update skier movement based on arrow keys
-        if (keys['ArrowLeft']) {
-            skier.velocityX = -SKIER_SPEED;
-            skier.direction = -1;
-        } else if (keys['ArrowRight']) {
-            skier.velocityX = SKIER_SPEED;
-            skier.direction = 1;
-        } else {
-            skier.velocityX = 0;
-            skier.direction = 0;
+        // Handle crash recovery
+        if (skier.crashed) {
+            skier.crashRecoveryTime -= 1/60;
+            if (skier.crashRecoveryTime <= 0) {
+                skier.crashed = false;
+            }
         }
 
-        skier.x += skier.velocityX;
+        // Update skier movement based on arrow keys (disabled during crash)
+        if (!skier.crashed) {
+            if (keys['ArrowLeft']) {
+                skier.velocityX = -SKIER_SPEED;
+                skier.direction = -1;
+            } else if (keys['ArrowRight']) {
+                skier.velocityX = SKIER_SPEED;
+                skier.direction = 1;
+            } else {
+                skier.velocityX = 0;
+                skier.direction = 0;
+            }
 
-        // Update speed based on score (increase every 100 points)
-        currentScrollSpeed = BASE_SCROLL_SPEED + Math.floor(score / 100) * 0.5;
+            skier.x += skier.velocityX;
+        }
+
+        // Calculate base scroll speed with score progression
+        let baseSpeed = BASE_SCROLL_SPEED + Math.floor(score / 100) * 0.5;
+
+        // Reduce speed when turning (Atari Ski mechanic)
+        if (skier.direction !== 0) {
+            baseSpeed *= 0.75; // 25% slower when turning
+        }
+
+        // Further reduce speed during crash recovery
+        if (skier.crashed) {
+            baseSpeed *= 0.3; // 70% slower when recovering
+        }
+
+        currentScrollSpeed = baseSpeed;
 
         // Update slope segments (scroll up - terrain moves up as skier goes down)
         for (let segment of slopeSegments) {
@@ -329,9 +379,9 @@
             }
         }
 
-        // Check collisions with trees and rocks
+        // Check collisions with trees, rocks, and moguls
         for (let obstacle of trees) {
-            if (obstacle.hit) continue;
+            if (obstacle.hit || skier.crashed) continue;
 
             // Simple circle collision detection
             const skierCenterX = skier.x + SKIER_WIDTH / 2;
@@ -344,9 +394,27 @@
                 Math.pow(skierCenterY - obstacleCenterY, 2)
             );
 
-            const collisionRadius = obstacle.type === 'tree' ? obstacle.size / 2 : obstacle.size / 2.5;
+            let collisionRadius;
+            if (obstacle.type === 'tree') {
+                collisionRadius = obstacle.size / 2;
+            } else if (obstacle.type === 'rock') {
+                collisionRadius = obstacle.size / 2.5;
+            } else if (obstacle.type === 'mogul') {
+                collisionRadius = obstacle.size / 2;
+            }
+
             if (distance < (collisionRadius + SKIER_WIDTH / 2)) {
-                gameOver();
+                obstacle.hit = true;
+                skier.crashCount++;
+
+                // Check if game over (3 crashes)
+                if (skier.crashCount >= 3) {
+                    gameOver();
+                } else {
+                    // Slow down and recover
+                    skier.crashed = true;
+                    skier.crashRecoveryTime = 1.5; // 1.5 seconds recovery
+                }
             }
         }
     }
@@ -375,8 +443,6 @@
             }
             drawSkier();
             drawGameOver();
-        } else if (gameState === 'modeSelect') {
-            drawModeSelect();
         }
     }
 
@@ -417,10 +483,34 @@
         }
     }
 
-    // Draw trees and rocks
+    // Draw trees, rocks, and moguls
     function drawTrees() {
         for (let obstacle of trees) {
-            if (obstacle.type === 'tree') {
+            if (obstacle.type === 'mogul') {
+                // Draw mogul as a white bump
+                const mogulSize = obstacle.size;
+
+                // Mogul shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                ctx.beginPath();
+                ctx.ellipse(obstacle.x, obstacle.y + 3, mogulSize * 0.8, mogulSize * 0.3, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Mogul body (rounded bump)
+                ctx.fillStyle = obstacle.hit ? '#e0e0e0' : '#f5f5f5';
+                ctx.strokeStyle = '#ccc';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.ellipse(obstacle.x, obstacle.y, mogulSize, mogulSize * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Highlight on top
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.beginPath();
+                ctx.ellipse(obstacle.x - mogulSize * 0.2, obstacle.y - mogulSize * 0.2, mogulSize * 0.4, mogulSize * 0.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (obstacle.type === 'tree') {
                 // Draw tree as a triangle
                 const treeHeight = obstacle.size * 1.2;
 
@@ -549,12 +639,20 @@
         ctx.save();
         ctx.translate(skier.x + SKIER_WIDTH / 2, skier.y + SKIER_HEIGHT / 2);
 
-        // Tilt skier based on direction
-        const tilt = skier.direction * 0.15;
+        // Flash effect when crashed
+        if (skier.crashed && Math.floor(skier.crashRecoveryTime * 10) % 2 === 0) {
+            ctx.globalAlpha = 0.5;
+        }
+
+        // Tilt skier based on direction (or tumble if crashed)
+        let tilt = skier.direction * 0.15;
+        if (skier.crashed) {
+            tilt = Math.sin(skier.crashRecoveryTime * 10) * 0.5; // Tumbling effect
+        }
         ctx.rotate(tilt);
 
         // Skier body (simple triangle shape)
-        ctx.fillStyle = '#ff6b6b';
+        ctx.fillStyle = skier.crashed ? '#ff3333' : '#ff6b6b';
         ctx.beginPath();
         ctx.moveTo(0, -SKIER_HEIGHT / 2);
         ctx.lineTo(-SKIER_WIDTH / 2, SKIER_HEIGHT / 2);
@@ -582,6 +680,14 @@
         ctx.stroke();
 
         ctx.restore();
+
+        // Show "OUCH!" text when crashed
+        if (skier.crashed) {
+            ctx.fillStyle = '#ff0000';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('OUCH!', skier.x + SKIER_WIDTH / 2, skier.y - 30);
+        }
     }
 
     // Draw score
@@ -602,6 +708,13 @@
                 ctx.fillText(`Best: ${bestSlalomTime.toFixed(1)}s`, 20, 130);
             }
         }
+
+        // Show crash counter (hearts/lives)
+        const crashesLeft = 3 - skier.crashCount;
+        ctx.font = 'bold 20px Arial';
+        ctx.fillStyle = '#ff0000';
+        const heartsY = gameMode === 'slalom' ? 160 : 100;
+        ctx.fillText('Lives: ' + '❤️'.repeat(crashesLeft) + '🖤'.repeat(skier.crashCount), 20, heartsY);
     }
 
     // Draw menu
@@ -661,7 +774,7 @@
 
         ctx.font = 'bold 32px Arial';
         ctx.fillStyle = '#2d5016';
-        ctx.fillText('CLICK TO CHOOSE MODE', GAME_WIDTH / 2, 300);
+        ctx.fillText('Choose a mode below!', GAME_WIDTH / 2, 300);
 
         if (highScore > 0 || bestSlalomTime < 999) {
             ctx.font = 'bold 22px Arial';
@@ -818,31 +931,15 @@
 
     // Handle input
     function handleClick(event) {
-        if (gameState === 'menu') {
-            gameState = 'modeSelect';
-            draw();
-        } else if (gameState === 'modeSelect') {
-            // Get click coordinates relative to canvas
-            const rect = gameCanvas.getBoundingClientRect();
-            const scaleX = GAME_WIDTH / rect.width;
-            const scaleY = GAME_HEIGHT / rect.height;
-            const clickX = (event.clientX - rect.left) * scaleX;
-            const clickY = (event.clientY - rect.top) * scaleY;
-
-            // Check if clicked on Downhill box (150, 150, 220, 180)
-            if (clickX >= 150 && clickX <= 370 && clickY >= 150 && clickY <= 330) {
-                gameMode = 'downhill';
-                initGame();
-            }
-            // Check if clicked on Slalom box (430, 150, 220, 180)
-            else if (clickX >= 430 && clickX <= 650 && clickY >= 150 && clickY <= 330) {
-                gameMode = 'slalom';
-                initGame();
-            }
-        } else if (gameState === 'gameOver') {
-            gameState = 'modeSelect';
+        if (gameState === 'gameOver') {
+            // Show mode selection buttons again
+            document.getElementById('modeButtons').style.display = 'flex';
+            document.getElementById('gameInfo').style.display = 'none';
+            document.getElementById('controlButtons').style.display = 'none';
+            gameState = 'menu';
             draw();
         }
+        // Menu state is handled by HTML buttons now
     }
 
     // Handle key presses
@@ -871,18 +968,14 @@
         touchStartX = touch.clientX;
         touchStartY = touch.clientY;
 
-        // Start game on tap if in menu, mode select, or game over
-        if (gameState === 'menu' || gameState === 'modeSelect' || gameState === 'gameOver') {
+        // Handle tap on canvas for game over screen
+        if (gameState === 'gameOver') {
             e.preventDefault();
-            // Create a synthetic event object for handleClick
-            const syntheticEvent = {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            };
-            handleClick(syntheticEvent);
+            handleClick();
         } else if (gameState === 'playing') {
             isTouchMoving = false;
         }
+        // Menu state is handled by HTML buttons
     }
 
     // Handle touch move (for continuous swipe control)
@@ -946,13 +1039,51 @@
                     touch-action: none;
                 "></canvas>
 
-                <div style="text-align: center; color: #666;">
-                    <p style="margin: 0.5rem 0;">💡 <strong>Controls:</strong> Arrow keys, swipe, or use buttons below</p>
-                    <p style="margin: 0.5rem 0;">🎯 <strong>Goal:</strong> Avoid trees and stay on the slope!</p>
+                <!-- Mode Selection Buttons (shown initially) -->
+                <div id="modeButtons" style="display: flex; gap: 1.5rem; margin-top: 1rem;">
+                    <button id="btnDownhill" style="
+                        width: 200px;
+                        padding: 1.5rem;
+                        background: linear-gradient(135deg, #4169E1 0%, #2c4d9e 100%);
+                        border: none;
+                        border-radius: 15px;
+                        color: white;
+                        font-size: 1.1rem;
+                        font-weight: bold;
+                        cursor: pointer;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                        transition: transform 0.2s;
+                    ">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏔️</div>
+                        <div>DOWNHILL</div>
+                        <div style="font-size: 0.8rem; font-weight: normal; margin-top: 0.5rem; opacity: 0.9;">Go for distance!</div>
+                    </button>
+                    <button id="btnSlalom" style="
+                        width: 200px;
+                        padding: 1.5rem;
+                        background: linear-gradient(135deg, #DC143C 0%, #a01028 100%);
+                        border: none;
+                        border-radius: 15px;
+                        color: white;
+                        font-size: 1.1rem;
+                        font-weight: bold;
+                        cursor: pointer;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                        transition: transform 0.2s;
+                    ">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⛳</div>
+                        <div>SLALOM</div>
+                        <div style="font-size: 0.8rem; font-weight: normal; margin-top: 0.5rem; opacity: 0.9;">Race the clock!</div>
+                    </button>
                 </div>
 
-                <!-- Left/Right Control Buttons -->
-                <div style="display: flex; gap: 20px; margin-top: 1rem;">
+                <div id="gameInfo" style="text-align: center; color: #666; display: none;">
+                    <p style="margin: 0.5rem 0;">💡 <strong>Controls:</strong> Arrow keys, swipe, or use buttons below</p>
+                    <p style="margin: 0.5rem 0;">🎯 <strong>Goal:</strong> <span id="goalText"></span></p>
+                </div>
+
+                <!-- Left/Right Control Buttons (hidden initially) -->
+                <div id="controlButtons" style="display: none; gap: 20px; margin-top: 1rem;">
                     <button id="btnSkiLeft" style="
                         width: 100px;
                         height: 80px;
@@ -1003,7 +1134,26 @@
         gameState = 'menu';
         draw();
 
-        // Event listeners for canvas - click to start
+        // Mode selection button handlers
+        document.getElementById('btnDownhill').addEventListener('click', () => {
+            gameMode = 'downhill';
+            document.getElementById('modeButtons').style.display = 'none';
+            document.getElementById('gameInfo').style.display = 'block';
+            document.getElementById('controlButtons').style.display = 'flex';
+            document.getElementById('goalText').textContent = 'Avoid trees and stay on the slope!';
+            initGame();
+        });
+
+        document.getElementById('btnSlalom').addEventListener('click', () => {
+            gameMode = 'slalom';
+            document.getElementById('modeButtons').style.display = 'none';
+            document.getElementById('gameInfo').style.display = 'block';
+            document.getElementById('controlButtons').style.display = 'flex';
+            document.getElementById('goalText').textContent = 'Pass through all gates!';
+            initGame();
+        });
+
+        // Event listeners for canvas - click to restart after game over
         gameCanvas.addEventListener('click', handleClick);
 
         // Touch event listeners for canvas (swipe control during gameplay)
