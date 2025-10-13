@@ -163,14 +163,37 @@
         draw(ctx) {
             if (!this.alive) return;
 
-            // Draw enemy ship
             ctx.fillStyle = this.type.color;
+
+            // Draw spaceship body - diamond/arrow shape
             ctx.beginPath();
-            ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+            ctx.moveTo(this.x + this.width / 2, this.y); // Top point
+            ctx.lineTo(this.x + this.width, this.y + this.height * 0.6); // Right side
+            ctx.lineTo(this.x + this.width / 2, this.y + this.height); // Bottom point
+            ctx.lineTo(this.x, this.y + this.height * 0.6); // Left side
+            ctx.closePath();
             ctx.fill();
 
-            // Draw wings
-            ctx.fillRect(this.x, this.y + this.height / 2, this.width, 4);
+            // Draw wings/fins extending out
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y + this.height * 0.6);
+            ctx.lineTo(this.x - 4, this.y + this.height * 0.5);
+            ctx.lineTo(this.x, this.y + this.height * 0.4);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(this.x + this.width, this.y + this.height * 0.6);
+            ctx.lineTo(this.x + this.width + 4, this.y + this.height * 0.5);
+            ctx.lineTo(this.x + this.width, this.y + this.height * 0.4);
+            ctx.fill();
+
+            // Add cockpit detail for flagships
+            if (this.type === ENEMY_TYPES.FLAGSHIP) {
+                ctx.fillStyle = '#FFFF00';
+                ctx.beginPath();
+                ctx.arc(this.x + this.width / 2, this.y + this.height * 0.5, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
 
         update(formationOffsetX) {
@@ -204,14 +227,14 @@
         }
 
         updateDive() {
-            this.divePhase += 0.05;
+            this.divePhase += 0.02;  // Slowed from 0.05 to 0.02
 
             // S-curve dive pattern
             const progress = this.divePhase;
             const curveOffset = Math.sin(progress * Math.PI * 2) * 80;
 
             this.x = this.diveStartX + curveOffset;
-            this.y = this.diveStartY + progress * 300;
+            this.y = this.diveStartY + progress * 180;  // Slowed from 300 to 180
 
             // Return to formation or die off screen
             if (this.y > CANVAS_HEIGHT + 50) {
