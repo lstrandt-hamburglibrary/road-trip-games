@@ -23,7 +23,7 @@
     const WALK_SPEED = 2;
     const RUN_SPEED = 3.5;
     const JUMP_POWER = -10;
-    const RUN_THRESHOLD = 15; // frames walking same direction to start running
+    const RUN_THRESHOLD = 5; // frames walking same direction to start running (reduced for easier gameplay)
 
     // Colors matching original
     const COLOR_BLACK = '#000000';
@@ -53,37 +53,79 @@
         };
     }
 
+    // Helper function to generate jagged edge points for a platform
+    function generateJaggedEdge(platform) {
+        const points = [];
+        for (let x = platform.x + platform.width; x >= platform.x; x -= 8) {
+            const jag = Math.random() * 6 - 3;
+            points.push({ x, y: platform.y + jag });
+        }
+        return points;
+    }
+
     // Create room with platforms and ladders
     function createRoom(gridX, gridY, hasTreasure, hasKey, hasDoor) {
         const platforms = [];
         const ladders = [];
 
-        // Ground - irregular bottom
-        platforms.push({ x: 0, y: 440, width: GAME_WIDTH, height: 40, irregular: true });
+        // Ground - irregular bottom (pre-generate jagged edge)
+        const ground = { x: 0, y: 440, width: GAME_WIDTH, height: 40, irregular: true };
+        ground.jaggedEdge = generateJaggedEdge(ground);
+        platforms.push(ground);
 
         // Generate cave-like platforms for this room
         if ((gridX + gridY) % 2 === 0) {
             // Pattern 1 - stepped platforms
-            platforms.push({ x: 10, y: 360, width: 180, height: 80, irregular: true });
-            platforms.push({ x: 450, y: 360, width: 180, height: 80, irregular: true });
-            platforms.push({ x: 200, y: 240, width: 240, height: 60, irregular: true });
-            platforms.push({ x: 60, y: 120, width: 160, height: 50, irregular: true });
-            platforms.push({ x: 420, y: 120, width: 160, height: 50, irregular: true });
+            const plat1 = { x: 10, y: 360, width: 180, height: 80, irregular: true };
+            plat1.jaggedEdge = generateJaggedEdge(plat1);
+            platforms.push(plat1);
 
-            ladders.push({ x: 120, y: 300, height: 60 });
-            ladders.push({ x: 320, y: 180, height: 60 });
-            ladders.push({ x: 500, y: 300, height: 60 });
+            const plat2 = { x: 450, y: 360, width: 180, height: 80, irregular: true };
+            plat2.jaggedEdge = generateJaggedEdge(plat2);
+            platforms.push(plat2);
+
+            const plat3 = { x: 200, y: 240, width: 240, height: 60, irregular: true };
+            plat3.jaggedEdge = generateJaggedEdge(plat3);
+            platforms.push(plat3);
+
+            const plat4 = { x: 60, y: 120, width: 160, height: 50, irregular: true };
+            plat4.jaggedEdge = generateJaggedEdge(plat4);
+            platforms.push(plat4);
+
+            const plat5 = { x: 420, y: 120, width: 160, height: 50, irregular: true };
+            plat5.jaggedEdge = generateJaggedEdge(plat5);
+            platforms.push(plat5);
+
+            // Ladders - start from ground level
+            ladders.push({ x: 120, y: 360, height: 80 }); // From ground to first platform
+            ladders.push({ x: 320, y: 240, height: 120 }); // From first to second platform
+            ladders.push({ x: 500, y: 360, height: 80 }); // From ground to first platform
         } else {
             // Pattern 2 - offset platforms
-            platforms.push({ x: 40, y: 320, width: 140, height: 70, irregular: true });
-            platforms.push({ x: 460, y: 320, width: 140, height: 70, irregular: true });
-            platforms.push({ x: 250, y: 200, width: 140, height: 60, irregular: true });
-            platforms.push({ x: 80, y: 80, width: 200, height: 50, irregular: true });
-            platforms.push({ x: 360, y: 80, width: 200, height: 50, irregular: true });
+            const plat1 = { x: 40, y: 320, width: 140, height: 70, irregular: true };
+            plat1.jaggedEdge = generateJaggedEdge(plat1);
+            platforms.push(plat1);
 
-            ladders.push({ x: 90, y: 260, height: 60 });
-            ladders.push({ x: 310, y: 140, height: 60 });
-            ladders.push({ x: 510, y: 260, height: 60 });
+            const plat2 = { x: 460, y: 320, width: 140, height: 70, irregular: true };
+            plat2.jaggedEdge = generateJaggedEdge(plat2);
+            platforms.push(plat2);
+
+            const plat3 = { x: 250, y: 200, width: 140, height: 60, irregular: true };
+            plat3.jaggedEdge = generateJaggedEdge(plat3);
+            platforms.push(plat3);
+
+            const plat4 = { x: 80, y: 80, width: 200, height: 50, irregular: true };
+            plat4.jaggedEdge = generateJaggedEdge(plat4);
+            platforms.push(plat4);
+
+            const plat5 = { x: 360, y: 80, width: 200, height: 50, irregular: true };
+            plat5.jaggedEdge = generateJaggedEdge(plat5);
+            platforms.push(plat5);
+
+            // Ladders - start from ground level
+            ladders.push({ x: 90, y: 320, height: 120 }); // From ground to first platform
+            ladders.push({ x: 310, y: 200, height: 120 }); // From first to second platform
+            ladders.push({ x: 510, y: 320, height: 120 }); // From ground to first platform
         }
 
         return {
@@ -517,8 +559,8 @@
         // Draw platforms with irregular edges
         ctx.fillStyle = COLOR_GOLD;
         for (let platform of room.platforms) {
-            if (platform.irregular) {
-                // Draw platform with jagged top edge
+            if (platform.irregular && platform.jaggedEdge) {
+                // Draw platform with pre-generated jagged top edge
                 ctx.beginPath();
                 ctx.moveTo(platform.x, platform.y + platform.height);
 
@@ -526,10 +568,9 @@
                 ctx.lineTo(platform.x + platform.width, platform.y + platform.height);
                 ctx.lineTo(platform.x + platform.width, platform.y);
 
-                // Top edge (jagged)
-                for (let x = platform.x + platform.width; x >= platform.x; x -= 8) {
-                    const jag = Math.random() * 6 - 3;
-                    ctx.lineTo(x, platform.y + jag);
+                // Top edge (use pre-generated jagged points)
+                for (let point of platform.jaggedEdge) {
+                    ctx.lineTo(point.x, point.y);
                 }
 
                 ctx.closePath();
