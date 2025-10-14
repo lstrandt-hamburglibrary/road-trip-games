@@ -7,7 +7,6 @@
     let rooms = [];
     let enemies = [];
     let treasures = [];
-    let keys = [];
     let lives = 3;
     let score = 0;
     let treasuresCollected = 0;
