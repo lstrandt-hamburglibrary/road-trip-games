@@ -5,14 +5,16 @@
     const CANVAS_WIDTH = 800;
     const CANVAS_HEIGHT = 600;
     const GRAVITY = 0.5;
-    const FLAP_POWER = -10;
+    const FLAP_POWER = -3; // Reduced for continuous flapping
     const MOVE_SPEED = 4;
+    const FLAP_COOLDOWN = 4; // Frames between flaps when holding button
 
     let gameState = {
         player: null,
         enemies: [],
         eggs: [],
         platforms: [],
+        pterodactyl: null,
         score: 0,
         wave: 1,
         lives: 3,
@@ -21,7 +23,9 @@
         keys: {},
         canvas: null,
         ctx: null,
-        animationId: null
+        animationId: null,
+        waveTimer: 0, // Timer for pterodactyl spawn
+        flapHeld: false // Track if flap button is held
     };
 
     // Platform layouts for different waves
@@ -64,13 +68,22 @@
             this.direction = 1; // 1 for right, -1 for left
             this.invincible = false;
             this.invincibleTimer = 0;
+            this.flapCooldown = 0; // Cooldown timer for continuous flapping
         }
 
         flap() {
-            this.velocityY = FLAP_POWER;
+            if (this.flapCooldown <= 0) {
+                this.velocityY += FLAP_POWER;
+                this.flapCooldown = FLAP_COOLDOWN;
+            }
         }
 
         update() {
+            // Update flap cooldown
+            if (this.flapCooldown > 0) {
+                this.flapCooldown--;
+            }
+
             // Update invincibility timer
             if (this.invincible) {
                 this.invincibleTimer--;
@@ -200,26 +213,79 @@
     }
 
     class Enemy {
-        constructor(wave, x = null, y = null) {
+        constructor(wave, x = null, y = null, type = null) {
             this.x = x !== null ? x : (Math.random() < 0.5 ? 0 : CANVAS_WIDTH);
             this.y = y !== null ? y : (Math.random() * 300 + 100);
             this.width = 40;
             this.height = 40;
             this.velocityY = 0;
-            this.velocityX = (Math.random() < 0.5 ? -1 : 1) * (2 + wave * 0.3);
+
+            // Determine enemy type based on wave if not specified
+            if (type === null) {
+                if (wave >= 5 && Math.random() < 0.15) {
+                    this.type = 'shadow'; // Rare, tough enemy
+                } else if (wave >= 3 && Math.random() < 0.3) {
+                    this.type = 'hunter'; // Aggressive enemy
+                } else {
+                    this.type = 'bounder'; // Basic enemy
+                }
+            } else {
+                this.type = type;
+            }
+
+            // Set properties based on type
+            switch(this.type) {
+                case 'shadow':
+                    this.color = '#800080'; // Purple
+                    this.speed = 3 + wave * 0.4;
+                    this.flapInterval = 15 + Math.random() * 15; // Faster flapping
+                    this.pointValue = 300;
+                    break;
+                case 'hunter':
+                    this.color = '#0000FF'; // Blue
+                    this.speed = 2.5 + wave * 0.35;
+                    this.flapInterval = 18 + Math.random() * 20;
+                    this.pointValue = 200;
+                    break;
+                case 'bounder':
+                default:
+                    this.color = '#FF4444'; // Red
+                    this.speed = 2 + wave * 0.3;
+                    this.flapInterval = 20 + Math.random() * 25;
+                    this.pointValue = 100;
+                    break;
+            }
+
+            this.velocityX = (Math.random() < 0.5 ? -1 : 1) * this.speed;
             this.direction = this.velocityX > 0 ? 1 : -1;
             this.flapTimer = Math.random() * 20; // Random start time for varied flapping
-            this.flapInterval = 20 + Math.random() * 25;
             this.targetHeight = 150 + Math.random() * 300; // Target height to patrol around
             this.targetChangeTimer = Math.random() * 180; // Change target every 3 seconds
         }
 
         update() {
-            // Change target height periodically
-            this.targetChangeTimer--;
-            if (this.targetChangeTimer <= 0) {
-                this.targetHeight = 150 + Math.random() * 300;
-                this.targetChangeTimer = 120 + Math.random() * 120; // 2-4 seconds
+            // Hunter AI: Chase player more aggressively
+            if (this.type === 'hunter' && gameState.player) {
+                const player = gameState.player;
+
+                // Try to get above player
+                this.targetHeight = player.y - 30;
+
+                // Move toward player horizontally
+                if (Math.abs(player.x - this.x) > 50) {
+                    const directionToPlayer = player.x > this.x ? 1 : -1;
+                    this.velocityX = directionToPlayer * this.speed;
+                    this.direction = directionToPlayer;
+                }
+
+                this.targetChangeTimer = 60; // Don't change target while chasing
+            } else {
+                // Change target height periodically (Bounder/Shadow behavior)
+                this.targetChangeTimer--;
+                if (this.targetChangeTimer <= 0) {
+                    this.targetHeight = 150 + Math.random() * 300;
+                    this.targetChangeTimer = 120 + Math.random() * 120; // 2-4 seconds
+                }
             }
 
             // AI flapping - patrol around target height
@@ -237,7 +303,6 @@
             if (this.flapTimer >= flapThreshold && shouldFlap) {
                 this.velocityY = FLAP_POWER * (0.6 + Math.random() * 0.3);
                 this.flapTimer = 0;
-                this.flapInterval = 20 + Math.random() * 25;
             }
 
             // Apply gravity
@@ -302,8 +367,8 @@
             ctx.save();
             ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
 
-            // Draw red triangle enemy (larger)
-            ctx.fillStyle = '#FF4444'; // Red color for enemies
+            // Draw triangle enemy with type-specific color
+            ctx.fillStyle = this.color;
 
             if (this.direction === 1) {
                 // Facing right - draw triangle pointing right
@@ -326,13 +391,85 @@
                 ctx.lineTo(22, 18);    // Bottom right
                 ctx.lineTo(-22, 0);    // Left point
                 ctx.closePath();
-                ctx.fillStyle = '#FF4444';
                 ctx.fill();
 
                 // Add eye
                 ctx.fillStyle = '#000';
                 ctx.beginPath();
                 ctx.arc(-8, -4, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+    }
+
+    class Pterodactyl {
+        constructor() {
+            this.x = Math.random() < 0.5 ? -50 : CANVAS_WIDTH + 50;
+            this.y = 100 + Math.random() * 200; // Random height in upper half
+            this.width = 60;
+            this.height = 50;
+            this.velocityX = this.x < 0 ? 5 : -5; // Move across screen
+            this.direction = this.velocityX > 0 ? 1 : -1;
+        }
+
+        update() {
+            this.x += this.velocityX;
+
+            // Remove pterodactyl when it flies off screen
+            if ((this.velocityX > 0 && this.x > CANVAS_WIDTH + 100) ||
+                (this.velocityX < 0 && this.x < -100)) {
+                return 'remove';
+            }
+
+            return null;
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+
+            // Draw pterodactyl (menacing gray/black flying dinosaur)
+            ctx.fillStyle = '#4a4a4a';
+
+            if (this.direction === 1) {
+                // Facing right - larger, more menacing shape
+                ctx.beginPath();
+                ctx.moveTo(-30, 0);    // Body left
+                ctx.lineTo(-25, -20);  // Wing up
+                ctx.lineTo(-10, -10);  // Wing middle
+                ctx.lineTo(30, -15);   // Wing tip
+                ctx.lineTo(35, 0);     // Head point
+                ctx.lineTo(30, 15);    // Wing tip down
+                ctx.lineTo(-10, 10);   // Wing middle down
+                ctx.lineTo(-25, 20);   // Wing down
+                ctx.closePath();
+                ctx.fill();
+
+                // Eye (red, menacing)
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(25, -2, 4, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Facing left
+                ctx.beginPath();
+                ctx.moveTo(30, 0);     // Body right
+                ctx.lineTo(25, -20);   // Wing up
+                ctx.lineTo(10, -10);   // Wing middle
+                ctx.lineTo(-30, -15);  // Wing tip
+                ctx.lineTo(-35, 0);    // Head point
+                ctx.lineTo(-30, 15);   // Wing tip down
+                ctx.lineTo(10, 10);    // Wing middle down
+                ctx.lineTo(25, 20);    // Wing down
+                ctx.closePath();
+                ctx.fill();
+
+                // Eye (red, menacing)
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(-25, -2, 4, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -396,6 +533,7 @@
             enemies: [],
             eggs: [],
             platforms: [],
+            pterodactyl: null,
             score: 0,
             wave: 1,
             lives: 3,
@@ -404,7 +542,9 @@
             keys: {},
             canvas: null,
             ctx: null,
-            animationId: null
+            animationId: null,
+            waveTimer: 0,
+            flapHeld: false
         };
 
         loadPlatformsForWave(1);
@@ -431,6 +571,10 @@
     function spawnWave() {
         const enemyCount = 2 + gameState.wave;
 
+        // Reset wave timer and clear pterodactyl
+        gameState.waveTimer = 0;
+        gameState.pterodactyl = null;
+
         // Waves 1-2: Spawn enemies in horizontal line on bottom platform
         if (gameState.wave === 1 || gameState.wave === 2) {
             const bottomPlatform = gameState.platforms[0]; // Bottom platform is always first
@@ -451,6 +595,19 @@
     function checkCollisions() {
         const player = gameState.player;
 
+        // Check pterodactyl collision (instant death, can't be defeated)
+        if (gameState.pterodactyl) {
+            const ptero = gameState.pterodactyl;
+            if (player.x < ptero.x + ptero.width &&
+                player.x + player.width > ptero.x &&
+                player.y < ptero.y + ptero.height &&
+                player.y + player.height > ptero.y) {
+                // Pterodactyl kills player instantly (even if invincible)
+                player.invincible = false;
+                player.loseLife();
+            }
+        }
+
         // Check enemy collisions - using proper AABB collision detection
         for (let i = gameState.enemies.length - 1; i >= 0; i--) {
             const enemy = gameState.enemies[i];
@@ -466,7 +623,7 @@
                     // Player wins - enemy becomes egg
                     gameState.eggs.push(new Egg(enemy.x, enemy.y));
                     gameState.enemies.splice(i, 1);
-                    gameState.score += 100;
+                    gameState.score += enemy.pointValue;
 
                     // Bounce player upward
                     player.velocityY = FLAP_POWER * 0.7; // Bounce effect
@@ -506,6 +663,11 @@
     function update() {
         if (!gameState.gameStarted || gameState.gameOver) return;
 
+        // Continuous flapping when button held
+        if (gameState.flapHeld) {
+            gameState.player.flap();
+        }
+
         // Update player - add momentum instead of instant movement
         if (gameState.keys['ArrowLeft'] || gameState.keys['a']) {
             gameState.player.velocityX -= 0.5; // Accelerate left
@@ -523,6 +685,20 @@
         }
 
         gameState.player.update();
+
+        // Update wave timer and spawn pterodactyl if needed
+        gameState.waveTimer++;
+        if (gameState.waveTimer > 2700 && !gameState.pterodactyl) { // 45 seconds at 60fps
+            gameState.pterodactyl = new Pterodactyl();
+        }
+
+        // Update pterodactyl
+        if (gameState.pterodactyl) {
+            const result = gameState.pterodactyl.update();
+            if (result === 'remove') {
+                gameState.pterodactyl = null;
+            }
+        }
 
         // Update enemies
         gameState.enemies.forEach(enemy => enemy.update());
@@ -606,6 +782,11 @@
         // Draw enemies
         gameState.enemies.forEach(enemy => enemy.draw(ctx));
 
+        // Draw pterodactyl (draw in front of everything for visibility)
+        if (gameState.pterodactyl) {
+            gameState.pterodactyl.draw(ctx);
+        }
+
         // Draw player
         gameState.player.draw(ctx);
 
@@ -638,9 +819,10 @@
             ctx.fillStyle = 'white';
             ctx.font = '32px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('Press SPACE or tap to flap!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+            ctx.fillText('HOLD SPACE or button to flap!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
             ctx.font = '24px Arial';
             ctx.fillText('Arrow keys or buttons to move', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 40);
+            ctx.fillText('Defeat enemies from above!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 70);
         }
     }
 
@@ -653,18 +835,25 @@
     function handleKeyDown(e) {
         gameState.keys[e.key] = true;
 
-        if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') && gameState.gameStarted) {
+        if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w')) {
             e.preventDefault();
-            gameState.player.flap();
-        }
 
-        if ((e.key === ' ' || e.key === 'Enter') && !gameState.gameStarted && !gameState.gameOver) {
-            gameState.gameStarted = true;
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+
+            if (gameState.gameStarted) {
+                gameState.flapHeld = true;
+            }
         }
     }
 
     function handleKeyUp(e) {
         gameState.keys[e.key] = false;
+
+        if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w')) {
+            gameState.flapHeld = false;
+        }
     }
 
     window.launchJoust = function() {
@@ -714,11 +903,13 @@
                     <h4 style="color: #333; margin-bottom: 1rem;">How to Play:</h4>
                     <ul style="color: #666; text-align: left; line-height: 1.8;">
                         <li>🦤 Ride your ostrich and joust enemy riders!</li>
+                        <li>🪽 HOLD flap button/spacebar for continuous flight control</li>
                         <li>⚔️ Defeat enemies by hitting them from ABOVE</li>
-                        <li>🥚 Collect eggs before they hatch into new enemies</li>
+                        <li>🥚 Collect eggs (250 pts) before they hatch into new enemies</li>
+                        <li>🦖 PTERODACTYL spawns after 45 seconds - instant death!</li>
+                        <li>🎨 Enemy types: Red Bounder (100), Blue Hunter (200), Purple Shadow (300)</li>
                         <li>🌋 Don't touch the lava at the bottom!</li>
-                        <li>📈 Survive waves to increase your score</li>
-                        <li>💀 Get hit from below = Game Over!</li>
+                        <li>💀 Get hit from below = Lose a life!</li>
                     </ul>
                 </div>
             </div>
@@ -744,18 +935,33 @@
                 gameState.gameStarted = true;
             }
             if (gameState.gameStarted) {
-                gameState.player.flap();
+                gameState.flapHeld = true;
             }
         });
 
-        flapBtn.addEventListener('click', (e) => {
+        flapBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            gameState.flapHeld = false;
+        });
+
+        flapBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
             if (!gameState.gameStarted && !gameState.gameOver) {
                 gameState.gameStarted = true;
             }
             if (gameState.gameStarted) {
-                gameState.player.flap();
+                gameState.flapHeld = true;
             }
+        });
+
+        flapBtn.addEventListener('mouseup', (e) => {
+            e.preventDefault();
+            gameState.flapHeld = false;
+        });
+
+        flapBtn.addEventListener('mouseleave', (e) => {
+            e.preventDefault();
+            gameState.flapHeld = false;
         });
 
         leftBtn.addEventListener('touchstart', (e) => {
