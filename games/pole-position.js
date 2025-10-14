@@ -22,9 +22,9 @@
         playerZ: 0,
         speed: 0,
         maxSpeed: 280,
-        acceleration: 0.3,
+        acceleration: 2.0,
         deceleration: 0.5,
-        braking: 1.5,
+        braking: 3.0,
         turning: 0.002,
         centrifugal: 0.3,
         gear: 'high', // 'low' or 'high'
@@ -111,10 +111,10 @@
             if (i > 320 && i < 360) segment.curve = 1.2;
             if (i > 400 && i < 430) segment.curve = -1.5;
 
-            // Add hills
-            if (i > 60 && i < 90) segment.hill = Math.sin((i - 60) / 30 * Math.PI) * 1000;
-            if (i > 200 && i < 250) segment.hill = Math.sin((i - 200) / 50 * Math.PI) * 1500;
-            if (i > 380 && i < 410) segment.hill = Math.sin((i - 380) / 30 * Math.PI) * 800;
+            // Add hills (moved further down track and made gentler)
+            if (i > 100 && i < 140) segment.hill = Math.sin((i - 100) / 40 * Math.PI) * 600;
+            if (i > 250 && i < 300) segment.hill = Math.sin((i - 250) / 50 * Math.PI) * 1000;
+            if (i > 400 && i < 440) segment.hill = Math.sin((i - 400) / 40 * Math.PI) * 500;
 
             gameState.segments.push(segment);
         }
@@ -355,9 +355,12 @@
                 '#ff0000'
             );
 
-            // Draw cars on this segment
+            // Draw cars on this segment (check relative to player position)
             gameState.cars.forEach(car => {
-                if (Math.abs(car.z - (segment.p1.world.z)) < SEGMENT_LENGTH / 2) {
+                const carSegmentIndex = Math.floor(car.z / SEGMENT_LENGTH) % gameState.segments.length;
+                const visibleSegmentIndex = (baseSegment.index + n) % gameState.segments.length;
+
+                if (carSegmentIndex === visibleSegmentIndex) {
                     const carSprite = {
                         world: { x: car.offset * ROAD_WIDTH, y: 0, z: car.z },
                         camera: {},
@@ -365,7 +368,7 @@
                     };
                     project(carSprite, gameState.playerX * ROAD_WIDTH, playerY + gameState.cameraHeight, gameState.position);
 
-                    if (carSprite.screen.scale > 0 && carSprite.camera.z > 0) {
+                    if (carSprite.camera.z > gameState.cameraDepth && carSprite.screen.scale > 0) {
                         const carW = carSprite.screen.scale * 80;
                         const carH = carSprite.screen.scale * 50;
 
