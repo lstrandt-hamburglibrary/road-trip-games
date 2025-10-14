@@ -96,10 +96,10 @@
             plat5.jaggedEdge = generateJaggedEdge(plat5);
             platforms.push(plat5);
 
-            // Ladders - start from ground level
-            ladders.push({ x: 120, y: 360, height: 80 }); // From ground to first platform
-            ladders.push({ x: 320, y: 240, height: 120 }); // From first to second platform
-            ladders.push({ x: 500, y: 360, height: 80 }); // From ground to first platform
+            // Ladders - extend above platforms so player can climb onto them
+            ladders.push({ x: 120, y: 330, height: 110 }); // From ground to first platform (extends above plat at 360)
+            ladders.push({ x: 320, y: 210, height: 150 }); // From first to second platform (extends above plat at 240)
+            ladders.push({ x: 500, y: 330, height: 110 }); // From ground to first platform
         } else {
             // Pattern 2 - offset platforms
             const plat1 = { x: 40, y: 320, width: 140, height: 70, irregular: true };
@@ -122,10 +122,10 @@
             plat5.jaggedEdge = generateJaggedEdge(plat5);
             platforms.push(plat5);
 
-            // Ladders - start from ground level
-            ladders.push({ x: 90, y: 320, height: 120 }); // From ground to first platform
-            ladders.push({ x: 310, y: 200, height: 120 }); // From first to second platform
-            ladders.push({ x: 510, y: 320, height: 120 }); // From ground to first platform
+            // Ladders - extend above platforms so player can climb onto them
+            ladders.push({ x: 90, y: 290, height: 150 }); // From ground to first platform (extends above plat at 320)
+            ladders.push({ x: 310, y: 170, height: 150 }); // From first to second platform (extends above plat at 200)
+            ladders.push({ x: 510, y: 290, height: 150 }); // From ground to first platform
         }
 
         return {
@@ -286,7 +286,7 @@
             }
         }
 
-        // Check ladder collisions
+        // Check ladder collisions - only enter climbing mode if player presses up/down
         let onLadder = false;
         for (let ladder of room.ladders) {
             if (player.x + PLAYER_WIDTH / 2 > ladder.x - 10 &&
@@ -296,11 +296,8 @@
 
                 onLadder = true;
 
-                // Allow player to exit ladder by pressing left/right
-                if (keys.left || keys.right) {
-                    player.climbing = false;
-                    // Don't modify vx here - let normal movement handle it
-                } else if (keys.up && player.y > ladder.y) {
+                // Only enter climbing mode if actively pressing up or down
+                if (keys.up && player.y > ladder.y) {
                     player.climbing = true;
                     player.vy = -3;
                     player.vx = 0;
@@ -309,9 +306,14 @@
                     player.vy = 3;
                     player.vx = 0;
                 } else if (player.climbing) {
-                    // Stop vertical movement if climbing but not pressing up/down
-                    player.vy = 0;
-                    player.vx = 0;
+                    // If climbing and pressing left/right, exit climbing mode
+                    if (keys.left || keys.right) {
+                        player.climbing = false;
+                    } else {
+                        // Hold position on ladder if not pressing any direction
+                        player.vy = 0;
+                        player.vx = 0;
+                    }
                 }
                 break;
             }
