@@ -125,15 +125,15 @@
 
     function spawnCars() {
         gameState.cars = [];
-        const carCount = gameState.phase === 'qualifying' ? 8 : 15;
+        const carCount = gameState.phase === 'qualifying' ? 12 : 20;
 
         for (let i = 0; i < carCount; i++) {
             // Spawn cars ahead of player, spread out across track
             gameState.cars.push({
-                offset: (Math.random() * 1.6 - 0.8), // -0.8 to 0.8 (within road bounds)
-                z: gameState.position + 2000 + (i * 3000), // Spread cars far ahead
-                speed: 80 + Math.random() * 40, // Slower than player for passing
-                color: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'][Math.floor(Math.random() * 5)],
+                offset: (Math.random() * 1.4 - 0.7), // -0.7 to 0.7 (within road bounds)
+                z: gameState.position + 1000 + (i * 1500), // Start closer, spread evenly
+                speed: 100 + Math.random() * 60, // Varied speeds for racing
+                color: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#ff6600', '#00ffff'][Math.floor(Math.random() * 7)],
                 passed: false
             });
         }
@@ -308,6 +308,10 @@
             segment.p1.world.y = segment.hill;
             segment.p2.world.y = gameState.segments[(segment.index + 1) % gameState.segments.length].hill;
 
+            // Apply curve to make road bend visually
+            segment.p1.world.x = x * ROAD_WIDTH;
+            segment.p2.world.x = (x + dx) * ROAD_WIDTH;
+
             project(segment.p1, gameState.playerX * ROAD_WIDTH, playerY + gameState.cameraHeight, gameState.position);
             project(segment.p2, gameState.playerX * ROAD_WIDTH, playerY + gameState.cameraHeight, gameState.position);
 
@@ -365,16 +369,32 @@
         }
 
         // After all segments are drawn, draw cars on top
-        gameState.cars.forEach(car => {
+        // Sort cars by distance for proper depth rendering
+        const sortedCars = [...gameState.cars].sort((a, b) => (b.z - gameState.position) - (a.z - gameState.position));
+
+        sortedCars.forEach(car => {
+            // Get the segment this car is on to apply curve offset
+            const carSegmentIndex = Math.floor((car.z - gameState.position) / SEGMENT_LENGTH);
+            if (carSegmentIndex < 0 || carSegmentIndex >= drawDistance) return;
+
+            const carSegment = gameState.segments[(baseSegment.index + carSegmentIndex) % gameState.segments.length];
+
+            // Calculate curve offset for this car
+            let carCurveOffset = 0;
+            for (let i = 0; i <= carSegmentIndex; i++) {
+                const seg = gameState.segments[(baseSegment.index + i) % gameState.segments.length];
+                carCurveOffset += seg.curve;
+            }
+
             const carSprite = {
-                world: { x: car.offset * ROAD_WIDTH, y: 0, z: car.z },
+                world: { x: car.offset * ROAD_WIDTH + carCurveOffset * ROAD_WIDTH, y: 0, z: car.z },
                 camera: {},
                 screen: {}
             };
             project(carSprite, gameState.playerX * ROAD_WIDTH, playerY + gameState.cameraHeight, gameState.position);
 
             // Only draw if car is in front of camera and visible
-            if (carSprite.camera.z > gameState.cameraDepth && carSprite.camera.z < gameState.position + drawDistance * SEGMENT_LENGTH) {
+            if (carSprite.camera.z > gameState.cameraDepth * 2) {
                 const carW = Math.max(carSprite.screen.scale * 100, 2);
                 const carH = Math.max(carSprite.screen.scale * 60, 2);
 
