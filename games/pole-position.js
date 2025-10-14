@@ -483,15 +483,18 @@
     }
 
     function handleKeyDown(e) {
+        // Prevent default for arrow keys and space to avoid page scrolling
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+            e.preventDefault();
+        }
+
         gameState.keys[e.key] = true;
 
         if (e.key === ' ' && !gameState.gameStarted && !gameState.gameOver) {
-            e.preventDefault();
             gameState.gameStarted = true;
         }
 
         if ((e.key === 'g' || e.key === 'G') && gameState.gameStarted) {
-            e.preventDefault();
             gameState.gear = gameState.gear === 'low' ? 'high' : 'low';
         }
     }
