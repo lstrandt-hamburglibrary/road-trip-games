@@ -21,10 +21,10 @@
         playerX: 0, // -1 to 1, where 0 is center
         playerZ: 0,
         speed: 0,
-        maxSpeed: 280,
-        acceleration: 2.0,
-        deceleration: 0.5,
-        braking: 3.0,
+        maxSpeed: 300,
+        acceleration: 5.0,
+        deceleration: 0.3,
+        braking: 5.0,
         turning: 0.002,
         centrifugal: 0.3,
         gear: 'high', // 'low' or 'high'
@@ -111,10 +111,9 @@
             if (i > 320 && i < 360) segment.curve = 1.2;
             if (i > 400 && i < 430) segment.curve = -1.5;
 
-            // Add hills (moved further down track and made gentler)
-            if (i > 100 && i < 140) segment.hill = Math.sin((i - 100) / 40 * Math.PI) * 600;
-            if (i > 250 && i < 300) segment.hill = Math.sin((i - 250) / 50 * Math.PI) * 1000;
-            if (i > 400 && i < 440) segment.hill = Math.sin((i - 400) / 40 * Math.PI) * 500;
+            // Add hills (very gentle, far down the track)
+            if (i > 200 && i < 250) segment.hill = Math.sin((i - 200) / 50 * Math.PI) * 400;
+            if (i > 350 && i < 400) segment.hill = Math.sin((i - 350) / 50 * Math.PI) * 300;
 
             gameState.segments.push(segment);
         }
