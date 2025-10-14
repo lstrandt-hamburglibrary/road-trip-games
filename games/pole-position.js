@@ -129,7 +129,7 @@
             // Spawn cars ahead of player, spread out across track
             gameState.cars.push({
                 offset: (Math.random() * 1.6 - 0.8), // -0.8 to 0.8 (within road bounds)
-                z: gameState.position + 500 + (i * 2000), // Spread cars ahead
+                z: gameState.position + 2000 + (i * 3000), // Spread cars far ahead
                 speed: 80 + Math.random() * 40, // Slower than player for passing
                 color: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'][Math.floor(Math.random() * 5)],
                 passed: false
@@ -174,7 +174,7 @@
             gameState.crashTimer--;
             if (gameState.crashTimer <= 0) {
                 gameState.crashed = false;
-                gameState.speed = 0;
+                // Don't reset speed to 0, let player continue
             }
             return;
         }
@@ -237,14 +237,14 @@
                 car.z += gameState.trackLength;
             }
 
-            // Check collision with player
+            // Check collision with player (only if moving fast enough)
             const relativeZ = car.z - gameState.position;
-            if (Math.abs(relativeZ) < 100 && relativeZ > 0) {
-                if (Math.abs(car.offset - gameState.playerX) < 0.2) {
+            if (Math.abs(relativeZ) < 80 && relativeZ > 0 && gameState.speed > 50) {
+                if (Math.abs(car.offset - gameState.playerX) < 0.25) {
                     // Collision!
                     gameState.crashed = true;
-                    gameState.crashTimer = 30; // 0.5 seconds
-                    gameState.speed = Math.max(gameState.speed * 0.5, 0);
+                    gameState.crashTimer = 20; // Shorter crash time
+                    gameState.speed = Math.max(gameState.speed * 0.7, 50); // Don't stop completely
                 }
             }
 
