@@ -23,7 +23,7 @@
         speed: 0,
         maxSpeed: 300,
         acceleration: 5.0,
-        deceleration: 0.3,
+        deceleration: 0.05,
         braking: 5.0,
         turning: 0.002,
         centrifugal: 0.15,
@@ -208,11 +208,8 @@
         // Apply curve centrifugal force (disabled - was causing auto-steering)
         // gameState.playerX -= (dx * speedPercent * segment.curve * gameState.centrifugal);
 
-        // Keep player on track (gentle speed penalty)
-        if (gameState.playerX < -1 || gameState.playerX > 1) {
-            gameState.speed = Math.max(0, gameState.speed - 5);
-            gameState.playerX = Math.max(-1, Math.min(1, gameState.playerX));
-        }
+        // Keep player on track (no speed penalty, just clamp position)
+        gameState.playerX = Math.max(-1, Math.min(1, gameState.playerX));
 
         // Update position
         gameState.position += gameState.speed;
