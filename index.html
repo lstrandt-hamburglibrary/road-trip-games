@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.58.0';</script>
+    <script>window.APP_VERSION = '1.59.0';</script>
 
     <style>
         * {
@@ -427,6 +427,11 @@
                         <h3>👾 Galaga</h3>
                         <p>1981 sequel with tractor beam & dual fighters!</p>
                     </div>
+
+                    <div class="feature-card" onclick="launchPolePosition()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);">
+                        <h3>🏎️ Pole Position</h3>
+                        <p>Classic 1982 Formula 1 racing game!</p>
+                    </div>
                 </div>
             </div>
 
@@ -595,6 +600,11 @@
                         <button id="galagaBtnRight" style="width: 80px; height: 80px; background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▶</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Pole Position Game Section (hidden by default) -->
+            <div id="polePositionGame" style="display: none;">
+                <div id="polePositionContent"></div>
             </div>
 
             <div class="roadmap">
@@ -925,5 +935,6 @@
     <script src="games/trouble.js?v=1.51.0"></script>
     <script src="games/galaxian.js?v=1.56.1"></script>
     <script src="games/galaga.js?v=1.56.1"></script>
+    <script src="games/pole-position.js?v=1.59.0"></script>
 </body>
 </html>
