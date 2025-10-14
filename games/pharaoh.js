@@ -296,7 +296,11 @@
 
                 onLadder = true;
 
-                if (keys.up && player.y > ladder.y) {
+                // Allow player to exit ladder by pressing left/right
+                if (keys.left || keys.right) {
+                    player.climbing = false;
+                    // Don't modify vx here - let normal movement handle it
+                } else if (keys.up && player.y > ladder.y) {
                     player.climbing = true;
                     player.vy = -3;
                     player.vx = 0;
@@ -307,6 +311,7 @@
                 } else if (player.climbing) {
                     // Stop vertical movement if climbing but not pressing up/down
                     player.vy = 0;
+                    player.vx = 0;
                 }
                 break;
             }
