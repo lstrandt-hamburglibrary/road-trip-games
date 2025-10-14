@@ -26,7 +26,7 @@
         deceleration: 0.3,
         braking: 5.0,
         turning: 0.002,
-        centrifugal: 0.3,
+        centrifugal: 0.15,
         gear: 'high', // 'low' or 'high'
 
         // Track position
@@ -103,13 +103,13 @@
                 Math.floor(i / RUMBLE_LENGTH) % 2 ? 'dark' : 'light'
             );
 
-            // Add curves
-            if (i > 20 && i < 50) segment.curve = 1.5;
-            if (i > 80 && i < 100) segment.curve = -2;
-            if (i > 150 && i < 180) segment.curve = 2;
-            if (i > 230 && i < 270) segment.curve = -1.8;
-            if (i > 320 && i < 360) segment.curve = 1.2;
-            if (i > 400 && i < 430) segment.curve = -1.5;
+            // Add curves (gentler)
+            if (i > 20 && i < 50) segment.curve = 0.8;
+            if (i > 80 && i < 100) segment.curve = -1.0;
+            if (i > 150 && i < 180) segment.curve = 1.0;
+            if (i > 230 && i < 270) segment.curve = -0.9;
+            if (i > 320 && i < 360) segment.curve = 0.6;
+            if (i > 400 && i < 430) segment.curve = -0.8;
 
             // Add hills (very gentle, far down the track)
             if (i > 200 && i < 250) segment.hill = Math.sin((i - 200) / 50 * Math.PI) * 400;
@@ -206,9 +206,9 @@
         // Apply curve centrifugal force
         gameState.playerX -= (dx * speedPercent * segment.curve * gameState.centrifugal);
 
-        // Keep player on track
+        // Keep player on track (gentle speed penalty)
         if (gameState.playerX < -1 || gameState.playerX > 1) {
-            gameState.speed = Math.max(0, gameState.speed - 50);
+            gameState.speed = Math.max(0, gameState.speed - 5);
             gameState.playerX = Math.max(-1, Math.min(1, gameState.playerX));
         }
 
