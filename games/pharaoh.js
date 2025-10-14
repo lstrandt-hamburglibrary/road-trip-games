@@ -238,11 +238,14 @@
         }
 
         // Check ladder collisions
+        let onLadder = false;
         for (let ladder of room.ladders) {
             if (player.x + PLAYER_WIDTH / 2 > ladder.x - 10 &&
                 player.x + PLAYER_WIDTH / 2 < ladder.x + 10 &&
                 player.y + PLAYER_HEIGHT > ladder.y &&
                 player.y < ladder.y + ladder.height) {
+
+                onLadder = true;
 
                 if (keys.up && player.y > ladder.y) {
                     player.climbing = true;
@@ -252,8 +255,17 @@
                     player.climbing = true;
                     player.vy = 3;
                     player.vx = 0;
+                } else if (player.climbing) {
+                    // Stop vertical movement if climbing but not pressing up/down
+                    player.vy = 0;
                 }
+                break;
             }
+        }
+
+        // If not on any ladder, stop climbing
+        if (!onLadder && player.climbing) {
+            player.climbing = false;
         }
 
         // Keep player in bounds
