@@ -15,15 +15,22 @@
     let level = 1;
     let password = '';
 
-    const GAME_WIDTH = 800;
-    const GAME_HEIGHT = 600;
-    const PLAYER_WIDTH = 30;
-    const PLAYER_HEIGHT = 40;
-    const GRAVITY = 0.5;
-    const WALK_SPEED = 3;
-    const RUN_SPEED = 5;
-    const JUMP_POWER = -12;
-    const RUN_THRESHOLD = 10; // frames walking same direction to start running
+    const GAME_WIDTH = 640;
+    const GAME_HEIGHT = 480;
+    const PLAYER_WIDTH = 16;
+    const PLAYER_HEIGHT = 24;
+    const GRAVITY = 0.6;
+    const WALK_SPEED = 2;
+    const RUN_SPEED = 3.5;
+    const JUMP_POWER = -10;
+    const RUN_THRESHOLD = 15; // frames walking same direction to start running
+
+    // Colors matching original
+    const COLOR_BLACK = '#000000';
+    const COLOR_GOLD = '#d4a76a';
+    const COLOR_BLUE = '#4169e1';
+    const COLOR_WHITE = '#ffffff';
+    const COLOR_RED = '#ff0000';
 
     // Room grid layout (4x4)
     const ROOM_GRID_WIDTH = 4;
@@ -51,32 +58,32 @@
         const platforms = [];
         const ladders = [];
 
-        // Ground
-        platforms.push({ x: 0, y: 560, width: GAME_WIDTH, height: 40 });
+        // Ground - irregular bottom
+        platforms.push({ x: 0, y: 440, width: GAME_WIDTH, height: 40, irregular: true });
 
-        // Generate platforms for this room
+        // Generate cave-like platforms for this room
         if ((gridX + gridY) % 2 === 0) {
-            // Platform pattern 1
-            platforms.push({ x: 100, y: 450, width: 200, height: 20 });
-            platforms.push({ x: 500, y: 450, width: 200, height: 20 });
-            platforms.push({ x: 250, y: 320, width: 300, height: 20 });
-            platforms.push({ x: 100, y: 190, width: 200, height: 20 });
-            platforms.push({ x: 500, y: 190, width: 200, height: 20 });
+            // Pattern 1 - stepped platforms
+            platforms.push({ x: 10, y: 360, width: 180, height: 80, irregular: true });
+            platforms.push({ x: 450, y: 360, width: 180, height: 80, irregular: true });
+            platforms.push({ x: 200, y: 240, width: 240, height: 60, irregular: true });
+            platforms.push({ x: 60, y: 120, width: 160, height: 50, irregular: true });
+            platforms.push({ x: 420, y: 120, width: 160, height: 50, irregular: true });
 
-            ladders.push({ x: 150, y: 470, height: 90 });
-            ladders.push({ x: 400, y: 340, height: 130 });
-            ladders.push({ x: 600, y: 470, height: 90 });
+            ladders.push({ x: 120, y: 300, height: 60 });
+            ladders.push({ x: 320, y: 180, height: 60 });
+            ladders.push({ x: 500, y: 300, height: 60 });
         } else {
-            // Platform pattern 2
-            platforms.push({ x: 50, y: 400, width: 150, height: 20 });
-            platforms.push({ x: 600, y: 400, width: 150, height: 20 });
-            platforms.push({ x: 350, y: 280, width: 100, height: 20 });
-            platforms.push({ x: 100, y: 160, width: 250, height: 20 });
-            platforms.push({ x: 450, y: 160, width: 250, height: 20 });
+            // Pattern 2 - offset platforms
+            platforms.push({ x: 40, y: 320, width: 140, height: 70, irregular: true });
+            platforms.push({ x: 460, y: 320, width: 140, height: 70, irregular: true });
+            platforms.push({ x: 250, y: 200, width: 140, height: 60, irregular: true });
+            platforms.push({ x: 80, y: 80, width: 200, height: 50, irregular: true });
+            platforms.push({ x: 360, y: 80, width: 200, height: 50, irregular: true });
 
-            ladders.push({ x: 100, y: 420, height: 140 });
-            ladders.push({ x: 400, y: 300, height: 120 });
-            ladders.push({ x: 650, y: 420, height: 140 });
+            ladders.push({ x: 90, y: 260, height: 60 });
+            ladders.push({ x: 310, y: 140, height: 60 });
+            ladders.push({ x: 510, y: 260, height: 60 });
         }
 
         return {
@@ -88,12 +95,12 @@
             hasKey,
             hasDoor,
             visited: false,
-            treasureX: 400,
-            treasureY: 150,
-            keyX: 300,
-            keyY: 300,
-            doorX: 700,
-            doorY: 500
+            treasureX: GAME_WIDTH / 2,
+            treasureY: 100,
+            keyX: 200,
+            keyY: 250,
+            doorX: 550,
+            doorY: 400
         };
     }
 
@@ -471,13 +478,14 @@
 
     // Draw game
     function draw() {
-        // Clear canvas
-        ctx.fillStyle = '#1a0f0a';
+        // Clear canvas - black background
+        ctx.fillStyle = COLOR_BLACK;
         ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
         if (gameState === 'menu') {
             drawMenu();
         } else if (gameState === 'playing') {
+            drawBorders();
             drawRoom();
             drawPlayer();
             drawEnemies();
@@ -489,195 +497,164 @@
         }
     }
 
-    // Draw room
+    // Draw side borders
+    function drawBorders() {
+        ctx.fillStyle = COLOR_BLUE;
+        // Left border
+        for (let y = 0; y < GAME_HEIGHT; y += 8) {
+            ctx.fillRect(0, y, 8, 4);
+        }
+        // Right border
+        for (let y = 0; y < GAME_HEIGHT; y += 8) {
+            ctx.fillRect(GAME_WIDTH - 8, y, 8, 4);
+        }
+    }
+
+    // Draw room with irregular cave-like platforms
     function drawRoom() {
         const room = getCurrentRoom();
 
-        // Draw platforms
-        ctx.fillStyle = '#8b7355';
+        // Draw platforms with irregular edges
+        ctx.fillStyle = COLOR_GOLD;
         for (let platform of room.platforms) {
-            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-
-            // Add hieroglyphics decoration
-            ctx.strokeStyle = '#654321';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < platform.width; i += 30) {
-                ctx.strokeRect(platform.x + i + 5, platform.y + 5, 20, 10);
-            }
-        }
-
-        // Draw ladders
-        ctx.strokeStyle = '#d4a76a';
-        ctx.lineWidth = 3;
-        for (let ladder of room.ladders) {
-            // Vertical rails
-            ctx.beginPath();
-            ctx.moveTo(ladder.x - 5, ladder.y);
-            ctx.lineTo(ladder.x - 5, ladder.y + ladder.height);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(ladder.x + 5, ladder.y);
-            ctx.lineTo(ladder.x + 5, ladder.y + ladder.height);
-            ctx.stroke();
-
-            // Rungs
-            for (let i = 0; i < ladder.height; i += 15) {
+            if (platform.irregular) {
+                // Draw platform with jagged top edge
                 ctx.beginPath();
-                ctx.moveTo(ladder.x - 5, ladder.y + i);
-                ctx.lineTo(ladder.x + 5, ladder.y + i);
+                ctx.moveTo(platform.x, platform.y + platform.height);
+
+                // Bottom edge (straight)
+                ctx.lineTo(platform.x + platform.width, platform.y + platform.height);
+                ctx.lineTo(platform.x + platform.width, platform.y);
+
+                // Top edge (jagged)
+                for (let x = platform.x + platform.width; x >= platform.x; x -= 8) {
+                    const jag = Math.random() * 6 - 3;
+                    ctx.lineTo(x, platform.y + jag);
+                }
+
+                ctx.closePath();
+                ctx.fill();
+
+                // Add dotted outline for depth
+                ctx.strokeStyle = '#b8925a';
+                ctx.setLineDash([2, 2]);
+                ctx.lineWidth = 1;
                 ctx.stroke();
+                ctx.setLineDash([]);
+            } else {
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
             }
         }
 
-        // Draw treasure
+        // Draw ladders - simple pixel style
+        ctx.fillStyle = COLOR_GOLD;
+        for (let ladder of room.ladders) {
+            // Draw as simple vertical bars with rungs
+            for (let y = 0; y < ladder.height; y += 8) {
+                // Left rail
+                ctx.fillRect(ladder.x - 3, ladder.y + y, 2, 8);
+                // Right rail
+                ctx.fillRect(ladder.x + 1, ladder.y + y, 2, 8);
+                // Rung
+                if (y % 16 === 0) {
+                    ctx.fillRect(ladder.x - 3, ladder.y + y + 3, 6, 2);
+                }
+            }
+        }
+
+        // Draw treasure - simple pixel square
         if (room.hasTreasure) {
-            ctx.fillStyle = '#ffd700';
-            ctx.beginPath();
-            ctx.arc(room.treasureX, room.treasureY, 15, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = '#ff8c00';
-            ctx.font = 'bold 20px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('💎', room.treasureX, room.treasureY + 7);
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(room.treasureX - 6, room.treasureY - 6, 12, 12);
+            ctx.fillStyle = COLOR_GOLD;
+            ctx.fillRect(room.treasureX - 4, room.treasureY - 4, 8, 8);
         }
 
-        // Draw key
+        // Draw key - simple pixel key
         if (room.hasKey) {
-            ctx.fillStyle = '#c0c0c0';
-            ctx.font = 'bold 30px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('🗝️', room.keyX, room.keyY);
+            ctx.fillStyle = COLOR_WHITE;
+            ctx.fillRect(room.keyX - 2, room.keyY - 6, 4, 12);
+            ctx.fillRect(room.keyX - 6, room.keyY - 6, 8, 4);
         }
 
-        // Draw door
+        // Draw door - simple pixel door
         if (room.hasDoor) {
-            ctx.fillStyle = '#8b4513';
-            ctx.fillRect(room.doorX - 20, room.doorY - 60, 40, 60);
-            ctx.strokeStyle = '#654321';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(room.doorX - 20, room.doorY - 60, 40, 60);
-
-            ctx.fillStyle = '#ffd700';
-            ctx.beginPath();
-            ctx.arc(room.doorX + 10, room.doorY - 30, 5, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillStyle = '#8b6914';
+            ctx.fillRect(room.doorX - 12, room.doorY - 32, 24, 32);
+            ctx.fillStyle = COLOR_BLACK;
+            ctx.fillRect(room.doorX - 8, room.doorY - 28, 16, 24);
         }
     }
 
-    // Draw player
+    // Draw player - simple pixel sprite
     function drawPlayer() {
-        ctx.save();
+        ctx.fillStyle = COLOR_WHITE;
 
-        // Player body
-        ctx.fillStyle = '#4169e1';
-        ctx.fillRect(player.x, player.y, PLAYER_WIDTH, PLAYER_HEIGHT);
-
-        // Head
-        ctx.fillStyle = '#ffdbac';
-        ctx.beginPath();
-        ctx.arc(player.x + PLAYER_WIDTH / 2, player.y + 10, 8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Eyes
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(player.x + PLAYER_WIDTH / 2 - 3, player.y + 8, 2, 0, Math.PI * 2);
-        ctx.arc(player.x + PLAYER_WIDTH / 2 + 3, player.y + 8, 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Torch
-        ctx.fillStyle = '#8b4513';
-        ctx.fillRect(player.x + PLAYER_WIDTH + 5, player.y + 10, 3, 15);
-
-        ctx.fillStyle = '#ff6600';
-        ctx.beginPath();
-        ctx.arc(player.x + PLAYER_WIDTH + 6, player.y + 5, 5, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
+        // Body (simple stick figure style)
+        ctx.fillRect(player.x + 6, player.y, 4, 8); // Head
+        ctx.fillRect(player.x + 6, player.y + 8, 4, 12); // Body
+        ctx.fillRect(player.x + 2, player.y + 10, 12, 2); // Arms
+        ctx.fillRect(player.x + 4, player.y + 20, 3, 4); // Left leg
+        ctx.fillRect(player.x + 9, player.y + 20, 3, 4); // Right leg
     }
 
-    // Draw enemies
+    // Draw enemies - simple pixel sprites
     function drawEnemies() {
         for (let enemy of enemies) {
             if (enemy.type === 'mummy') {
-                ctx.fillStyle = '#dcdcdc';
-                ctx.fillRect(enemy.x, enemy.y, 30, 40);
+                // Simple white mummy sprite
+                ctx.fillStyle = COLOR_WHITE;
+                ctx.fillRect(enemy.x + 6, enemy.y, 4, 8); // Head
+                ctx.fillRect(enemy.x + 4, enemy.y + 8, 8, 12); // Body
+                ctx.fillRect(enemy.x + 4, enemy.y + 20, 3, 4); // Left leg
+                ctx.fillRect(enemy.x + 9, enemy.y + 20, 3, 4); // Right leg
 
-                // Bandages
-                ctx.strokeStyle = '#a9a9a9';
-                ctx.lineWidth = 2;
-                for (let i = 0; i < 40; i += 8) {
-                    ctx.beginPath();
-                    ctx.moveTo(enemy.x, enemy.y + i);
-                    ctx.lineTo(enemy.x + 30, enemy.y + i);
-                    ctx.stroke();
-                }
-
-                // Eyes
-                ctx.fillStyle = '#ff0000';
-                ctx.beginPath();
-                ctx.arc(enemy.x + 10, enemy.y + 12, 3, 0, Math.PI * 2);
-                ctx.arc(enemy.x + 20, enemy.y + 12, 3, 0, Math.PI * 2);
-                ctx.fill();
+                // Red eyes
+                ctx.fillStyle = COLOR_RED;
+                ctx.fillRect(enemy.x + 6, enemy.y + 3, 1, 1);
+                ctx.fillRect(enemy.x + 9, enemy.y + 3, 1, 1);
 
             } else if (enemy.type === 'pharaoh') {
-                ctx.fillStyle = '#ffd700';
-                ctx.fillRect(enemy.x, enemy.y, 30, 40);
-
-                // Crown
-                ctx.fillStyle = '#ff6600';
-                ctx.fillRect(enemy.x, enemy.y - 10, 30, 10);
-
-                // Face
-                ctx.fillStyle = '#8b7355';
-                ctx.fillRect(enemy.x + 5, enemy.y + 5, 20, 15);
-
-                // Eyes
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(enemy.x + 12, enemy.y + 12, 2, 0, Math.PI * 2);
-                ctx.arc(enemy.x + 18, enemy.y + 12, 2, 0, Math.PI * 2);
-                ctx.fill();
+                // Gold pharaoh sprite
+                ctx.fillStyle = COLOR_GOLD;
+                ctx.fillRect(enemy.x + 5, enemy.y - 4, 6, 4); // Crown
+                ctx.fillRect(enemy.x + 6, enemy.y, 4, 8); // Head
+                ctx.fillRect(enemy.x + 4, enemy.y + 8, 8, 12); // Body
+                ctx.fillRect(enemy.x + 4, enemy.y + 20, 3, 4); // Left leg
+                ctx.fillRect(enemy.x + 9, enemy.y + 20, 3, 4); // Right leg
 
             } else if (enemy.type === 'winged') {
-                // Body
+                // Winged avenger - flying creature
                 ctx.fillStyle = '#8b008b';
-                ctx.beginPath();
-                ctx.arc(enemy.x, enemy.y, 20, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillRect(enemy.x - 4, enemy.y - 4, 8, 8); // Body
 
-                // Wings
-                ctx.fillStyle = '#9370db';
-                ctx.beginPath();
-                const wingFlap = Math.sin(Date.now() / 100) * 10;
-                ctx.ellipse(enemy.x - 15, enemy.y, 20, 10 + wingFlap, -0.3, 0, Math.PI * 2);
-                ctx.ellipse(enemy.x + 15, enemy.y, 20, 10 + wingFlap, 0.3, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Eyes
-                ctx.fillStyle = '#ffff00';
-                ctx.beginPath();
-                ctx.arc(enemy.x - 5, enemy.y - 5, 4, 0, Math.PI * 2);
-                ctx.arc(enemy.x + 5, enemy.y - 5, 4, 0, Math.PI * 2);
-                ctx.fill();
+                // Wings (simple)
+                const wingFlap = Math.sin(Date.now() / 100) > 0 ? 2 : 0;
+                ctx.fillRect(enemy.x - 12, enemy.y - 2 + wingFlap, 6, 2); // Left wing
+                ctx.fillRect(enemy.x + 6, enemy.y - 2 + wingFlap, 6, 2); // Right wing
             }
         }
     }
 
-    // Draw HUD
+    // Draw HUD - matching original style
     function drawHUD() {
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 20px Arial';
+        ctx.fillStyle = COLOR_WHITE;
+        ctx.font = '12px monospace';
         ctx.textAlign = 'left';
-        ctx.fillText(`Lives: ${lives}`, 10, 30);
-        ctx.fillText(`Score: ${score}`, 10, 55);
-        ctx.fillText(`Treasures: ${treasuresCollected}/16`, 10, 80);
-        ctx.fillText(`Keys: ${keysHeld}`, 10, 105);
-        ctx.fillText(`Room: ${currentRoom.x},${currentRoom.y}`, 10, 130);
-        ctx.fillText(`Level: ${level}`, GAME_WIDTH - 100, 30);
+
+        // Lives (hearts)
+        for (let i = 0; i < lives && i < 5; i++) {
+            ctx.fillRect(20 + (i * 12), 10, 8, 8);
+        }
+
+        // Score
+        ctx.textAlign = 'right';
+        ctx.fillText(String(score).padStart(4, '0'), GAME_WIDTH - 20, 20);
+
+        // Treasures/Keys at bottom
+        ctx.textAlign = 'left';
+        ctx.fillText(`T:${treasuresCollected}`, 20, GAME_HEIGHT - 10);
+        ctx.fillText(`K:${keysHeld}`, 80, GAME_HEIGHT - 10);
     }
 
     // Draw menu
