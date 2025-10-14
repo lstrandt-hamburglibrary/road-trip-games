@@ -169,15 +169,15 @@
             }
         }
 
-        // Handle crash timer
-        if (gameState.crashed) {
-            gameState.crashTimer--;
-            if (gameState.crashTimer <= 0) {
-                gameState.crashed = false;
-                // Don't reset speed to 0, let player continue
-            }
-            return;
-        }
+        // Handle crash timer (disabled - causing freezing issues)
+        // if (gameState.crashed) {
+        //     gameState.crashTimer--;
+        //     if (gameState.crashTimer <= 0) {
+        //         gameState.crashed = false;
+        //     }
+        //     return;
+        // }
+        gameState.crashed = false; // Always reset crash state
 
         const segment = findSegment(gameState.position + gameState.playerZ);
         const speedPercent = gameState.speed / gameState.maxSpeed;
@@ -237,16 +237,18 @@
                 car.z += gameState.trackLength;
             }
 
-            // Check collision with player (only if moving fast enough)
+            // Check collision with player (disabled - was causing car to freeze)
+            // const relativeZ = car.z - gameState.position;
+            // if (Math.abs(relativeZ) < 80 && relativeZ > 0 && gameState.speed > 50) {
+            //     if (Math.abs(car.offset - gameState.playerX) < 0.25) {
+            //         // Collision!
+            //         gameState.crashed = true;
+            //         gameState.crashTimer = 20;
+            //         gameState.speed = Math.max(gameState.speed * 0.7, 50);
+            //     }
+            // }
+
             const relativeZ = car.z - gameState.position;
-            if (Math.abs(relativeZ) < 80 && relativeZ > 0 && gameState.speed > 50) {
-                if (Math.abs(car.offset - gameState.playerX) < 0.25) {
-                    // Collision!
-                    gameState.crashed = true;
-                    gameState.crashTimer = 20; // Shorter crash time
-                    gameState.speed = Math.max(gameState.speed * 0.7, 50); // Don't stop completely
-                }
-            }
 
             // Pass car for points (check if car is behind us now)
             if (gameState.phase === 'race' && !car.passed) {
