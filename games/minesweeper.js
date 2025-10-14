@@ -23,8 +23,13 @@
         firstClick: true,
         timer: 0,
         timerInterval: null,
-        minesRemaining: 10
+        minesRemaining: 10,
+        flagMode: false  // Toggle between reveal and flag mode
     };
+
+    // Touch handling for long-press
+    let touchTimer = null;
+    let touchHandled = false;
 
     // Initialize game
     function initGame(difficulty = 'beginner') {
@@ -47,7 +52,8 @@
             firstClick: true,
             timer: 0,
             timerInterval: null,
-            minesRemaining: config.mines
+            minesRemaining: config.mines,
+            flagMode: false
         };
 
         // Initialize empty grid (mines placed on first click)
@@ -141,7 +147,18 @@
 
     // Handle left click
     function handleLeftClick(row, col) {
-        if (gameState.gameOver || gameState.flagged[row][col]) {
+        if (gameState.gameOver) {
+            return;
+        }
+
+        // If in flag mode, place/remove flag instead
+        if (gameState.flagMode) {
+            toggleFlag(row, col);
+            return;
+        }
+
+        // Can't reveal flagged cells
+        if (gameState.flagged[row][col]) {
             return;
         }
 
@@ -173,17 +190,20 @@
         renderGame();
     }
 
-    // Handle right click (flagging)
-    function handleRightClick(row, col, event) {
-        event.preventDefault();
-
+    // Toggle flag on a cell
+    function toggleFlag(row, col) {
         if (gameState.gameOver || gameState.revealed[row][col]) {
             return;
         }
-
         gameState.flagged[row][col] = !gameState.flagged[row][col];
         gameState.minesRemaining += gameState.flagged[row][col] ? -1 : 1;
         renderGame();
+    }
+
+    // Handle right click (flagging)
+    function handleRightClick(row, col, event) {
+        event.preventDefault();
+        toggleFlag(row, col);
     }
 
     // Handle middle click or both buttons (chording)
@@ -410,6 +430,20 @@
                     " id="minesweeperTimer">${String(gameState.timer).padStart(3, '0')}</div>
                 </div>
 
+                <!-- Flag Mode Toggle (for mobile/touch devices) -->
+                <button onclick="toggleFlagMode()" style="
+                    background: ${gameState.flagMode ? '#FF9800' : '#4CAF50'};
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    font-size: 1rem;
+                ">
+                    ${gameState.flagMode ? '🚩 FLAG MODE' : '👆 REVEAL MODE'}
+                </button>
+
                 <!-- Game Grid Container -->
                 <div style="max-width: 100%; overflow-x: hidden;">
                     <div style="
@@ -431,7 +465,8 @@
 
                 <!-- Instructions -->
                 <div style="text-align: center; color: #666; font-size: 0.8rem; max-width: 600px; padding: 0 0.25rem;">
-                    <p><strong>Left-click</strong> to reveal | <strong>Right-click</strong> to flag | <strong>Middle-click</strong> on numbers to chord</p>
+                    <p><strong>Desktop:</strong> Left-click to reveal | Right-click to flag | Middle-click on numbers to chord</p>
+                    <p><strong>Mobile:</strong> Toggle flag mode button or long-press to flag</p>
                     <p style="margin-top: 0.15rem;">💡 First click is always safe! Numbers show adjacent mine count.</p>
                 </div>
             </div>
@@ -475,6 +510,9 @@
                     <div
                         onmousedown="handleMouseDown(event, ${r}, ${c})"
                         oncontextmenu="handleRightClickCell(${r}, ${c}, event)"
+                        ontouchstart="handleTouchStart(event, ${r}, ${c})"
+                        ontouchend="handleTouchEnd(event, ${r}, ${c})"
+                        ontouchmove="handleTouchMove()"
                         style="
                             width: ${cellSize}px;
                             height: ${cellSize}px;
@@ -513,6 +551,56 @@
 
     window.handleRightClickCell = function(row, col, event) {
         handleRightClick(row, col, event);
+    };
+
+    // Touch event handlers for long-press flagging
+    window.handleTouchStart = function(event, row, col) {
+        touchHandled = false;
+
+        // Start long-press timer (500ms)
+        touchTimer = setTimeout(() => {
+            // Long press detected - toggle flag
+            toggleFlag(row, col);
+            touchHandled = true;
+
+            // Vibrate if available (haptic feedback)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }, 500);
+    };
+
+    window.handleTouchEnd = function(event, row, col) {
+        // Clear long-press timer
+        if (touchTimer) {
+            clearTimeout(touchTimer);
+            touchTimer = null;
+        }
+
+        // If long-press was handled, don't process as click
+        if (touchHandled) {
+            event.preventDefault();
+            touchHandled = false;
+            return;
+        }
+
+        // Normal tap - treat as left click
+        event.preventDefault();
+        handleLeftClick(row, col);
+    };
+
+    window.handleTouchMove = function() {
+        // Cancel long-press if finger moves
+        if (touchTimer) {
+            clearTimeout(touchTimer);
+            touchTimer = null;
+        }
+    };
+
+    // Toggle flag mode
+    window.toggleFlagMode = function() {
+        gameState.flagMode = !gameState.flagMode;
+        renderGame();
     };
 
     // Change difficulty
