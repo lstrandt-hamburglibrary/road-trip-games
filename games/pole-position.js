@@ -103,13 +103,15 @@
                 Math.floor(i / RUMBLE_LENGTH) % 2 ? 'dark' : 'light'
             );
 
-            // Add curves (gentler)
-            if (i > 20 && i < 50) segment.curve = 0.8;
-            if (i > 80 && i < 100) segment.curve = -1.0;
-            if (i > 150 && i < 180) segment.curve = 1.0;
-            if (i > 230 && i < 270) segment.curve = -0.9;
-            if (i > 320 && i < 360) segment.curve = 0.6;
-            if (i > 400 && i < 430) segment.curve = -0.8;
+            // Add more varied curves
+            if (i > 20 && i < 60) segment.curve = 0.8;
+            if (i > 80 && i < 110) segment.curve = -1.2;
+            if (i > 130 && i < 170) segment.curve = 1.5;
+            if (i > 190 && i < 220) segment.curve = -0.7;
+            if (i > 250 && i < 290) segment.curve = -1.3;
+            if (i > 310 && i < 350) segment.curve = 1.1;
+            if (i > 370 && i < 410) segment.curve = -1.0;
+            if (i > 430 && i < 470) segment.curve = 0.9;
 
             // Add hills (very gentle, far down the track)
             if (i > 200 && i < 250) segment.hill = Math.sin((i - 200) / 50 * Math.PI) * 400;
@@ -169,15 +171,14 @@
             }
         }
 
-        // Handle crash timer (disabled - causing freezing issues)
-        // if (gameState.crashed) {
-        //     gameState.crashTimer--;
-        //     if (gameState.crashTimer <= 0) {
-        //         gameState.crashed = false;
-        //     }
-        //     return;
-        // }
-        gameState.crashed = false; // Always reset crash state
+        // Handle crash timer (allow movement during crash, just visual effect)
+        if (gameState.crashed) {
+            gameState.crashTimer--;
+            if (gameState.crashTimer <= 0) {
+                gameState.crashed = false;
+            }
+            // Don't return - let car keep moving during crash
+        }
 
         const segment = findSegment(gameState.position + gameState.playerZ);
         const speedPercent = gameState.speed / gameState.maxSpeed;
@@ -237,18 +238,18 @@
                 car.z += gameState.trackLength;
             }
 
-            // Check collision with player (disabled - was causing car to freeze)
-            // const relativeZ = car.z - gameState.position;
-            // if (Math.abs(relativeZ) < 80 && relativeZ > 0 && gameState.speed > 50) {
-            //     if (Math.abs(car.offset - gameState.playerX) < 0.25) {
-            //         // Collision!
-            //         gameState.crashed = true;
-            //         gameState.crashTimer = 20;
-            //         gameState.speed = Math.max(gameState.speed * 0.7, 50);
-            //     }
-            // }
-
+            // Check collision with player
             const relativeZ = car.z - gameState.position;
+            if (Math.abs(relativeZ) < 100 && relativeZ > -50 && relativeZ < 200) {
+                if (Math.abs(car.offset - gameState.playerX) < 0.2) {
+                    // Collision! Slow down briefly
+                    if (!gameState.crashed) {
+                        gameState.crashed = true;
+                        gameState.crashTimer = 15;
+                        gameState.speed = Math.max(gameState.speed * 0.6, 80);
+                    }
+                }
+            }
 
             // Pass car for points (check if car is behind us now)
             if (gameState.phase === 'race' && !car.passed) {
@@ -377,6 +378,15 @@
                 const carW = Math.max(carSprite.screen.scale * 100, 2);
                 const carH = Math.max(carSprite.screen.scale * 60, 2);
 
+                // Draw shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillRect(
+                    carSprite.screen.x - carW / 2 + 2,
+                    carSprite.screen.y - 2,
+                    carW,
+                    4
+                );
+
                 // Draw car body
                 ctx.fillStyle = car.color;
                 ctx.fillRect(
@@ -386,26 +396,83 @@
                     carH
                 );
 
-                // Draw car windows (for visibility)
-                ctx.fillStyle = '#333';
+                // Draw car top (lighter color)
+                ctx.fillStyle = shadeColor(car.color, 40);
                 ctx.fillRect(
-                    carSprite.screen.x - carW / 3,
-                    carSprite.screen.y - carH + carH * 0.2,
-                    carW * 0.66,
-                    carH * 0.4
+                    carSprite.screen.x - carW / 2,
+                    carSprite.screen.y - carH,
+                    carW,
+                    carH * 0.3
                 );
+
+                // Draw windows
+                ctx.fillStyle = '#1a1a2e';
+                const windowMargin = carW * 0.15;
+                ctx.fillRect(
+                    carSprite.screen.x - carW / 2 + windowMargin,
+                    carSprite.screen.y - carH + carH * 0.1,
+                    carW - windowMargin * 2,
+                    carH * 0.25
+                );
+
+                // Draw wheels
+                ctx.fillStyle = '#000';
+                const wheelW = carW * 0.15;
+                const wheelH = carH * 0.2;
+                // Front left wheel
+                ctx.fillRect(carSprite.screen.x - carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.8, wheelW, wheelH);
+                // Front right wheel
+                ctx.fillRect(carSprite.screen.x + carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.8, wheelW, wheelH);
+                // Rear left wheel
+                ctx.fillRect(carSprite.screen.x - carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.2, wheelW, wheelH);
+                // Rear right wheel
+                ctx.fillRect(carSprite.screen.x + carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.2, wheelW, wheelH);
             }
         });
 
-        // Draw player car
+        // Draw player car (detailed sprite)
         const playerCarY = CANVAS_HEIGHT - 100;
         const playerCarX = CANVAS_WIDTH / 2;
+        const pCarW = 60;
+        const pCarH = 80;
 
+        // Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.fillRect(playerCarX - pCarW / 2 + 3, playerCarY + 5, pCarW, 8);
+
+        // Car body
         ctx.fillStyle = gameState.crashed ? '#666' : '#ff0000';
-        ctx.fillRect(playerCarX - 30, playerCarY - 40, 60, 40);
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(playerCarX - 20, playerCarY - 35, 15, 15);
-        ctx.fillRect(playerCarX + 5, playerCarY - 35, 15, 15);
+        ctx.fillRect(playerCarX - pCarW / 2, playerCarY - pCarH, pCarW, pCarH);
+
+        // Car top (lighter red or gray)
+        ctx.fillStyle = gameState.crashed ? '#888' : '#ff6666';
+        ctx.fillRect(playerCarX - pCarW / 2, playerCarY - pCarH, pCarW, pCarH * 0.35);
+
+        // Windshield
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(playerCarX - pCarW / 2 + 8, playerCarY - pCarH + 5, pCarW - 16, pCarH * 0.25);
+
+        // Rear window
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(playerCarX - pCarW / 2 + 8, playerCarY - pCarH * 0.3, pCarW - 16, pCarH * 0.15);
+
+        // Wheels
+        ctx.fillStyle = '#000';
+        // Front left
+        ctx.fillRect(playerCarX - pCarW / 2 - 5, playerCarY - pCarH * 0.75, 10, 15);
+        // Front right
+        ctx.fillRect(playerCarX + pCarW / 2 - 5, playerCarY - pCarH * 0.75, 10, 15);
+        // Rear left
+        ctx.fillRect(playerCarX - pCarW / 2 - 5, playerCarY - pCarH * 0.25, 10, 15);
+        // Rear right
+        ctx.fillRect(playerCarX + pCarW / 2 - 5, playerCarY - pCarH * 0.25, 10, 15);
+
+        // Headlights
+        if (!gameState.crashed) {
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(playerCarX - pCarW / 2 + 5, playerCarY - 5, 8, 4);
+            ctx.fillRect(playerCarX + pCarW / 2 - 13, playerCarY - 5, 8, 4);
+        }
 
         // Draw HUD
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -471,6 +538,16 @@
             ctx.font = '24px Arial';
             ctx.fillText('Click "Play Again" to restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 100);
         }
+    }
+
+    function shadeColor(color, percent) {
+        // Lighten or darken a hex color
+        const num = parseInt(color.replace("#",""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.min(255, (num >> 16) + amt);
+        const G = Math.min(255, (num >> 8 & 0x00FF) + amt);
+        const B = Math.min(255, (num & 0x0000FF) + amt);
+        return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
     }
 
     function drawTrapezoid(ctx, x1, y1, w1, x2, y2, w2, color) {
