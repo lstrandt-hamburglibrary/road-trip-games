@@ -50,8 +50,9 @@
         segments: [],
 
         // Camera
-        cameraHeight: 1500,
+        cameraHeight: 1000,
         cameraDepth: 1 / CAMERA_DEPTH,
+        drawDistance: 400,
 
         // Crash state
         crashed: false,
@@ -147,10 +148,18 @@
         p.camera.x = p.world.x - cameraX;
         p.camera.y = p.world.y - cameraY;
         p.camera.z = p.world.z - cameraZ;
-        p.screen.scale = gameState.cameraDepth / p.camera.z;
-        p.screen.x = Math.round((CANVAS_WIDTH / 2) + (p.screen.scale * p.camera.x * CANVAS_WIDTH / 2));
-        p.screen.y = Math.round((CANVAS_HEIGHT / 2) - (p.screen.scale * p.camera.y * CANVAS_HEIGHT / 2));
-        p.screen.w = Math.round(p.screen.scale * ROAD_WIDTH * CANVAS_WIDTH / 2);
+
+        if (p.camera.z > 0) {
+            p.screen.scale = gameState.cameraDepth / p.camera.z;
+            p.screen.x = Math.round((CANVAS_WIDTH / 2) + (p.screen.scale * p.camera.x * CANVAS_WIDTH / 2));
+            p.screen.y = Math.round((CANVAS_HEIGHT / 2) - (p.screen.scale * p.camera.y * CANVAS_HEIGHT / 2));
+            p.screen.w = Math.round(p.screen.scale * ROAD_WIDTH * CANVAS_WIDTH / 2);
+        } else {
+            p.screen.scale = 0;
+            p.screen.x = 0;
+            p.screen.y = 0;
+            p.screen.w = 0;
+        }
     }
 
     function update(dt) {
@@ -301,7 +310,7 @@
         let dx = 0;
 
         // Render road segments
-        const drawDistance = 300;
+        const drawDistance = gameState.drawDistance;
         for (let n = 0; n < drawDistance; n++) {
             const segment = gameState.segments[(baseSegment.index + n) % gameState.segments.length];
 
@@ -318,8 +327,8 @@
             x += dx;
             dx += segment.curve;
 
-            if (segment.p1.camera.z <= gameState.cameraDepth) continue;
-            if (segment.p2.screen.y >= segment.p1.screen.y) continue;
+            // Skip segments that are behind camera or off screen
+            if (segment.p1.camera.z <= gameState.cameraDepth || segment.p2.camera.z <= 0) continue;
             if (segment.p2.screen.y >= maxY) continue;
 
             // Draw road
