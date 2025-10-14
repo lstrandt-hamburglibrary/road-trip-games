@@ -126,11 +126,13 @@
         const carCount = gameState.phase === 'qualifying' ? 8 : 15;
 
         for (let i = 0; i < carCount; i++) {
+            // Spawn cars ahead of player, spread out across track
             gameState.cars.push({
-                offset: Math.random() * 1.2 - 0.6, // -0.6 to 0.6
-                z: Math.random() * gameState.trackLength,
-                speed: 150 + Math.random() * 50,
-                color: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'][Math.floor(Math.random() * 5)]
+                offset: (Math.random() * 1.6 - 0.8), // -0.8 to 0.8 (within road bounds)
+                z: gameState.position + 500 + (i * 2000), // Spread cars ahead
+                speed: 80 + Math.random() * 40, // Slower than player for passing
+                color: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'][Math.floor(Math.random() * 5)],
+                passed: false
             });
         }
     }
@@ -203,8 +205,8 @@
             gameState.speed = Math.max(gameState.speed - gameState.deceleration, 0);
         }
 
-        // Apply curve centrifugal force
-        gameState.playerX -= (dx * speedPercent * segment.curve * gameState.centrifugal);
+        // Apply curve centrifugal force (disabled - was causing auto-steering)
+        // gameState.playerX -= (dx * speedPercent * segment.curve * gameState.centrifugal);
 
         // Keep player on track (gentle speed penalty)
         if (gameState.playerX < -1 || gameState.playerX > 1) {
@@ -228,28 +230,32 @@
         // Update opponent cars
         gameState.cars.forEach(car => {
             car.z += car.speed * dt;
-            if (car.z > gameState.trackLength) {
+
+            // Wrap around track
+            while (car.z >= gameState.trackLength) {
                 car.z -= gameState.trackLength;
+                car.passed = false; // Reset when wrapping
+            }
+            while (car.z < 0) {
+                car.z += gameState.trackLength;
             }
 
             // Check collision with player
-            const carSegment = findSegment(car.z);
-            if (Math.abs(car.z - gameState.position) < 50) {
-                if (Math.abs(car.offset - gameState.playerX) < 0.15) {
+            const relativeZ = car.z - gameState.position;
+            if (Math.abs(relativeZ) < 100 && relativeZ > 0) {
+                if (Math.abs(car.offset - gameState.playerX) < 0.2) {
                     // Collision!
                     gameState.crashed = true;
                     gameState.crashTimer = 30; // 0.5 seconds
-                    gameState.speed = 0;
+                    gameState.speed = Math.max(gameState.speed * 0.5, 0);
                 }
             }
 
-            // Pass car for points
-            if (gameState.phase === 'race') {
-                if (car.z > gameState.position - 50 && car.z < gameState.position) {
-                    if (!car.passed) {
-                        car.passed = true;
-                        gameState.score += 200;
-                    }
+            // Pass car for points (check if car is behind us now)
+            if (gameState.phase === 'race' && !car.passed) {
+                if (relativeZ < -100) {
+                    car.passed = true;
+                    gameState.score += 200;
                 }
             }
         });
@@ -354,34 +360,43 @@
                 '#ff0000'
             );
 
-            // Draw cars on this segment (check relative to player position)
-            gameState.cars.forEach(car => {
-                const carSegmentIndex = Math.floor(car.z / SEGMENT_LENGTH) % gameState.segments.length;
-                const visibleSegmentIndex = (baseSegment.index + n) % gameState.segments.length;
-
-                if (carSegmentIndex === visibleSegmentIndex) {
-                    const carSprite = {
-                        world: { x: car.offset * ROAD_WIDTH, y: 0, z: car.z },
-                        camera: {},
-                        screen: {}
-                    };
-                    project(carSprite, gameState.playerX * ROAD_WIDTH, playerY + gameState.cameraHeight, gameState.position);
-
-                    if (carSprite.camera.z > gameState.cameraDepth && carSprite.screen.scale > 0) {
-                        const carW = carSprite.screen.scale * 80;
-                        const carH = carSprite.screen.scale * 50;
-
-                        ctx.fillStyle = car.color;
-                        ctx.fillRect(
-                            carSprite.screen.x - carW / 2,
-                            carSprite.screen.y - carH,
-                            carW,
-                            carH
-                        );
-                    }
-                }
-            });
+            // Store cars that are on this segment for later rendering
+            segment.carsOnSegment = [];
         }
+
+        // After all segments are drawn, draw cars on top
+        gameState.cars.forEach(car => {
+            const carSprite = {
+                world: { x: car.offset * ROAD_WIDTH, y: 0, z: car.z },
+                camera: {},
+                screen: {}
+            };
+            project(carSprite, gameState.playerX * ROAD_WIDTH, playerY + gameState.cameraHeight, gameState.position);
+
+            // Only draw if car is in front of camera and visible
+            if (carSprite.camera.z > gameState.cameraDepth && carSprite.camera.z < gameState.position + drawDistance * SEGMENT_LENGTH) {
+                const carW = Math.max(carSprite.screen.scale * 100, 2);
+                const carH = Math.max(carSprite.screen.scale * 60, 2);
+
+                // Draw car body
+                ctx.fillStyle = car.color;
+                ctx.fillRect(
+                    carSprite.screen.x - carW / 2,
+                    carSprite.screen.y - carH,
+                    carW,
+                    carH
+                );
+
+                // Draw car windows (for visibility)
+                ctx.fillStyle = '#333';
+                ctx.fillRect(
+                    carSprite.screen.x - carW / 3,
+                    carSprite.screen.y - carH + carH * 0.2,
+                    carW * 0.66,
+                    carH * 0.4
+                );
+            }
+        });
 
         // Draw player car
         const playerCarY = CANVAS_HEIGHT - 100;
