@@ -244,13 +244,14 @@
                 continue;
             }
 
-            // Check collision with centipedes
+            // Check collision with centipedes (tighter hitbox)
             for (let c = centipedes.length - 1; c >= 0; c--) {
                 const centipede = centipedes[c];
                 for (let s = centipede.segments.length - 1; s >= 0; s--) {
                     const segment = centipede.segments[s];
-                    if (Math.abs(bullet.x - segment.x) < GRID_SIZE &&
-                        Math.abs(bullet.y - segment.y) < GRID_SIZE) {
+                    const hitRadius = 8; // Half of grid size for tighter collision
+                    if (Math.abs(bullet.x - (segment.x + GRID_SIZE / 2)) < hitRadius &&
+                        Math.abs(bullet.y - (segment.y + GRID_SIZE / 2)) < hitRadius) {
 
                         // Create mushroom at segment position
                         mushrooms.push({
@@ -292,11 +293,12 @@
                 }
             }
 
-            // Check collision with mushrooms
+            // Check collision with mushrooms (tighter hitbox)
             for (let m = mushrooms.length - 1; m >= 0; m--) {
                 const mushroom = mushrooms[m];
-                if (Math.abs(bullet.x - mushroom.x) < GRID_SIZE &&
-                    Math.abs(bullet.y - mushroom.y) < GRID_SIZE) {
+                const hitRadius = 8; // Half of grid size for tighter collision
+                if (Math.abs(bullet.x - (mushroom.x + GRID_SIZE / 2)) < hitRadius &&
+                    Math.abs(bullet.y - (mushroom.y + GRID_SIZE / 2)) < hitRadius) {
                     mushroom.health--;
                     if (mushroom.health <= 0) {
                         mushrooms.splice(m, 1);
@@ -307,11 +309,12 @@
                 }
             }
 
-            // Check collision with enemies
+            // Check collision with enemies (tighter hitbox)
             for (let e = enemies.length - 1; e >= 0; e--) {
                 const enemy = enemies[e];
-                if (Math.abs(bullet.x - enemy.x) < GRID_SIZE &&
-                    Math.abs(bullet.y - enemy.y) < GRID_SIZE) {
+                const hitRadius = 8; // Half of grid size for tighter collision
+                if (Math.abs(bullet.x - enemy.x) < hitRadius &&
+                    Math.abs(bullet.y - enemy.y) < hitRadius) {
 
                     if (enemy.type === 'flea') {
                         enemy.health--;
@@ -344,7 +347,7 @@
             const enemy = enemies[i];
 
             if (enemy.type === 'spider') {
-                // Zigzag movement with wider, gentler pattern
+                // Zigzag movement with very wide, gentle pattern
                 enemy.x += enemy.vx;
                 enemy.y += enemy.vy;
                 enemy.bounceTimer++;
@@ -353,8 +356,8 @@
                 const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
                 const playerMaxY = GAME_HEIGHT - GRID_SIZE;
 
-                // Bounce when hitting bounds or after traveling enough for wide, gentle zigzag
-                if (enemy.y <= playerMinY || enemy.y >= playerMaxY || enemy.bounceTimer > 50) {
+                // Bounce when hitting bounds or after traveling enough for very wide zigzag
+                if (enemy.y <= playerMinY || enemy.y >= playerMaxY || enemy.bounceTimer > 80) {
                     enemy.vy = -enemy.vy;
                     enemy.bounceTimer = 0;
                 }
@@ -439,7 +442,7 @@
                 x: fromLeft ? -GRID_SIZE : GAME_WIDTH + GRID_SIZE,
                 y: playerMinY + GRID_SIZE * 3, // Start in middle of player area
                 vx: fromLeft ? 0.75 : -0.75, // 50% slower horizontal movement
-                vy: 2, // Reduced vertical speed for gentler, wider zigzag
+                vy: 1, // Very slow vertical speed for very wide zigzag
                 bounceTimer: 0
             });
         }
