@@ -30,7 +30,7 @@
     const COLOR_FLEA = '#00ffff';
     const COLOR_SCORPION = '#ffff00';
     const COLOR_POISON = '#ff00ff';
-    const COLOR_EXPLOSIVE = '#ff6600'; // Bright orange for explosive rocks
+    const COLOR_EXPLOSIVE = '#00ccff'; // Bright blue for explosive rocks
 
     // Player object
     function createPlayer() {
@@ -85,8 +85,8 @@
             }
         }
 
-        // Add 3 explosive rocks per level
-        const explosiveCount = 3;
+        // Add 5 explosive mushrooms per level
+        const explosiveCount = 5;
         for (let i = 0; i < explosiveCount; i++) {
             const x = Math.floor(Math.random() * COLS);
             const y = Math.floor(Math.random() * (ROWS - PLAYER_AREA_ROWS));
@@ -679,7 +679,7 @@
     // Draw mushrooms
     function drawMushrooms() {
         for (let mushroom of mushrooms) {
-            // Explosive mushrooms are bright orange
+            // Explosive mushrooms are bright blue
             if (mushroom.explosive) {
                 ctx.fillStyle = COLOR_EXPLOSIVE;
             } else {
@@ -695,18 +695,8 @@
             ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
             ctx.fill();
 
-            // Explosive mushrooms have a special marker (X)
-            if (mushroom.explosive) {
-                ctx.strokeStyle = '#ffff00';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(x + size / 4, y + size / 4);
-                ctx.lineTo(x + size * 3 / 4, y + size * 3 / 4);
-                ctx.moveTo(x + size * 3 / 4, y + size / 4);
-                ctx.lineTo(x + size / 4, y + size * 3 / 4);
-                ctx.stroke();
-            } else {
-                // Draw health indicator for normal mushrooms
+            // Draw health indicator (for all mushrooms)
+            if (!mushroom.explosive) {
                 ctx.fillStyle = COLOR_BG;
                 const spots = 4 - mushroom.health;
                 for (let i = 0; i < spots; i++) {
@@ -833,9 +823,9 @@
         ctx.fillText('🦂 Scorpion - Poisons mushrooms (1000 pts)', GAME_WIDTH / 2, 405);
 
         ctx.fillStyle = COLOR_EXPLOSIVE;
-        ctx.fillText('💣 EXPLOSIVE ROCKS:', GAME_WIDTH / 2, 440);
+        ctx.fillText('💣 EXPLOSIVE MUSHROOMS:', GAME_WIDTH / 2, 440);
         ctx.fillStyle = '#ffffff';
-        ctx.fillText('Blast everything within 3 spaces!', GAME_WIDTH / 2, 465);
+        ctx.fillText('Bright blue - blast everything within 3 spaces!', GAME_WIDTH / 2, 465);
 
         ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#00ff00';
@@ -944,7 +934,7 @@
                     <p style="margin: 0.5rem 0;">🎮 Arrow Keys to move, Space to shoot</p>
                     <p style="margin: 0.5rem 0;">🐛 Destroy all centipede segments!</p>
                     <p style="margin: 0.5rem 0;">⚠️ Watch out for Spider, Flea, and Scorpion!</p>
-                    <p style="margin: 0.5rem 0; color: #ff6600; font-weight: bold;">💣 Hit orange explosive rocks to clear 3 spaces!</p>
+                    <p style="margin: 0.5rem 0; color: #00ccff; font-weight: bold;">💣 Hit bright blue explosive mushrooms to clear 3 spaces!</p>
                 </div>
 
                 <!-- Mobile Touch Controls -->
