@@ -708,7 +708,8 @@
         const aliveEnemies = gameState.enemies.filter(e => e.alive).length;
 
         if (gameState.challengeStage) {
-            if (aliveEnemies === 0 || gameState.challengeTimer <= 0) {
+            // Don't advance during formation, then check if all enemies dead or timer expired
+            if (!gameState.formingUp && (aliveEnemies === 0 || gameState.challengeTimer <= 0)) {
                 gameState.level++;
                 startStage();
             }
@@ -755,8 +756,8 @@
         handleInput();
         updateFormation();
 
-        // Update challenge stage timer
-        if (gameState.challengeStage) {
+        // Update challenge stage timer (only after enemies finish forming up)
+        if (gameState.challengeStage && !gameState.formingUp) {
             gameState.challengeTimer--;
         }
 
