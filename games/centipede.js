@@ -30,6 +30,7 @@
     const COLOR_FLEA = '#00ffff';
     const COLOR_SCORPION = '#ffff00';
     const COLOR_POISON = '#ff00ff';
+    const COLOR_EXPLOSIVE = '#ff6600'; // Bright orange for explosive rocks
 
     // Player object
     function createPlayer() {
@@ -78,7 +79,28 @@
                     x: x * GRID_SIZE,
                     y: y * GRID_SIZE,
                     health: 4,
-                    poisoned: false
+                    poisoned: false,
+                    explosive: false
+                });
+            }
+        }
+
+        // Add 3 explosive rocks per level
+        const explosiveCount = 3;
+        for (let i = 0; i < explosiveCount; i++) {
+            const x = Math.floor(Math.random() * COLS);
+            const y = Math.floor(Math.random() * (ROWS - PLAYER_AREA_ROWS));
+
+            // Check if mushroom already exists at this position
+            if (!mushrooms.find(m => m.gridX === x && m.gridY === y)) {
+                mushrooms.push({
+                    gridX: x,
+                    gridY: y,
+                    x: x * GRID_SIZE,
+                    y: y * GRID_SIZE,
+                    health: 4,
+                    poisoned: false,
+                    explosive: true
                 });
             }
         }
@@ -306,8 +328,15 @@
                     Math.abs(bullet.y - (mushroom.y + GRID_SIZE / 2)) < hitRadius) {
                     mushroom.health--;
                     if (mushroom.health <= 0) {
+                        // Check if it's an explosive mushroom
+                        if (mushroom.explosive) {
+                            // Trigger explosion!
+                            explode(mushroom.gridX, mushroom.gridY);
+                            score += 50; // Bonus for explosive!
+                        } else {
+                            score += 1;
+                        }
                         mushrooms.splice(m, 1);
-                        score += 1;
                     }
                     bullets.splice(i, 1);
                     break;
@@ -490,6 +519,71 @@
         }
     }
 
+    // Explode - destroys everything within 3 grid spaces
+    function explode(centerX, centerY) {
+        const BLAST_RADIUS = 3;
+
+        // Destroy mushrooms in radius
+        for (let m = mushrooms.length - 1; m >= 0; m--) {
+            const mushroom = mushrooms[m];
+            const distance = Math.max(
+                Math.abs(mushroom.gridX - centerX),
+                Math.abs(mushroom.gridY - centerY)
+            );
+            if (distance <= BLAST_RADIUS) {
+                mushrooms.splice(m, 1);
+                score += 2; // Bonus points for chain destruction
+            }
+        }
+
+        // Destroy centipede segments in radius
+        for (let c = centipedes.length - 1; c >= 0; c--) {
+            const centipede = centipedes[c];
+            for (let s = centipede.segments.length - 1; s >= 0; s--) {
+                const segment = centipede.segments[s];
+                const distance = Math.max(
+                    Math.abs(segment.gridX - centerX),
+                    Math.abs(segment.gridY - centerY)
+                );
+                if (distance <= BLAST_RADIUS) {
+                    // Split centipede if hit in middle
+                    if (s > 0 && s < centipede.segments.length - 1) {
+                        const rearSegments = centipede.segments.splice(s + 1);
+                        if (rearSegments.length > 0) {
+                            centipedes.push({
+                                segments: rearSegments,
+                                direction: centipede.direction,
+                                moveTimer: 0,
+                                moveDelay: centipede.moveDelay
+                            });
+                        }
+                    }
+                    centipede.segments.splice(s, 1);
+                    score += 15; // Bonus for explosive kill
+                }
+            }
+            // Remove centipede if no segments left
+            if (centipede.segments.length === 0) {
+                centipedes.splice(c, 1);
+            }
+        }
+
+        // Destroy enemies in radius
+        for (let e = enemies.length - 1; e >= 0; e--) {
+            const enemy = enemies[e];
+            const enemyGridX = Math.floor(enemy.x / GRID_SIZE);
+            const enemyGridY = Math.floor(enemy.y / GRID_SIZE);
+            const distance = Math.max(
+                Math.abs(enemyGridX - centerX),
+                Math.abs(enemyGridY - centerY)
+            );
+            if (distance <= BLAST_RADIUS) {
+                enemies.splice(e, 1);
+                score += 100; // Bonus for explosive kill
+            }
+        }
+    }
+
     // Lose a life
     function loseLife() {
         lives--;
@@ -585,7 +679,13 @@
     // Draw mushrooms
     function drawMushrooms() {
         for (let mushroom of mushrooms) {
-            ctx.fillStyle = mushroom.poisoned ? COLOR_POISON : COLOR_MUSHROOM;
+            // Explosive mushrooms are bright orange
+            if (mushroom.explosive) {
+                ctx.fillStyle = COLOR_EXPLOSIVE;
+            } else {
+                ctx.fillStyle = mushroom.poisoned ? COLOR_POISON : COLOR_MUSHROOM;
+            }
+
             const size = GRID_SIZE - 4;
             const x = mushroom.x + 2;
             const y = mushroom.y + 2;
@@ -595,16 +695,28 @@
             ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
             ctx.fill();
 
-            // Draw health indicator
-            ctx.fillStyle = COLOR_BG;
-            const spots = 4 - mushroom.health;
-            for (let i = 0; i < spots; i++) {
-                const angle = (i / 4) * Math.PI * 2;
-                const spotX = x + size / 2 + Math.cos(angle) * (size / 4);
-                const spotY = y + size / 2 + Math.sin(angle) * (size / 4);
+            // Explosive mushrooms have a special marker (X)
+            if (mushroom.explosive) {
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(spotX, spotY, 2, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.moveTo(x + size / 4, y + size / 4);
+                ctx.lineTo(x + size * 3 / 4, y + size * 3 / 4);
+                ctx.moveTo(x + size * 3 / 4, y + size / 4);
+                ctx.lineTo(x + size / 4, y + size * 3 / 4);
+                ctx.stroke();
+            } else {
+                // Draw health indicator for normal mushrooms
+                ctx.fillStyle = COLOR_BG;
+                const spots = 4 - mushroom.health;
+                for (let i = 0; i < spots; i++) {
+                    const angle = (i / 4) * Math.PI * 2;
+                    const spotX = x + size / 2 + Math.cos(angle) * (size / 4);
+                    const spotY = y + size / 2 + Math.sin(angle) * (size / 4);
+                    ctx.beginPath();
+                    ctx.arc(spotX, spotY, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
         }
     }
@@ -715,10 +827,15 @@
         ctx.fillText('Space: Shoot', GAME_WIDTH / 2, 280);
 
         ctx.font = '14px Arial';
-        ctx.fillText('ENEMIES:', GAME_WIDTH / 2, 340);
-        ctx.fillText('🕷️ Spider - Eats mushrooms (300-900 pts)', GAME_WIDTH / 2, 370);
-        ctx.fillText('🦟 Flea - Drops mushrooms (200 pts)', GAME_WIDTH / 2, 395);
-        ctx.fillText('🦂 Scorpion - Poisons mushrooms (1000 pts)', GAME_WIDTH / 2, 420);
+        ctx.fillText('ENEMIES:', GAME_WIDTH / 2, 330);
+        ctx.fillText('🕷️ Spider - Eats mushrooms (300-900 pts)', GAME_WIDTH / 2, 355);
+        ctx.fillText('🦟 Flea - Drops mushrooms (200 pts)', GAME_WIDTH / 2, 380);
+        ctx.fillText('🦂 Scorpion - Poisons mushrooms (1000 pts)', GAME_WIDTH / 2, 405);
+
+        ctx.fillStyle = COLOR_EXPLOSIVE;
+        ctx.fillText('💣 EXPLOSIVE ROCKS:', GAME_WIDTH / 2, 440);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText('Blast everything within 3 spaces!', GAME_WIDTH / 2, 465);
 
         ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#00ff00';
@@ -827,6 +944,7 @@
                     <p style="margin: 0.5rem 0;">🎮 Arrow Keys to move, Space to shoot</p>
                     <p style="margin: 0.5rem 0;">🐛 Destroy all centipede segments!</p>
                     <p style="margin: 0.5rem 0;">⚠️ Watch out for Spider, Flea, and Scorpion!</p>
+                    <p style="margin: 0.5rem 0; color: #ff6600; font-weight: bold;">💣 Hit orange explosive rocks to clear 3 spaces!</p>
                 </div>
 
                 <!-- Mobile Touch Controls -->
