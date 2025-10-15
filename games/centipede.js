@@ -722,7 +722,7 @@
 
         ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#00ff00';
-        ctx.fillText('PRESS SPACE TO START', GAME_WIDTH / 2, 500);
+        ctx.fillText('TAP SCREEN OR PRESS SPACE', GAME_WIDTH / 2, 500);
     }
 
     // Draw level complete
@@ -757,7 +757,7 @@
 
         ctx.font = 'bold 20px Arial';
         ctx.fillStyle = '#00ff00';
-        ctx.fillText('PRESS SPACE TO RETRY', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 100);
+        ctx.fillText('TAP SCREEN OR PRESS SPACE', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 100);
     }
 
     // Game loop
@@ -828,6 +828,24 @@
                     <p style="margin: 0.5rem 0;">🐛 Destroy all centipede segments!</p>
                     <p style="margin: 0.5rem 0;">⚠️ Watch out for Spider, Flea, and Scorpion!</p>
                 </div>
+
+                <!-- Mobile Touch Controls -->
+                <div id="centipedeControls" style="display: flex; justify-content: space-between; width: 100%; max-width: 500px; align-items: flex-end; margin-top: 1rem; padding: 0 1rem;">
+                    <button id="centipedeBtnFire" style="width: 90px; height: 90px; background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); color: white; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
+                    <div style="display: grid; grid-template-columns: repeat(3, 70px); grid-template-rows: repeat(3, 70px); gap: 8px;">
+                        <div style="grid-column: 2;"></div>
+                        <button id="centipedeBtnUp" style="grid-column: 2; width: 70px; height: 70px; background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▲</button>
+                        <div></div>
+
+                        <button id="centipedeBtnLeft" style="width: 70px; height: 70px; background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">◀</button>
+                        <div></div>
+                        <button id="centipedeBtnRight" style="width: 70px; height: 70px; background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▶</button>
+
+                        <div></div>
+                        <button id="centipedeBtnDown" style="grid-column: 2; width: 70px; height: 70px; background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▼</button>
+                        <div></div>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -848,7 +866,137 @@
         // Event listeners
         document.addEventListener('keydown', handleKeyDown);
         document.addEventListener('keyup', handleKeyUp);
+
+        // Setup mobile controls
+        setupMobileControls();
     };
+
+    // Setup mobile touch controls
+    function setupMobileControls() {
+        const canvas = gameCanvas;
+        const btnUp = document.getElementById('centipedeBtnUp');
+        const btnDown = document.getElementById('centipedeBtnDown');
+        const btnLeft = document.getElementById('centipedeBtnLeft');
+        const btnRight = document.getElementById('centipedeBtnRight');
+        const btnFire = document.getElementById('centipedeBtnFire');
+
+        // Add canvas click/touch to start/restart game
+        const handleCanvasClick = () => {
+            if (gameState === 'menu') {
+                score = 0;
+                lives = 3;
+                level = 1;
+                initGame();
+            } else if (gameState === 'gameOver') {
+                score = 0;
+                lives = 3;
+                level = 1;
+                gameState = 'menu';
+                draw();
+            }
+        };
+
+        canvas.addEventListener('click', handleCanvasClick);
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleCanvasClick();
+        });
+
+        if (btnUp) {
+            btnUp.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys.up = true;
+            });
+            btnUp.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys.up = false;
+            });
+            btnUp.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                keys.up = true;
+            });
+            btnUp.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                keys.up = false;
+            });
+        }
+
+        if (btnDown) {
+            btnDown.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys.down = true;
+            });
+            btnDown.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys.down = false;
+            });
+            btnDown.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                keys.down = true;
+            });
+            btnDown.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                keys.down = false;
+            });
+        }
+
+        if (btnLeft) {
+            btnLeft.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys.left = true;
+            });
+            btnLeft.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys.left = false;
+            });
+            btnLeft.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                keys.left = true;
+            });
+            btnLeft.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                keys.left = false;
+            });
+        }
+
+        if (btnRight) {
+            btnRight.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys.right = true;
+            });
+            btnRight.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys.right = false;
+            });
+            btnRight.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                keys.right = true;
+            });
+            btnRight.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                keys.right = false;
+            });
+        }
+
+        if (btnFire) {
+            btnFire.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys.space = true;
+            });
+            btnFire.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys.space = false;
+            });
+            btnFire.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                keys.space = true;
+            });
+            btnFire.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                keys.space = false;
+            });
+        }
+    }
 
     // Exit to menu
     window.exitCentipedeToMenu = function() {
