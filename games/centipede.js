@@ -353,7 +353,8 @@
                 const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
                 const playerMaxY = GAME_HEIGHT - GRID_SIZE;
 
-                if (enemy.y <= playerMinY || enemy.y >= playerMaxY || enemy.bounceTimer > 20) {
+                // Bounce when hitting bounds or after traveling enough for wide zigzag
+                if (enemy.y <= playerMinY || enemy.y >= playerMaxY || enemy.bounceTimer > 30) {
                     enemy.vy = -enemy.vy;
                     enemy.bounceTimer = 0;
                 }
@@ -436,9 +437,9 @@
             enemies.push({
                 type: 'spider',
                 x: fromLeft ? -GRID_SIZE : GAME_WIDTH + GRID_SIZE,
-                y: playerMinY + GRID_SIZE * 2, // Start higher in player area
+                y: playerMinY + GRID_SIZE * 3, // Start in middle of player area
                 vx: fromLeft ? 1.5 : -1.5, // Reduced from 2 to 1.5 for slower movement
-                vy: 3, // Increased vertical speed for bigger bounces
+                vy: 4, // Increased vertical speed for wider zigzag
                 bounceTimer: 0
             });
         }
