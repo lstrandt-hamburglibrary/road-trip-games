@@ -618,6 +618,26 @@
                 mushroom.poisoned = false;
             }
 
+            // Add new explosive mushrooms for this level
+            const explosiveCount = 5;
+            for (let i = 0; i < explosiveCount; i++) {
+                const x = Math.floor(Math.random() * COLS);
+                const y = Math.floor(Math.random() * (ROWS - PLAYER_AREA_ROWS));
+
+                // Check if mushroom already exists at this position
+                if (!mushrooms.find(m => m.gridX === x && m.gridY === y)) {
+                    mushrooms.push({
+                        gridX: x,
+                        gridY: y,
+                        x: x * GRID_SIZE,
+                        y: y * GRID_SIZE,
+                        health: 4,
+                        poisoned: false,
+                        explosive: true
+                    });
+                }
+            }
+
             // Reset player position and invincibility
             player.x = Math.floor(COLS / 2) * GRID_SIZE;
             player.y = PLAYER_START_ROW * GRID_SIZE;
