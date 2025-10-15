@@ -36,8 +36,7 @@
         return {
             x: Math.floor(COLS / 2) * GRID_SIZE,
             y: PLAYER_START_ROW * GRID_SIZE,
-            speed: 3,
-            shootCooldown: 0
+            speed: 3
         };
     }
 
@@ -102,9 +101,6 @@
     // Update game state
     function update() {
         if (gameState !== 'playing') return;
-
-        // Update player shoot cooldown
-        if (player.shootCooldown > 0) player.shootCooldown--;
 
         // Player movement
         const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
@@ -331,12 +327,16 @@
             const enemy = enemies[i];
 
             if (enemy.type === 'spider') {
-                // Zigzag movement
+                // Zigzag movement with larger vertical bounces
                 enemy.x += enemy.vx;
                 enemy.y += enemy.vy;
                 enemy.bounceTimer++;
 
-                if (enemy.bounceTimer > 30) {
+                // Keep spider within player area bounds
+                const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
+                const playerMaxY = GAME_HEIGHT - GRID_SIZE;
+
+                if (enemy.y <= playerMinY || enemy.y >= playerMaxY || enemy.bounceTimer > 20) {
                     enemy.vy = -enemy.vy;
                     enemy.bounceTimer = 0;
                 }
@@ -414,12 +414,13 @@
         // Spider
         if (enemies.filter(e => e.type === 'spider').length === 0 && Math.random() < 0.005) {
             const fromLeft = Math.random() < 0.5;
+            const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
             enemies.push({
                 type: 'spider',
                 x: fromLeft ? -GRID_SIZE : GAME_WIDTH + GRID_SIZE,
-                y: (ROWS - PLAYER_AREA_ROWS + 2) * GRID_SIZE,
+                y: playerMinY + GRID_SIZE * 2, // Start higher in player area
                 vx: fromLeft ? 2 : -2,
-                vy: 2,
+                vy: 3, // Increased vertical speed for bigger bounces
                 bounceTimer: 0
             });
         }
@@ -452,13 +453,13 @@
 
     // Player shoots
     function shoot() {
-        if (player.shootCooldown === 0) {
+        // Only one bullet on screen at a time (authentic Centipede mechanic)
+        if (bullets.length === 0) {
             bullets.push({
                 x: player.x + GRID_SIZE / 2,
                 y: player.y,
                 speed: 8
             });
-            player.shootCooldown = 10;
         }
     }
 
