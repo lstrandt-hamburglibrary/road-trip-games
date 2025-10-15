@@ -578,17 +578,23 @@
 
     function drawGameOver(ctx) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, CANVAS_HEIGHT / 2 - 60, CANVAS_WIDTH, 120);
+        ctx.fillRect(0, CANVAS_HEIGHT / 2 - 80, CANVAS_WIDTH, 160);
 
         ctx.fillStyle = '#FF0000';
         ctx.font = 'bold 32px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText('GAME OVER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 10);
+        ctx.fillText('GAME OVER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 30);
 
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '18px monospace';
-        ctx.fillText(`Final Score: ${gameState.score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20);
-        ctx.fillText('Press R to Restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
+        ctx.fillText(`Final Score: ${gameState.score}`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+
+        // Restart button
+        ctx.fillStyle = '#28a745';
+        ctx.fillRect(CANVAS_WIDTH / 2 - 80, CANVAS_HEIGHT / 2 + 20, 160, 50);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 20px monospace';
+        ctx.fillText('RESTART', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 52);
 
         ctx.textAlign = 'left';
     }
@@ -601,9 +607,45 @@
 
     // Setup mobile touch controls
     function setupMobileControls() {
+        const canvas = gameState.canvas;
         const btnLeft = document.getElementById('galaxianBtnLeft');
         const btnRight = document.getElementById('galaxianBtnRight');
         const btnFire = document.getElementById('galaxianBtnFire');
+
+        // Add canvas click/touch for restart button
+        const handleCanvasClick = (e) => {
+            if (!gameState.gameOver) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            let clientX, clientY;
+            if (e.type.includes('touch')) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const x = (clientX - rect.left) * scaleX;
+            const y = (clientY - rect.top) * scaleY;
+
+            // Check if click is on restart button
+            const buttonX = CANVAS_WIDTH / 2 - 80;
+            const buttonY = CANVAS_HEIGHT / 2 + 20;
+            const buttonWidth = 160;
+            const buttonHeight = 50;
+
+            if (x >= buttonX && x <= buttonX + buttonWidth &&
+                y >= buttonY && y <= buttonY + buttonHeight) {
+                resetGame();
+            }
+        };
+
+        canvas.addEventListener('click', handleCanvasClick);
+        canvas.addEventListener('touchstart', handleCanvasClick);
 
         if (btnLeft) {
             btnLeft.addEventListener('touchstart', (e) => {
