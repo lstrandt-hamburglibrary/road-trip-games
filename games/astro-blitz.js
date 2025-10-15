@@ -343,7 +343,7 @@
             this.y = this.diveStartY + progress * 100;
 
             // Check for player capture
-            if (this.capturing && !gameState.capturedShip) {
+            if (this.capturing && !gameState.capturedShip && gameState.player) {
                 if (checkRectCollision(this, gameState.player)) {
                     // Capture the player!
                     gameState.capturedShip = new CapturedShip(
