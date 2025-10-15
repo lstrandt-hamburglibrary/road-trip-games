@@ -36,7 +36,9 @@
         return {
             x: Math.floor(COLS / 2) * GRID_SIZE,
             y: PLAYER_START_ROW * GRID_SIZE,
-            speed: 3
+            speed: 3,
+            invincible: false,
+            invincibleTimer: 0
         };
     }
 
@@ -102,6 +104,14 @@
     function update() {
         if (gameState !== 'playing') return;
 
+        // Update invincibility timer
+        if (player.invincibleTimer > 0) {
+            player.invincibleTimer--;
+            if (player.invincibleTimer === 0) {
+                player.invincible = false;
+            }
+        }
+
         // Player movement
         const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
 
@@ -152,11 +162,13 @@
                 moveCentipede(centipede);
             }
 
-            // Check collision with player
-            for (let segment of centipede.segments) {
-                if (Math.abs(segment.x - player.x) < GRID_SIZE &&
-                    Math.abs(segment.y - player.y) < GRID_SIZE) {
-                    loseLife();
+            // Check collision with player (if not invincible)
+            if (!player.invincible) {
+                for (let segment of centipede.segments) {
+                    if (Math.abs(segment.x - player.x) < GRID_SIZE &&
+                        Math.abs(segment.y - player.y) < GRID_SIZE) {
+                        loseLife();
+                    }
                 }
             }
         }
@@ -362,8 +374,9 @@
                     }
                 }
 
-                // Check collision with player
-                if (Math.abs(enemy.x - player.x) < GRID_SIZE &&
+                // Check collision with player (if not invincible)
+                if (!player.invincible &&
+                    Math.abs(enemy.x - player.x) < GRID_SIZE &&
                     Math.abs(enemy.y - player.y) < GRID_SIZE) {
                     loseLife();
                 }
@@ -424,7 +437,7 @@
                 type: 'spider',
                 x: fromLeft ? -GRID_SIZE : GAME_WIDTH + GRID_SIZE,
                 y: playerMinY + GRID_SIZE * 2, // Start higher in player area
-                vx: fromLeft ? 2 : -2,
+                vx: fromLeft ? 1.5 : -1.5, // Reduced from 2 to 1.5 for slower movement
                 vy: 3, // Increased vertical speed for bigger bounces
                 bounceTimer: 0
             });
@@ -474,8 +487,11 @@
         if (lives <= 0) {
             gameOver();
         } else {
+            // Respawn player with invincibility
             player.x = Math.floor(COLS / 2) * GRID_SIZE;
             player.y = PLAYER_START_ROW * GRID_SIZE;
+            player.invincible = true;
+            player.invincibleTimer = 120; // 2 seconds at 60fps
         }
     }
 
@@ -617,6 +633,11 @@
 
     // Draw player
     function drawPlayer() {
+        // Blink effect when invincible
+        if (player.invincible && Math.floor(player.invincibleTimer / 5) % 2 === 0) {
+            return; // Don't draw every other interval for blinking effect
+        }
+
         ctx.fillStyle = COLOR_PLAYER;
         const size = GRID_SIZE - 4;
 
