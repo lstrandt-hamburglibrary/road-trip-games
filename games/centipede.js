@@ -86,7 +86,9 @@
 
     // Initialize game
     function initGame() {
-        player = createPlayer();
+        if (!player) {
+            player = createPlayer();
+        }
         centipedes = [];
         bullets = [];
         enemies = [];
@@ -94,10 +96,13 @@
         initMushrooms();
 
         // Create initial centipede
-        centipedes.push(createCentipede(12, GAME_WIDTH - GRID_SIZE, 0, 'left'));
+        const centipedeLength = 12;
+        centipedes.push(createCentipede(centipedeLength, GAME_WIDTH - GRID_SIZE, 0, 'left'));
 
         gameState = 'playing';
-        gameLoop();
+        if (!animationId) {
+            gameLoop();
+        }
     }
 
     // Update game state
@@ -502,7 +507,35 @@
     // Next level
     function nextLevel() {
         level++;
-        initGame();
+        gameState = 'levelComplete';
+
+        // Show level complete message briefly
+        setTimeout(() => {
+            // Clear everything for new level
+            centipedes = [];
+            bullets = [];
+            enemies = [];
+
+            // Repair some mushrooms (like original game)
+            for (let mushroom of mushrooms) {
+                if (mushroom.health < 4) {
+                    mushroom.health = Math.min(4, mushroom.health + 1);
+                }
+                mushroom.poisoned = false;
+            }
+
+            // Reset player position and invincibility
+            player.x = Math.floor(COLS / 2) * GRID_SIZE;
+            player.y = PLAYER_START_ROW * GRID_SIZE;
+            player.invincible = false;
+            player.invincibleTimer = 0;
+
+            // Create new centipede for this level
+            const centipedeLength = 12;
+            centipedes.push(createCentipede(centipedeLength, GAME_WIDTH - GRID_SIZE, 0, 'left'));
+
+            gameState = 'playing';
+        }, 2000);
     }
 
     // Game over
@@ -527,6 +560,11 @@
             drawPlayer();
             drawHUD();
             drawPlayerAreaBorder();
+        } else if (gameState === 'levelComplete') {
+            drawMushrooms();
+            drawHUD();
+            drawPlayerAreaBorder();
+            drawLevelComplete();
         } else if (gameState === 'gameOver') {
             drawGameOver();
         }
@@ -687,6 +725,21 @@
         ctx.fillText('PRESS SPACE TO START', GAME_WIDTH / 2, 500);
     }
 
+    // Draw level complete
+    function drawLevelComplete() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+        ctx.fillStyle = '#00ff00';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('LEVEL COMPLETE!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '28px Arial';
+        ctx.fillText(`Starting Level ${level}...`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 40);
+    }
+
     // Draw game over
     function drawGameOver() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
@@ -712,7 +765,7 @@
         update();
         draw();
 
-        if (gameState === 'playing') {
+        if (gameState === 'playing' || gameState === 'levelComplete') {
             animationId = requestAnimationFrame(gameLoop);
         }
     }
