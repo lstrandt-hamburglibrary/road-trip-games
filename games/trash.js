@@ -359,6 +359,16 @@
         playerCards[position] = { ...trashState.drawnCard, faceUp: true };
         trashState.drawnCard = null;
 
+        // Check for win immediately after placing a card
+        if (playerCards.every(c => c.faceUp)) {
+            trashState.gameOver = true;
+            trashState.message = trashState.currentPlayer === 1
+                ? (trashState.mode === 'twoPlayer' ? '🎉 Player 1 wins!' : '🎉 You win!')
+                : (trashState.mode === 'twoPlayer' ? '🎉 Player 2 wins!' : '😢 Computer wins!');
+            showTrashBoard();
+            return;
+        }
+
         // Flip up the card that was there
         if (oldCard && !oldCard.faceUp) {
             oldCard.faceUp = true;
@@ -395,14 +405,6 @@
                     trashState.message = `Revealed ${oldCard.rank}${oldCard.suit} - Tap spot ${oldValue} to place it.`;
                 }
             }
-        }
-
-        // Check for win
-        if (playerCards.every(c => c.faceUp)) {
-            trashState.gameOver = true;
-            trashState.message = trashState.currentPlayer === 1
-                ? (trashState.mode === 'twoPlayer' ? '🎉 Player 1 wins!' : '🎉 You win!')
-                : (trashState.mode === 'twoPlayer' ? '🎉 Player 2 wins!' : '😢 Computer wins!');
         }
 
         showTrashBoard();
