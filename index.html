@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.61.7';</script>
+    <script>window.APP_VERSION = '1.62.0';</script>
 
     <style>
         * {
@@ -432,6 +432,11 @@
                         <h3>🏎️ Pole Position</h3>
                         <p>Classic 1982 Formula 1 racing game!</p>
                     </div>
+
+                    <div class="feature-card" onclick="launchCentipede()" style="background: linear-gradient(135deg, #00ff00 0%, #00aa00 100%);">
+                        <h3>🐛 Centipede</h3>
+                        <p>Classic 1980 Atari arcade shooter!</p>
+                    </div>
                 </div>
             </div>
 
@@ -605,6 +610,17 @@
             <!-- Pole Position Game Section (hidden by default) -->
             <div id="polePositionGame" style="display: none;">
                 <div id="polePositionContent"></div>
+            </div>
+
+            <!-- Centipede Game Section (hidden by default) -->
+            <div id="centipedeGame" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>🐛 Centipede</h2>
+                    <button onclick="exitCentipede()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
+                </div>
+                <div style="text-align: center;">
+                    <canvas id="centipedeCanvas"></canvas>
+                </div>
             </div>
 
             <!-- Pharaoh's Curse Game Section (hidden by default) -->
@@ -945,6 +961,7 @@
     <script src="games/galaxian.js?v=1.56.1"></script>
     <script src="games/galaga.js?v=1.56.1"></script>
     <script src="games/pole-position.js?v=1.60.2"></script>
+    <script src="games/centipede.js?v=1.62.0"></script>
     <script src="games/pharaoh.js?v=1.61.0"></script>
 </body>
 </html>
