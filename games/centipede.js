@@ -118,6 +118,11 @@
             player.y += player.speed;
         }
 
+        // Continuous shooting while space is held
+        if (keys.space) {
+            shoot();
+        }
+
         // Update centipedes
         updateCentipedes();
 
@@ -696,21 +701,23 @@
         keys.down = keys['arrowdown'] || keys['s'];
         keys.left = keys['arrowleft'] || keys['a'];
         keys.right = keys['arrowright'] || keys['d'];
+        keys.space = keys[' '] || false;
 
         if (gameState === 'menu' && e.code === 'Space') {
+            e.preventDefault();
             score = 0;
             lives = 3;
             level = 1;
             initGame();
         } else if (gameState === 'gameOver' && e.code === 'Space') {
+            e.preventDefault();
             score = 0;
             lives = 3;
             level = 1;
             gameState = 'menu';
             draw();
         } else if (gameState === 'playing' && e.code === 'Space') {
-            // Shooting
-            shoot();
+            e.preventDefault();
         }
     }
 
@@ -721,6 +728,7 @@
         keys.down = keys['arrowdown'] || keys['s'];
         keys.left = keys['arrowleft'] || keys['a'];
         keys.right = keys['arrowright'] || keys['d'];
+        keys.space = keys[' '] || false;
     }
 
     // Launch game
