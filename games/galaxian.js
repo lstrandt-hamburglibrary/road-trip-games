@@ -48,7 +48,12 @@
         formationOffsetX: 0,
         formationDirection: 1,
         keys: {},
-        shootCooldown: 0
+        shootCooldown: 0,
+        respawning: false,
+        respawnTimer: 0,
+        invincible: false,
+        invincibilityTimer: 0,
+        blinkTimer: 0
     };
 
     // Player object
@@ -62,6 +67,11 @@
         }
 
         draw(ctx) {
+            // Blink when invincible (skip drawing every 8 frames)
+            if (gameState.invincible && Math.floor(gameState.blinkTimer / 8) % 2 === 0) {
+                return;
+            }
+
             // Draw simple spaceship shape
             ctx.fillStyle = '#00FF00';
             ctx.beginPath();
@@ -300,6 +310,11 @@
         gameState.formationOffsetX = 0;
         gameState.formationDirection = 1;
         gameState.shootCooldown = 0;
+        gameState.respawning = false;
+        gameState.respawnTimer = 0;
+        gameState.invincible = false;
+        gameState.invincibilityTimer = 0;
+        gameState.blinkTimer = 0;
 
         // Create starfield
         gameState.stars = [];
@@ -364,6 +379,9 @@
     }
 
     function handleInput() {
+        // Don't handle input if player doesn't exist
+        if (!gameState.player) return;
+
         if (gameState.keys['ArrowLeft'] || gameState.keys['a']) {
             gameState.player.moveLeft();
         }
@@ -401,22 +419,24 @@
             }
         }
 
-        // Enemy bullets hit player
-        for (let i = gameState.enemyBullets.length - 1; i >= 0; i--) {
-            const bullet = gameState.enemyBullets[i];
-            if (checkRectCollision(bullet, gameState.player)) {
-                gameState.enemyBullets.splice(i, 1);
-                loseLife();
-                break;
+        // Enemy bullets hit player (only if not invincible and player exists)
+        if (!gameState.invincible && gameState.player) {
+            for (let i = gameState.enemyBullets.length - 1; i >= 0; i--) {
+                const bullet = gameState.enemyBullets[i];
+                if (checkRectCollision(bullet, gameState.player)) {
+                    gameState.enemyBullets.splice(i, 1);
+                    loseLife();
+                    break;
+                }
             }
-        }
 
-        // Enemy collision with player
-        for (let enemy of gameState.enemies) {
-            if (enemy.alive && checkRectCollision(enemy, gameState.player)) {
-                enemy.alive = false;
-                loseLife();
-                break;
+            // Enemy collision with player
+            for (let enemy of gameState.enemies) {
+                if (enemy.alive && checkRectCollision(enemy, gameState.player)) {
+                    enemy.alive = false;
+                    loseLife();
+                    break;
+                }
             }
         }
     }
@@ -429,9 +449,18 @@
     }
 
     function loseLife() {
+        // Only lose life if not already respawning
+        if (gameState.respawning) return;
+
         gameState.lives--;
+
         if (gameState.lives <= 0) {
             gameState.gameOver = true;
+        } else {
+            // Set up respawn
+            gameState.respawning = true;
+            gameState.respawnTimer = 60; // 1 second at 60fps
+            gameState.player = null; // Remove player temporarily
         }
     }
 
@@ -445,6 +474,31 @@
 
     function update() {
         if (gameState.gameOver || gameState.paused) return;
+
+        // Handle respawning
+        if (gameState.respawning) {
+            gameState.respawnTimer--;
+            if (gameState.respawnTimer <= 0) {
+                // Respawn player
+                gameState.player = new Player(
+                    CANVAS_WIDTH / 2 - PLAYER_WIDTH / 2,
+                    CANVAS_HEIGHT - 60
+                );
+                gameState.respawning = false;
+                gameState.invincible = true;
+                gameState.invincibilityTimer = 180; // 3 seconds at 60fps
+                gameState.blinkTimer = 0;
+            }
+        }
+
+        // Handle invincibility timer
+        if (gameState.invincible) {
+            gameState.invincibilityTimer--;
+            gameState.blinkTimer++;
+            if (gameState.invincibilityTimer <= 0) {
+                gameState.invincible = false;
+            }
+        }
 
         // Decrement shoot cooldown
         if (gameState.shootCooldown > 0) {
@@ -490,8 +544,10 @@
         // Draw stars
         gameState.stars.forEach(star => star.draw(ctx));
 
-        // Draw player
-        gameState.player.draw(ctx);
+        // Draw player (if exists)
+        if (gameState.player) {
+            gameState.player.draw(ctx);
+        }
 
         // Draw player bullet
         if (gameState.bullet) {
