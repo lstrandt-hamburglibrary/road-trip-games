@@ -106,6 +106,22 @@
         // Update player shoot cooldown
         if (player.shootCooldown > 0) player.shootCooldown--;
 
+        // Player movement
+        const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
+
+        if (keys.left && player.x > 0) {
+            player.x -= player.speed;
+        }
+        if (keys.right && player.x < GAME_WIDTH - GRID_SIZE) {
+            player.x += player.speed;
+        }
+        if (keys.up && player.y > playerMinY) {
+            player.y -= player.speed;
+        }
+        if (keys.down && player.y < GAME_HEIGHT - GRID_SIZE) {
+            player.y += player.speed;
+        }
+
         // Update centipedes
         updateCentipedes();
 
@@ -691,27 +707,9 @@
             level = 1;
             gameState = 'menu';
             draw();
-        } else if (gameState === 'playing') {
-            // Player movement
-            const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
-
-            if (keys.left && player.x > 0) {
-                player.x -= player.speed;
-            }
-            if (keys.right && player.x < GAME_WIDTH - GRID_SIZE) {
-                player.x += player.speed;
-            }
-            if (keys.up && player.y > playerMinY) {
-                player.y -= player.speed;
-            }
-            if (keys.down && player.y < GAME_HEIGHT - GRID_SIZE) {
-                player.y += player.speed;
-            }
-
+        } else if (gameState === 'playing' && e.code === 'Space') {
             // Shooting
-            if (e.code === 'Space') {
-                shoot();
-            }
+            shoot();
         }
     }
 
