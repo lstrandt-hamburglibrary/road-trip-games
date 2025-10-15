@@ -344,7 +344,7 @@
             const enemy = enemies[i];
 
             if (enemy.type === 'spider') {
-                // Zigzag movement with larger vertical bounces
+                // Zigzag movement with wider, gentler pattern
                 enemy.x += enemy.vx;
                 enemy.y += enemy.vy;
                 enemy.bounceTimer++;
@@ -353,8 +353,8 @@
                 const playerMinY = (ROWS - PLAYER_AREA_ROWS) * GRID_SIZE;
                 const playerMaxY = GAME_HEIGHT - GRID_SIZE;
 
-                // Bounce when hitting bounds or after traveling enough for wide zigzag
-                if (enemy.y <= playerMinY || enemy.y >= playerMaxY || enemy.bounceTimer > 30) {
+                // Bounce when hitting bounds or after traveling enough for wide, gentle zigzag
+                if (enemy.y <= playerMinY || enemy.y >= playerMaxY || enemy.bounceTimer > 50) {
                     enemy.vy = -enemy.vy;
                     enemy.bounceTimer = 0;
                 }
@@ -438,8 +438,8 @@
                 type: 'spider',
                 x: fromLeft ? -GRID_SIZE : GAME_WIDTH + GRID_SIZE,
                 y: playerMinY + GRID_SIZE * 3, // Start in middle of player area
-                vx: fromLeft ? 1.5 : -1.5, // Reduced from 2 to 1.5 for slower movement
-                vy: 4, // Increased vertical speed for wider zigzag
+                vx: fromLeft ? 0.75 : -0.75, // 50% slower horizontal movement
+                vy: 2, // Reduced vertical speed for gentler, wider zigzag
                 bounceTimer: 0
             });
         }
