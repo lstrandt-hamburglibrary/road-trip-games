@@ -327,7 +327,7 @@
         }
 
         updateDive() {
-            this.divePhase += 0.025; // Faster dive speed!
+            this.divePhase += 0.018; // Moderately faster dive speed
 
             const progress = this.divePhase;
 
@@ -340,7 +340,7 @@
                 this.x = this.diveStartX + curveOffset;
             }
 
-            this.y = this.diveStartY + progress * 120;
+            this.y = this.diveStartY + progress * 100;
 
             // Check for player capture
             if (this.capturing && !gameState.capturedShip) {
