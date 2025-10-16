@@ -54,7 +54,8 @@
         invincible: false,
         invincibilityTimer: 0,
         blinkTimer: 0,
-        divingCount: 0
+        divingCount: 0,
+        aliveEnemyCount: 0
     };
 
     // Player object
@@ -386,6 +387,7 @@
             this.health--;
             if (this.health <= 0) {
                 this.alive = false;
+                gameState.aliveEnemyCount--;
 
                 // Decrement diving count if this enemy was diving
                 if (this.diving) {
@@ -458,6 +460,7 @@
         gameState.invincibilityTimer = 0;
         gameState.blinkTimer = 0;
         gameState.divingCount = 0;
+        gameState.aliveEnemyCount = 0;
 
         // Create starfield
         gameState.stars = [];
@@ -485,6 +488,7 @@
         gameState.formingUp = true;
         gameState.enemiesEntering = [];
         gameState.divingCount = 0;
+        gameState.aliveEnemyCount = 0;
 
         const cols = 10;
         const startX = 50;
@@ -545,6 +549,9 @@
                 enemyIndex++;
             }
         }
+
+        // Set alive enemy count
+        gameState.aliveEnemyCount = gameState.enemies.length;
     }
 
     function updateFormation() {
@@ -686,6 +693,7 @@
                     enemy.alive = false;
                     enemy.diving = false;
                     gameState.divingCount--;
+                    gameState.aliveEnemyCount--;
                     loseLife();
                     break;
                 }
@@ -718,16 +726,14 @@
     }
 
     function checkLevelComplete() {
-        const aliveEnemies = gameState.enemies.filter(e => e.alive).length;
-
         if (gameState.challengeStage) {
             // Don't advance during formation, then check if all enemies dead or timer expired
-            if (!gameState.formingUp && (aliveEnemies === 0 || gameState.challengeTimer <= 0)) {
+            if (!gameState.formingUp && (gameState.aliveEnemyCount === 0 || gameState.challengeTimer <= 0)) {
                 gameState.level++;
                 startStage();
             }
         } else {
-            if (aliveEnemies === 0 && !gameState.formingUp) {
+            if (gameState.aliveEnemyCount === 0 && !gameState.formingUp) {
                 gameState.level++;
                 startStage();
             }
