@@ -361,7 +361,7 @@
             dx += segment.curve;
 
             // Skip segments that are behind camera or off screen
-            if (segment.p1.camera.z <= gameState.cameraDepth || segment.p2.camera.z <= 0) continue;
+            if (segment.p2.camera.z <= 0) continue; // Only skip if far point is behind camera
             if (segment.p2.screen.y >= maxY) continue;
 
             // Draw road
