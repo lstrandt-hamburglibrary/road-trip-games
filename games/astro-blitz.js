@@ -53,7 +53,8 @@
         respawnTimer: 0,
         invincible: false,
         invincibilityTimer: 0,
-        blinkTimer: 0
+        blinkTimer: 0,
+        divingCount: 0
     };
 
     // Player object
@@ -301,8 +302,7 @@
                 this.y = this.homeY;
 
                 // Random chance to start diving (INCREASED frequency for Astro Blitz!)
-                const divingCount = gameState.enemies.filter(e => e.alive && e.diving).length;
-                if (divingCount < 4 && Math.random() < 0.0008) { // More aggressive!
+                if (gameState.divingCount < 4 && Math.random() < 0.0008) { // More aggressive!
                     this.startDive();
                 }
             }
@@ -318,6 +318,7 @@
             this.divePhase = 0;
             this.diveStartX = this.x;
             this.diveStartY = this.y;
+            gameState.divingCount++;
 
             // Boss enemies might try to capture
             if (this.type === ENEMY_TYPES.BOSS && !gameState.capturedShip &&
@@ -353,6 +354,7 @@
                     );
                     this.capturing = false;
                     this.diving = false;
+                    gameState.divingCount--;
                     this.x = this.homeX;
                     this.y = this.homeY;
                     loseLife();
@@ -363,6 +365,7 @@
             // Return to formation or die off screen
             if (this.y > CANVAS_HEIGHT + 50) {
                 this.diving = false;
+                gameState.divingCount--;
                 this.capturing = false;
                 this.x = this.homeX;
                 this.y = this.homeY;
@@ -383,6 +386,12 @@
             this.health--;
             if (this.health <= 0) {
                 this.alive = false;
+
+                // Decrement diving count if this enemy was diving
+                if (this.diving) {
+                    gameState.divingCount--;
+                    this.diving = false;
+                }
 
                 // If this boss was holding captured ship, release it
                 if (gameState.capturedShip && gameState.capturedShip.captor === this) {
@@ -448,6 +457,7 @@
         gameState.invincible = false;
         gameState.invincibilityTimer = 0;
         gameState.blinkTimer = 0;
+        gameState.divingCount = 0;
 
         // Create starfield
         gameState.stars = [];
@@ -474,6 +484,7 @@
         gameState.enemies = [];
         gameState.formingUp = true;
         gameState.enemiesEntering = [];
+        gameState.divingCount = 0;
 
         const cols = 10;
         const startX = 50;
@@ -673,6 +684,8 @@
             for (let enemy of gameState.enemies) {
                 if (enemy.alive && enemy.diving && checkRectCollision(enemy, gameState.player)) {
                     enemy.alive = false;
+                    enemy.diving = false;
+                    gameState.divingCount--;
                     loseLife();
                     break;
                 }
