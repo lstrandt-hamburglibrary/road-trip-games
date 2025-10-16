@@ -428,11 +428,6 @@
                         <p>1981 sequel with tractor beam & dual fighters!</p>
                     </div>
 
-                    <div class="feature-card" onclick="launchAstroBlitz()" style="background: linear-gradient(135deg, #FF00FF 0%, #00DDFF 50%, #FF8800 100%);">
-                        <h3>⚡ Astro Blitz</h3>
-                        <p>High-speed mashup - best of both games!</p>
-                    </div>
-
                     <div class="feature-card" onclick="launchPolePosition()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);">
                         <h3>🏎️ Pole Position</h3>
                         <p>Classic 1982 Formula 1 racing game!</p>
@@ -608,31 +603,6 @@
                     <div style="display: flex; gap: 0.5rem;">
                         <button id="galagaBtnLeft" style="width: 80px; height: 80px; background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">◀</button>
                         <button id="galagaBtnRight" style="width: 80px; height: 80px; background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▶</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Astro Blitz Game Section (hidden by default) -->
-            <div id="astroBlitzGame" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2>⚡ Astro Blitz</h2>
-                    <button onclick="exitAstroBlitz()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
-                </div>
-                <div style="text-align: center; max-width: 100%; overflow: hidden;">
-                    <canvas id="astroBlitzCanvas" style="max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
-                    <div style="margin-top: 1rem; color: #666; font-size: 0.9rem;">
-                        <p><strong>Arrow Keys / A-D</strong> to move | <strong>Space</strong> to shoot (auto-fire!)</p>
-                        <p style="margin-top: 0.5rem;">⚡ <strong>FASTER</strong> gameplay - enemies attack more often!</p>
-                        <p style="margin-top: 0.25rem;">✨ Capture feature + 🎯 Blitz Stages every 3rd level!</p>
-                    </div>
-                </div>
-
-                <!-- Mobile Touch Controls -->
-                <div id="astroBlitzControls" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; padding: 0 1rem;">
-                    <button id="astroBlitzBtnFire" style="width: 90px; height: 90px; background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); color: white; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button id="astroBlitzBtnLeft" style="width: 80px; height: 80px; background: linear-gradient(135deg, #FF00FF 0%, #00DDFF 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">◀</button>
-                        <button id="astroBlitzBtnRight" style="width: 80px; height: 80px; background: linear-gradient(135deg, #FF00FF 0%, #00DDFF 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▶</button>
                     </div>
                 </div>
             </div>
@@ -988,7 +958,6 @@
     <script src="games/trouble.js?v=1.51.0"></script>
     <script src="games/galaxian.js?v=1.56.1"></script>
     <script src="games/galaga.js?v=1.56.1"></script>
-    <script src="games/astro-blitz.js?v=1.64.2"></script>
     <script src="games/pole-position.js?v=1.60.2"></script>
     <script src="games/centipede.js?v=1.62.0"></script>
     <script src="games/pharaoh.js?v=1.61.0"></script>
