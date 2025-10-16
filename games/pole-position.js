@@ -69,6 +69,7 @@
             this.curve = 0;
             this.hill = 0;
             this.cars = [];
+            this.billboard = null; // For roadside billboards/signs
         }
     }
 
@@ -117,6 +118,11 @@
             // Add hills (very gentle, far down the track)
             if (i > 200 && i < 250) segment.hill = Math.sin((i - 200) / 50 * Math.PI) * 400;
             if (i > 350 && i < 400) segment.hill = Math.sin((i - 350) / 50 * Math.PI) * 300;
+
+            // Add billboards and signs (authentic 1982 style)
+            if (i % 30 === 5) segment.billboard = { side: 'left', type: 'NAMCO', color: '#FF0000' };
+            if (i % 35 === 10) segment.billboard = { side: 'right', type: 'POLE', color: '#0000FF' };
+            if (i % 40 === 20) segment.billboard = { side: 'left', type: 'START', color: '#FFFF00' };
 
             gameState.segments.push(segment);
         }
@@ -291,12 +297,39 @@
     function render() {
         const ctx = gameState.ctx;
 
-        // Clear sky
-        ctx.fillStyle = '#72d7ee';
+        // Clear sky (authentic 1982 blue)
+        ctx.fillStyle = '#5299FF';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-        // Draw horizon
-        ctx.fillStyle = '#5cb85c';
+        // Draw mountains in background (brown/gray)
+        const horizonY = CANVAS_HEIGHT * 0.4;
+        ctx.fillStyle = '#8B6F47';
+        ctx.beginPath();
+        ctx.moveTo(0, horizonY);
+        ctx.lineTo(100, horizonY - 40);
+        ctx.lineTo(200, horizonY - 20);
+        ctx.lineTo(300, horizonY - 60);
+        ctx.lineTo(400, horizonY - 30);
+        ctx.lineTo(500, horizonY - 70);
+        ctx.lineTo(600, horizonY - 40);
+        ctx.lineTo(700, horizonY - 20);
+        ctx.lineTo(800, horizonY - 50);
+        ctx.lineTo(CANVAS_WIDTH, horizonY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw clouds (simple white rectangles)
+        ctx.fillStyle = '#FFFFFF';
+        const cloudY = 40;
+        ctx.fillRect(50, cloudY, 60, 15);
+        ctx.fillRect(65, cloudY - 8, 30, 15);
+        ctx.fillRect(350, cloudY + 20, 80, 18);
+        ctx.fillRect(370, cloudY + 12, 40, 18);
+        ctx.fillRect(600, cloudY + 5, 70, 16);
+        ctx.fillRect(615, cloudY - 3, 40, 16);
+
+        // Draw grass (authentic green)
+        ctx.fillStyle = '#00AA00';
         ctx.fillRect(0, CANVAS_HEIGHT / 2, CANVAS_WIDTH, CANVAS_HEIGHT / 2);
 
         const baseSegment = findSegment(gameState.position);
@@ -361,17 +394,46 @@
                 );
             }
 
-            // Side lines
+            // Side lines (red/white curbs)
+            const curbColor = rumble ? '#FFFFFF' : '#FF0000';
             drawTrapezoid(ctx,
                 segment.p1.screen.x - segment.p1.screen.w, segment.p1.screen.y, lineW1 * 3,
                 segment.p2.screen.x - segment.p2.screen.w, segment.p2.screen.y, lineW2 * 3,
-                '#ff0000'
+                curbColor
             );
             drawTrapezoid(ctx,
                 segment.p1.screen.x + segment.p1.screen.w, segment.p1.screen.y, lineW1 * 3,
                 segment.p2.screen.x + segment.p2.screen.w, segment.p2.screen.y, lineW2 * 3,
-                '#ff0000'
+                curbColor
             );
+
+            // Draw billboards (authentic 1982 style)
+            if (segment.billboard && segment.p1.camera.z > gameState.cameraDepth) {
+                const billboardScale = segment.p1.screen.scale;
+                const billboardW = Math.max(billboardScale * 120, 8);
+                const billboardH = Math.max(billboardScale * 60, 4);
+                const billboardX = segment.billboard.side === 'left' ?
+                    segment.p1.screen.x - segment.p1.screen.w - billboardW - lineW1 * 10 :
+                    segment.p1.screen.x + segment.p1.screen.w + lineW1 * 10;
+                const billboardY = segment.p1.screen.y - billboardH;
+
+                // Billboard background
+                ctx.fillStyle = segment.billboard.color;
+                ctx.fillRect(billboardX, billboardY, billboardW, billboardH);
+
+                // Billboard text (if large enough)
+                if (billboardW > 20) {
+                    ctx.fillStyle = '#000';
+                    ctx.font = `bold ${Math.max(billboardH * 0.4, 6)}px monospace`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(segment.billboard.type, billboardX + billboardW / 2, billboardY + billboardH * 0.7);
+                }
+
+                // Billboard poles
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(billboardX + billboardW * 0.1, billboardY + billboardH, billboardW * 0.1, billboardH * 0.5);
+                ctx.fillRect(billboardX + billboardW * 0.8, billboardY + billboardH, billboardW * 0.1, billboardH * 0.5);
+            }
 
             // Store cars that are on this segment for later rendering
             segment.carsOnSegment = [];
@@ -410,122 +472,141 @@
                 // Draw shadow
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
                 ctx.fillRect(
-                    carSprite.screen.x - carW / 2 + 2,
-                    carSprite.screen.y - 2,
-                    carW,
-                    4
+                    carSprite.screen.x - carW / 2 + 1,
+                    carSprite.screen.y - 1,
+                    carW - 2,
+                    3
                 );
 
-                // Draw car body
-                ctx.fillStyle = car.color;
-                ctx.fillRect(
-                    carSprite.screen.x - carW / 2,
-                    carSprite.screen.y - carH,
-                    carW,
-                    carH
-                );
+                // Draw opponent car (authentic pixelated F1 sprite)
+                const opCarColor = car.color;
 
-                // Draw car top (lighter color)
-                ctx.fillStyle = shadeColor(car.color, 40);
-                ctx.fillRect(
-                    carSprite.screen.x - carW / 2,
-                    carSprite.screen.y - carH,
-                    carW,
-                    carH * 0.3
-                );
+                // Simplified rear wing
+                ctx.fillStyle = opCarColor;
+                ctx.fillRect(carSprite.screen.x - carW / 2, carSprite.screen.y - carH, carW, carH * 0.12);
 
-                // Draw windows
+                // Engine cover
+                ctx.fillStyle = opCarColor;
+                ctx.fillRect(carSprite.screen.x - carW / 2 + carW * 0.2, carSprite.screen.y - carH * 0.85, carW * 0.6, carH * 0.4);
+
+                // Cockpit (white)
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(carSprite.screen.x - carW / 2 + carW * 0.25, carSprite.screen.y - carH * 0.8, carW * 0.5, carH * 0.2);
+
+                // Helmet
                 ctx.fillStyle = '#1a1a2e';
-                const windowMargin = carW * 0.15;
-                ctx.fillRect(
-                    carSprite.screen.x - carW / 2 + windowMargin,
-                    carSprite.screen.y - carH + carH * 0.1,
-                    carW - windowMargin * 2,
-                    carH * 0.25
-                );
+                ctx.fillRect(carSprite.screen.x - carW / 2 + carW * 0.35, carSprite.screen.y - carH * 0.75, carW * 0.3, carH * 0.12);
 
-                // Draw wheels
+                // Nose cone
+                ctx.fillStyle = opCarColor;
+                ctx.fillRect(carSprite.screen.x - carW / 2 + carW * 0.3, carSprite.screen.y - carH * 0.4, carW * 0.4, carH * 0.35);
+
+                // Side pods
+                ctx.fillStyle = opCarColor;
+                ctx.fillRect(carSprite.screen.x - carW / 2, carSprite.screen.y - carH * 0.5, carW * 0.2, carH * 0.3);
+                ctx.fillRect(carSprite.screen.x + carW / 2 - carW * 0.2, carSprite.screen.y - carH * 0.5, carW * 0.2, carH * 0.3);
+
+                // Wheels (pixelated black blocks)
                 ctx.fillStyle = '#000';
-                const wheelW = carW * 0.15;
-                const wheelH = carH * 0.2;
-                // Front left wheel
-                ctx.fillRect(carSprite.screen.x - carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.8, wheelW, wheelH);
-                // Front right wheel
-                ctx.fillRect(carSprite.screen.x + carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.8, wheelW, wheelH);
-                // Rear left wheel
-                ctx.fillRect(carSprite.screen.x - carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.2, wheelW, wheelH);
-                // Rear right wheel
-                ctx.fillRect(carSprite.screen.x + carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.2, wheelW, wheelH);
+                const wheelW = Math.max(carW * 0.15, 2);
+                const wheelH = Math.max(carH * 0.18, 2);
+                // Front wheels
+                ctx.fillRect(carSprite.screen.x - carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.15, wheelW, wheelH);
+                ctx.fillRect(carSprite.screen.x + carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.15, wheelW, wheelH);
+                // Rear wheels
+                ctx.fillRect(carSprite.screen.x - carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.95, wheelW, wheelH);
+                ctx.fillRect(carSprite.screen.x + carW / 2 - wheelW / 2, carSprite.screen.y - carH * 0.95, wheelW, wheelH);
             }
         });
 
-        // Draw player car (detailed sprite)
+        // Draw player car (authentic 1982 pixelated sprite - F1 style)
         const playerCarY = CANVAS_HEIGHT - 100;
         const playerCarX = CANVAS_WIDTH / 2;
-        const pCarW = 60;
-        const pCarH = 80;
+        const pCarW = 48;
+        const pCarH = 64;
 
-        // Shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.fillRect(playerCarX - pCarW / 2 + 3, playerCarY + 5, pCarW, 8);
+        // Shadow (simple black oval)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(playerCarX - pCarW / 2 + 2, playerCarY + 2, pCarW - 4, 6);
 
-        // Car body
-        ctx.fillStyle = gameState.crashed ? '#666' : '#ff0000';
-        ctx.fillRect(playerCarX - pCarW / 2, playerCarY - pCarH, pCarW, pCarH);
+        // Main car body (red/white F1 style)
+        const carColor = gameState.crashed ? '#999' : '#FF0000';
+        const accentColor = gameState.crashed ? '#CCC' : '#FFFFFF';
 
-        // Car top (lighter red or gray)
-        ctx.fillStyle = gameState.crashed ? '#888' : '#ff6666';
-        ctx.fillRect(playerCarX - pCarW / 2, playerCarY - pCarH, pCarW, pCarH * 0.35);
+        // Rear wing
+        ctx.fillStyle = carColor;
+        ctx.fillRect(playerCarX - pCarW / 2, playerCarY - pCarH + 4, pCarW, 6);
 
-        // Windshield
+        // Engine cover (red)
+        ctx.fillStyle = carColor;
+        ctx.fillRect(playerCarX - pCarW / 2 + 8, playerCarY - pCarH + 12, pCarW - 16, 24);
+
+        // Cockpit (white stripe)
+        ctx.fillStyle = accentColor;
+        ctx.fillRect(playerCarX - pCarW / 2 + 10, playerCarY - pCarH + 18, pCarW - 20, 12);
+
+        // Driver helmet (dark blue)
         ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(playerCarX - pCarW / 2 + 8, playerCarY - pCarH + 5, pCarW - 16, pCarH * 0.25);
+        ctx.fillRect(playerCarX - pCarW / 2 + 16, playerCarY - pCarH + 20, pCarW - 32, 8);
 
-        // Rear window
-        ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(playerCarX - pCarW / 2 + 8, playerCarY - pCarH * 0.3, pCarW - 16, pCarH * 0.15);
+        // Nose cone (white with red tip)
+        ctx.fillStyle = accentColor;
+        ctx.fillRect(playerCarX - pCarW / 2 + 12, playerCarY - pCarH + 38, pCarW - 24, 16);
+        ctx.fillStyle = carColor;
+        ctx.fillRect(playerCarX - pCarW / 2 + 14, playerCarY - pCarH + 52, pCarW - 28, 8);
 
-        // Wheels
+        // Side pods (wider sections)
+        ctx.fillStyle = carColor;
+        ctx.fillRect(playerCarX - pCarW / 2, playerCarY - pCarH + 30, 8, 20);
+        ctx.fillRect(playerCarX + pCarW / 2 - 8, playerCarY - pCarH + 30, 8, 20);
+
+        // Wheels (black rectangles - authentic pixelated)
         ctx.fillStyle = '#000';
         // Front left
-        ctx.fillRect(playerCarX - pCarW / 2 - 5, playerCarY - pCarH * 0.75, 10, 15);
+        ctx.fillRect(playerCarX - pCarW / 2 - 4, playerCarY - pCarH + 54, 8, 10);
         // Front right
-        ctx.fillRect(playerCarX + pCarW / 2 - 5, playerCarY - pCarH * 0.75, 10, 15);
+        ctx.fillRect(playerCarX + pCarW / 2 - 4, playerCarY - pCarH + 54, 8, 10);
         // Rear left
-        ctx.fillRect(playerCarX - pCarW / 2 - 5, playerCarY - pCarH * 0.25, 10, 15);
+        ctx.fillRect(playerCarX - pCarW / 2 - 4, playerCarY - pCarH + 8, 8, 12);
         // Rear right
-        ctx.fillRect(playerCarX + pCarW / 2 - 5, playerCarY - pCarH * 0.25, 10, 15);
+        ctx.fillRect(playerCarX + pCarW / 2 - 4, playerCarY - pCarH + 8, 8, 12);
 
-        // Headlights
-        if (!gameState.crashed) {
-            ctx.fillStyle = '#ffff00';
-            ctx.fillRect(playerCarX - pCarW / 2 + 5, playerCarY - 5, 8, 4);
-            ctx.fillRect(playerCarX + pCarW / 2 - 13, playerCarY - 5, 8, 4);
-        }
+        // Draw HUD (authentic 1982 style - bright colors on black)
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, 60);
 
-        // Draw HUD
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(0, 0, CANVAS_WIDTH, 80);
-
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 24px Arial';
+        // Use authentic arcade font style
+        ctx.font = 'bold 20px monospace';
         ctx.textAlign = 'left';
 
-        if (gameState.phase === 'qualifying') {
-            ctx.fillText(`QUALIFYING LAP`, 20, 30);
-            ctx.fillText(`TIME: ${Math.ceil(gameState.time)}s`, 20, 60);
+        // TOP score (red text like original)
+        ctx.fillStyle = '#FF0000';
+        ctx.fillText(`TOP ${Math.round(gameState.score).toString().padStart(6, '0')}`, 20, 25);
+
+        // SCORE (white text)
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(`SCORE ${Math.round(gameState.score).toString().padStart(6, '0')}`, 20, 50);
+
+        // TIME (white text in center)
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(`TIME ${Math.ceil(gameState.time)}s`, CANVAS_WIDTH / 2 - 50, 25);
+
+        // LAP indicator (white text)
+        if (gameState.phase === 'race') {
+            ctx.fillText(`LAP ${gameState.checkpointsPassed + 1}`, CANVAS_WIDTH / 2 + 50, 25);
         } else {
-            ctx.fillText(`RACE - Lap ${gameState.checkpointsPassed + 1}`, 20, 30);
-            ctx.fillText(`TIME: ${Math.ceil(gameState.time)}s`, 20, 60);
+            ctx.fillStyle = '#FFFF00';
+            ctx.fillText(`QUALIFYING`, CANVAS_WIDTH / 2 + 50, 25);
         }
 
+        // SPEED (white text on right)
         ctx.textAlign = 'right';
-        ctx.fillText(`SPEED: ${Math.round(gameState.speed)} km/h`, CANVAS_WIDTH - 20, 30);
-        ctx.fillText(`SCORE: ${gameState.score}`, CANVAS_WIDTH - 20, 60);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText(`SPEED ${Math.round(gameState.speed)}km`, CANVAS_WIDTH - 20, 25);
 
-        // Gear indicator
-        ctx.textAlign = 'center';
-        ctx.fillText(`GEAR: ${gameState.gear.toUpperCase()}`, CANVAS_WIDTH / 2, 60);
+        // Gear (if shown)
+        ctx.fillText(`${gameState.gear.toUpperCase()}`, CANVAS_WIDTH - 20, 50);
 
         // Game over / start screen
         if (!gameState.gameStarted) {
