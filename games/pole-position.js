@@ -377,16 +377,14 @@
                 ctx.fillRect(0, y2, CANVAS_WIDTH, y1 - y2);
             }
 
-            // Road - always draw, with minimum width to ensure continuity
-            const minWidth = 0.5; // Minimum width to prevent gaps
-            const w1 = Math.max(minWidth, segment.p1.screen.w);
-            const w2 = Math.max(minWidth, segment.p2.screen.w);
-
-            drawTrapezoid(ctx,
-                segment.p1.screen.x, segment.p1.screen.y, w1,
-                segment.p2.screen.x, segment.p2.screen.y, w2,
-                roadColor
-            );
+            // Road - draw if at least one point is visible
+            if (segment.p1.screen.w > 0 || segment.p2.screen.w > 0) {
+                drawTrapezoid(ctx,
+                    segment.p1.screen.x, segment.p1.screen.y, segment.p1.screen.w,
+                    segment.p2.screen.x, segment.p2.screen.y, segment.p2.screen.w,
+                    roadColor
+                );
+            }
 
             // Road lines (only if road is wide enough to show details)
             if (segment.p1.screen.w > 1 && segment.p2.screen.w > 1) {
