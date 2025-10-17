@@ -429,18 +429,25 @@
             spawnSparx(Math.random() < 0.5);
         }
 
-        // Move marker
+        // Move marker - only allow 4 directions (no diagonals)
         let dx = 0, dy = 0;
-        if (gameState.keys['ArrowLeft'] || gameState.keys['a']) dx = -1;
-        if (gameState.keys['ArrowRight'] || gameState.keys['d']) dx = 1;
-        if (gameState.keys['ArrowUp'] || gameState.keys['w']) dy = -1;
-        if (gameState.keys['ArrowDown'] || gameState.keys['s']) dy = 1;
+
+        // Prioritize most recent key press by checking vertical first, then horizontal
+        // This prevents diagonal movement
+        if (gameState.keys['ArrowUp'] || gameState.keys['w']) {
+            dy = -1;
+        } else if (gameState.keys['ArrowDown'] || gameState.keys['s']) {
+            dy = 1;
+        } else if (gameState.keys['ArrowLeft'] || gameState.keys['a']) {
+            dx = -1;
+        } else if (gameState.keys['ArrowRight'] || gameState.keys['d']) {
+            dx = 1;
+        }
 
         if (dx !== 0 || dy !== 0) {
-            // Normalize diagonal movement
-            const length = Math.sqrt(dx ** 2 + dy ** 2);
-            dx = (dx / length) * marker.speed;
-            dy = (dy / length) * marker.speed;
+            // Apply speed (no normalization needed - only one direction at a time)
+            dx = dx * marker.speed;
+            dy = dy * marker.speed;
 
             const newX = marker.x + dx;
             const newY = marker.y + dy;
