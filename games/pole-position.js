@@ -362,7 +362,13 @@
 
             // Skip segments that are behind camera
             if (segment.p2.camera.z <= 0) continue;
-            // Don't skip based on screen Y - this was causing gaps in the track
+
+            // Clip segment coordinates to screen bounds to prevent gaps
+            const p1Y = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p1.screen.y));
+            const p2Y = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p2.screen.y));
+
+            // Skip if segment height is invalid
+            if (p1Y <= p2Y) continue;
 
             // Draw road
             const rumble = segment.color === 'dark';
@@ -372,7 +378,7 @@
 
             // Grass
             ctx.fillStyle = grassColor;
-            ctx.fillRect(0, segment.p2.screen.y, CANVAS_WIDTH, segment.p1.screen.y - segment.p2.screen.y);
+            ctx.fillRect(0, p2Y, CANVAS_WIDTH, p1Y - p2Y);
 
             // Road
             drawTrapezoid(ctx,
