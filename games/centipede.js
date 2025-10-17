@@ -989,7 +989,8 @@
         document.getElementById('gamesMenu').style.display = 'none';
         document.getElementById('centipedeGame').style.display = 'block';
 
-        // Prevent body scrolling while game is active
+        // Scroll to top first, then prevent body scrolling while game is active
+        window.scrollTo(0, 0);
         document.body.style.overflow = 'hidden';
 
         // Initialize canvas
