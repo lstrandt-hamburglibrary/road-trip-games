@@ -901,6 +901,12 @@
     const keys = {};
 
     function handleKeyDown(e) {
+        // Prevent default scroll behavior for arrow keys and space at all times
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
         keys[e.key.toLowerCase()] = true;
         keys.up = keys['arrowup'] || keys['w'];
         keys.down = keys['arrowdown'] || keys['s'];
@@ -908,26 +914,17 @@
         keys.right = keys['arrowright'] || keys['d'];
         keys.space = keys[' '] || false;
 
-        // Prevent default scroll behavior for arrow keys during gameplay
-        if (gameState === 'playing' && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-            e.preventDefault();
-        }
-
         if (gameState === 'menu' && e.code === 'Space') {
-            e.preventDefault();
             score = 0;
             lives = 3;
             level = 1;
             initGame();
         } else if (gameState === 'gameOver' && e.code === 'Space') {
-            e.preventDefault();
             score = 0;
             lives = 3;
             level = 1;
             gameState = 'menu';
             draw();
-        } else if (gameState === 'playing' && e.code === 'Space') {
-            e.preventDefault();
         }
     }
 
@@ -988,10 +985,6 @@
         document.querySelector('.roadmap').style.display = 'none';
         document.getElementById('gamesMenu').style.display = 'none';
         document.getElementById('centipedeGame').style.display = 'block';
-
-        // Scroll to top first, then prevent body scrolling while game is active
-        window.scrollTo(0, 0);
-        document.body.style.overflow = 'hidden';
 
         // Initialize canvas
         gameCanvas = document.getElementById('centipedeCanvas');
@@ -1143,9 +1136,6 @@
 
         document.removeEventListener('keydown', handleKeyDown, { passive: false });
         document.removeEventListener('keyup', handleKeyUp);
-
-        // Restore body scrolling
-        document.body.style.overflow = '';
 
         document.getElementById('centipedeGame').style.display = 'none';
         document.getElementById('gamesMenu').style.display = 'block';
