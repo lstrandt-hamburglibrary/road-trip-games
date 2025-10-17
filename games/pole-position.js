@@ -360,9 +360,9 @@
             x += dx;
             dx += segment.curve;
 
-            // Skip segments that are behind camera or off screen
-            if (segment.p2.camera.z <= 0) continue; // Only skip if far point is behind camera
-            if (segment.p2.screen.y >= maxY) continue;
+            // Skip segments that are behind camera
+            if (segment.p2.camera.z <= 0) continue;
+            // Don't skip based on screen Y - this was causing gaps in the track
 
             // Draw road
             const rumble = segment.color === 'dark';
