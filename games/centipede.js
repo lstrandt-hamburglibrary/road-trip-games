@@ -996,8 +996,8 @@
         gameState = 'menu';
         draw();
 
-        // Event listeners
-        document.addEventListener('keydown', handleKeyDown);
+        // Event listeners (passive: false allows preventDefault to work)
+        document.addEventListener('keydown', handleKeyDown, { passive: false });
         document.addEventListener('keyup', handleKeyUp);
 
         // Setup mobile controls
@@ -1137,7 +1137,7 @@
             cancelAnimationFrame(animationId);
         }
 
-        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener('keydown', handleKeyDown, { passive: false });
         document.removeEventListener('keyup', handleKeyUp);
 
         document.getElementById('centipedeGame').style.display = 'none';
