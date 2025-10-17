@@ -908,6 +908,11 @@
         keys.right = keys['arrowright'] || keys['d'];
         keys.space = keys[' '] || false;
 
+        // Prevent default scroll behavior for arrow keys during gameplay
+        if (gameState === 'playing' && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+            e.preventDefault();
+        }
+
         if (gameState === 'menu' && e.code === 'Space') {
             e.preventDefault();
             score = 0;
