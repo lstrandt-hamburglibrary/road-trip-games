@@ -19,7 +19,7 @@
         marker: {
             x: 0,
             y: CANVAS_HEIGHT / 2,
-            speed: 3,
+            speed: 2,
             drawing: false,
             drawSpeed: 'fast', // 'fast' or 'slow'
             onEdge: true,
@@ -80,7 +80,7 @@
         gameState.marker = {
             x: 0,
             y: CANVAS_HEIGHT / 2,
-            speed: 3,
+            speed: 2, // Reduced from 3 to align better with 4px grid
             drawing: false,
             drawSpeed: 'fast',
             onEdge: true,
@@ -194,12 +194,16 @@
 
         // Check if on claimed area
         if (gameState.grid[gy][gx] === 1) {
-            // Check if adjacent to unclaimed
+            // Check if adjacent to unclaimed (include diagonals for better corner handling)
             const neighbors = [
                 { x: gx - 1, y: gy },
                 { x: gx + 1, y: gy },
                 { x: gx, y: gy - 1 },
                 { x: gx, y: gy + 1 },
+                { x: gx - 1, y: gy - 1 },
+                { x: gx + 1, y: gy - 1 },
+                { x: gx - 1, y: gy + 1 },
+                { x: gx + 1, y: gy + 1 },
             ];
 
             for (const n of neighbors) {
@@ -321,7 +325,7 @@
                     gameState.marker = {
                         x: 0,
                         y: CANVAS_HEIGHT / 2,
-                        speed: 3,
+                        speed: 2,
                         drawing: false,
                         drawSpeed: 'fast',
                         onEdge: true,
@@ -642,7 +646,7 @@
                 gameState.marker.drawSpeed = 'slow';
                 gameState.marker.onEdge = false;
                 gameState.marker.path = [{ x: gameState.marker.x, y: gameState.marker.y }];
-                gameState.marker.speed = 1.5; // Slower movement
+                gameState.marker.speed = 1; // Slower movement, aligns with grid
             }
         }
     }
@@ -652,7 +656,7 @@
 
         // Reset speed when releasing slow draw
         if ((e.key === 's' || e.key === 'S') && gameState.marker.drawSpeed === 'slow') {
-            gameState.marker.speed = 3;
+            gameState.marker.speed = 2;
         }
     }
 
@@ -791,7 +795,7 @@
                 gameState.marker.drawSpeed = 'slow';
                 gameState.marker.onEdge = false;
                 gameState.marker.path = [{ x: gameState.marker.x, y: gameState.marker.y }];
-                gameState.marker.speed = 1.5;
+                gameState.marker.speed = 1;
             }
         });
 
