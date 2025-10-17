@@ -360,58 +360,59 @@
             x += dx;
             dx += segment.curve;
 
-            // Skip segments that are behind camera
-            if (segment.p2.camera.z <= 0) continue;
+            // Only skip if truly behind camera (both points)
+            if (segment.p1.camera.z <= gameState.cameraDepth && segment.p2.camera.z <= gameState.cameraDepth) continue;
 
-            // Clip segment coordinates to screen bounds to prevent gaps
-            const p1Y = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p1.screen.y));
-            const p2Y = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p2.screen.y));
-
-            // Skip if segment height is invalid
-            if (p1Y <= p2Y) continue;
-
-            // Draw road
+            // Draw grass and road
             const rumble = segment.color === 'dark';
             const roadColor = rumble ? '#555' : '#777';
             const grassColor = rumble ? '#10aa10' : '#16bf16';
             const lineColor = rumble ? '#fff' : '#fff';
 
-            // Grass
+            // Grass - always draw to fill gaps
             ctx.fillStyle = grassColor;
-            ctx.fillRect(0, p2Y, CANVAS_WIDTH, p1Y - p2Y);
+            const y1 = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p1.screen.y));
+            const y2 = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p2.screen.y));
+            if (y1 > y2) {
+                ctx.fillRect(0, y2, CANVAS_WIDTH, y1 - y2);
+            }
 
             // Road
-            drawTrapezoid(ctx,
-                segment.p1.screen.x, segment.p1.screen.y, segment.p1.screen.w,
-                segment.p2.screen.x, segment.p2.screen.y, segment.p2.screen.w,
-                roadColor
-            );
-
-            // Road lines
-            const lineW1 = segment.p1.screen.w / 40;
-            const lineW2 = segment.p2.screen.w / 40;
-
-            // Center line
-            if (!rumble) {
+            if (segment.p1.screen.w > 1 && segment.p2.screen.w > 1) {
                 drawTrapezoid(ctx,
-                    segment.p1.screen.x, segment.p1.screen.y, lineW1,
-                    segment.p2.screen.x, segment.p2.screen.y, lineW2,
-                    lineColor
+                    segment.p1.screen.x, segment.p1.screen.y, segment.p1.screen.w,
+                    segment.p2.screen.x, segment.p2.screen.y, segment.p2.screen.w,
+                    roadColor
                 );
             }
 
-            // Side lines (red/white curbs)
-            const curbColor = rumble ? '#FFFFFF' : '#FF0000';
-            drawTrapezoid(ctx,
-                segment.p1.screen.x - segment.p1.screen.w, segment.p1.screen.y, lineW1 * 3,
-                segment.p2.screen.x - segment.p2.screen.w, segment.p2.screen.y, lineW2 * 3,
-                curbColor
-            );
-            drawTrapezoid(ctx,
-                segment.p1.screen.x + segment.p1.screen.w, segment.p1.screen.y, lineW1 * 3,
-                segment.p2.screen.x + segment.p2.screen.w, segment.p2.screen.y, lineW2 * 3,
-                curbColor
-            );
+            // Road lines (only if road is visible)
+            if (segment.p1.screen.w > 1 && segment.p2.screen.w > 1) {
+                const lineW1 = segment.p1.screen.w / 40;
+                const lineW2 = segment.p2.screen.w / 40;
+
+                // Center line
+                if (!rumble) {
+                    drawTrapezoid(ctx,
+                        segment.p1.screen.x, segment.p1.screen.y, lineW1,
+                        segment.p2.screen.x, segment.p2.screen.y, lineW2,
+                        lineColor
+                    );
+                }
+
+                // Side lines (red/white curbs)
+                const curbColor = rumble ? '#FFFFFF' : '#FF0000';
+                drawTrapezoid(ctx,
+                    segment.p1.screen.x - segment.p1.screen.w, segment.p1.screen.y, lineW1 * 3,
+                    segment.p2.screen.x - segment.p2.screen.w, segment.p2.screen.y, lineW2 * 3,
+                    curbColor
+                );
+                drawTrapezoid(ctx,
+                    segment.p1.screen.x + segment.p1.screen.w, segment.p1.screen.y, lineW1 * 3,
+                    segment.p2.screen.x + segment.p2.screen.w, segment.p2.screen.y, lineW2 * 3,
+                    curbColor
+                );
+            }
 
             // Draw billboards (authentic 1982 style)
             if (segment.billboard && segment.p1.camera.z > gameState.cameraDepth) {
