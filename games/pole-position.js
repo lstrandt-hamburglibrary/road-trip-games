@@ -369,16 +369,8 @@
             const grassColor = rumble ? '#10aa10' : '#16bf16';
             const lineColor = rumble ? '#fff' : '#fff';
 
-            // Grass - always draw to fill gaps
-            ctx.fillStyle = grassColor;
-            const y1 = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p1.screen.y));
-            const y2 = Math.max(0, Math.min(CANVAS_HEIGHT, segment.p2.screen.y));
-            if (y1 > y2) {
-                ctx.fillRect(0, y2, CANVAS_WIDTH, y1 - y2);
-            }
-
-            // Road - draw if at least one point is visible
-            if (segment.p1.screen.w > 0 || segment.p2.screen.w > 0) {
+            // Road
+            if (segment.p1.screen.w > 1 && segment.p2.screen.w > 1) {
                 drawTrapezoid(ctx,
                     segment.p1.screen.x, segment.p1.screen.y, segment.p1.screen.w,
                     segment.p2.screen.x, segment.p2.screen.y, segment.p2.screen.w,
@@ -386,7 +378,7 @@
                 );
             }
 
-            // Road lines (only if road is wide enough to show details)
+            // Road lines (only if road is visible)
             if (segment.p1.screen.w > 1 && segment.p2.screen.w > 1) {
                 const lineW1 = segment.p1.screen.w / 40;
                 const lineW2 = segment.p2.screen.w / 40;
