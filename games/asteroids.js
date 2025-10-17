@@ -43,10 +43,12 @@
 
         // Controls
         keys: {},
+        firing: false,
 
         // Timers
         ufoTimer: 0,
         hyperspaceCooldown: 0,
+        fireTimer: 0, // Cooldown between shots
     };
 
     // Initialize game
@@ -63,6 +65,8 @@
         gameState.particles = [];
         gameState.ufoTimer = 0;
         gameState.hyperspaceCooldown = 0;
+        gameState.fireTimer = 0;
+        gameState.firing = false;
 
         resetShip();
         spawnAsteroids(4); // Start with 4 asteroids
@@ -302,6 +306,17 @@
         // Update hyperspace cooldown
         if (gameState.hyperspaceCooldown > 0) {
             gameState.hyperspaceCooldown--;
+        }
+
+        // Update fire timer
+        if (gameState.fireTimer > 0) {
+            gameState.fireTimer--;
+        }
+
+        // Automatic firing when fire button held
+        if (gameState.firing && gameState.fireTimer === 0) {
+            shootBullet();
+            gameState.fireTimer = 10; // Fire rate: every 10 frames (~6 shots/sec)
         }
 
         // Update bullets
@@ -581,7 +596,7 @@
 
             ctx.font = '18px monospace';
             ctx.fillText('Arrow Keys / WASD to rotate and thrust', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
-            ctx.fillText('SPACE to shoot', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
+            ctx.fillText('Hold SPACE for continuous fire', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
             ctx.fillText('SHIFT for Hyperspace', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
         }
 
@@ -640,9 +655,11 @@
             gameState.ship.thrusting = true;
         }
 
-        // Shoot
-        if (e.key === ' ' && gameState.gameStarted && !gameState.gameOver) {
-            shootBullet();
+        // Shoot - start continuous fire
+        if (e.key === ' ') {
+            if (gameState.gameStarted && !gameState.gameOver) {
+                gameState.firing = true;
+            }
         }
 
         // Hyperspace
@@ -662,6 +679,9 @@
         }
         if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
             gameState.ship.thrusting = false;
+        }
+        if (e.key === ' ') {
+            gameState.firing = false;
         }
     }
 
@@ -722,7 +742,7 @@
                         <li>🛸 UFOs appear and shoot at you - destroy them for bonus points!</li>
                         <li>⚡ <strong>Hyperspace:</strong> Emergency teleport (risky - 10% chance of self-destruct!)</li>
                         <li>🚀 Your ship has realistic inertia - you keep drifting unless you counter-thrust</li>
-                        <li>🔫 Maximum 4 bullets on screen at once</li>
+                        <li>🔫 Hold fire button for continuous automatic shooting!</li>
                         <li>💡 Screen wraps - everything that goes off one edge appears on the opposite side</li>
                     </ul>
                 </div>
@@ -765,14 +785,20 @@
             if (!gameState.gameStarted && !gameState.gameOver) {
                 gameState.gameStarted = true;
             }
-            shootBullet();
+            gameState.firing = true;
+        });
+        fireBtn.addEventListener('touchend', () => {
+            gameState.firing = false;
         });
         fireBtn.addEventListener('mousedown', (e) => {
             e.preventDefault();
             if (!gameState.gameStarted && !gameState.gameOver) {
                 gameState.gameStarted = true;
             }
-            shootBullet();
+            gameState.firing = true;
+        });
+        fireBtn.addEventListener('mouseup', () => {
+            gameState.firing = false;
         });
 
         hyperspaceBtn.addEventListener('click', () => {
