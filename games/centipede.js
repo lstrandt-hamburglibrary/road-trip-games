@@ -989,6 +989,9 @@
         document.getElementById('gamesMenu').style.display = 'none';
         document.getElementById('centipedeGame').style.display = 'block';
 
+        // Prevent body scrolling while game is active
+        document.body.style.overflow = 'hidden';
+
         // Initialize canvas
         gameCanvas = document.getElementById('centipedeCanvas');
         ctx = gameCanvas.getContext('2d');
@@ -1139,6 +1142,9 @@
 
         document.removeEventListener('keydown', handleKeyDown, { passive: false });
         document.removeEventListener('keyup', handleKeyUp);
+
+        // Restore body scrolling
+        document.body.style.overflow = '';
 
         document.getElementById('centipedeGame').style.display = 'none';
         document.getElementById('gamesMenu').style.display = 'block';
