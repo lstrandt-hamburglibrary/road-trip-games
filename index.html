@@ -427,6 +427,11 @@
                         <h3>🐛 Centipede</h3>
                         <p>Classic 1980 Atari arcade shooter!</p>
                     </div>
+
+                    <div class="feature-card" onclick="launchAsteroids()" style="background: linear-gradient(135deg, #1a1a2e 0%, #4a4e69 100%);">
+                        <h3>🚀 Asteroids</h3>
+                        <p>Classic 1979 vector arcade game!</p>
+                    </div>
                 </div>
             </div>
 
@@ -599,6 +604,11 @@
                     <button onclick="exitCentipedeToMenu()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Games</button>
                 </div>
                 <div id="centipedeContent"></div>
+            </div>
+
+            <!-- Asteroids Game Section (hidden by default) -->
+            <div id="asteroidsGame" style="display: none;">
+                <div id="asteroidsContent"></div>
             </div>
 
             <!-- Pharaoh's Curse Game Section (hidden by default) -->
@@ -938,6 +948,7 @@
     <script src="games/galaxian.js?v=1.56.1"></script>
     <script src="games/galaga.js?v=1.56.1"></script>
     <script src="games/centipede.js?v=1.62.0"></script>
+    <script src="games/asteroids.js?v=1.68.0"></script>
     <script src="games/pharaoh.js?v=1.61.0"></script>
 </body>
 </html>
