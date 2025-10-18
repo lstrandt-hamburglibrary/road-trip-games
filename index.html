@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.76.0';</script>
+    <script>window.APP_VERSION = '1.77.0';</script>
 
     <style>
         * {
@@ -252,6 +252,35 @@
 
             body {
                 padding: 10px;
+            }
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
             }
         }
     </style>
@@ -1401,6 +1430,42 @@
 
             winMsg.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Trigger confetti celebration!
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a29bfe', '#fd79a8', '#fdcb6e', '#e17055', '#00b894'];
+            const confettiCount = 150;
+
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+
+                    // Random properties
+                    const left = Math.random() * 100;
+                    const animationDuration = 2 + Math.random() * 3; // 2-5 seconds
+                    const delay = Math.random() * 0.5; // Stagger the start
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const size = 8 + Math.random() * 6; // 8-14px
+
+                    confetti.style.left = `${left}%`;
+                    confetti.style.backgroundColor = color;
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    confetti.style.animation = `confetti-fall ${animationDuration}s linear ${delay}s forwards`;
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0'; // Mix circles and squares
+
+                    document.body.appendChild(confetti);
+
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, (animationDuration + delay) * 1000);
+                }, i * 15); // Stagger creation
+            }
         }
 
         // Show toast notification
