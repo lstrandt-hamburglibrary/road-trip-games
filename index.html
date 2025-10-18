@@ -1000,8 +1000,10 @@
                 <h3 style="color: #333; margin-bottom: 1rem;">How to Play:</h3>
                 <ul style="color: #666; line-height: 1.8;">
                     <li>Select your player number above before marking squares</li>
-                    <li>When you spot an item, click it to mark it in your color</li>
-                    <li>Player 1 marks in BLUE, Player 2 marks in RED</li>
+                    <li>When you spot an item, click it to mark it with your checkmark</li>
+                    <li>Player 1: BLUE ✓ in upper right corner</li>
+                    <li>Player 2: RED ✓ in upper left corner</li>
+                    <li>If both mark the same square, it turns PURPLE</li>
                     <li>First player to get 5 in a row with their color wins!</li>
                     <li>The center square is a FREE space for both players</li>
                 </ul>
@@ -1171,56 +1173,91 @@
                     const p2Marked = player2Marks[index];
 
                     if (p1Marked && p2Marked) {
-                        // Both marked (shouldn't happen except FREE) - show purple
+                        // Both marked - show purple background
                         isMarked = true;
                         bgColor = 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)';
                         textColor = 'white';
-                    } else if (p1Marked) {
-                        isMarked = true;
-                        bgColor = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';  // Blue for Player 1
-                        textColor = 'white';
-                    } else if (p2Marked) {
-                        isMarked = true;
-                        bgColor = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';  // Red for Player 2
-                        textColor = 'white';
                     } else {
-                        isMarked = false;
+                        // Not both marked - keep white background
+                        isMarked = p1Marked || p2Marked;
                         bgColor = 'white';
                         textColor = '#333';
                     }
+
+                    // Generate checkmark overlays
+                    let checkmarks = '';
+                    if (p1Marked && !p2Marked) {
+                        // Blue checkmark in upper right
+                        checkmarks = '<div style="position: absolute; top: 2px; right: 2px; color: #007bff; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
+                    } else if (p2Marked && !p1Marked) {
+                        // Red checkmark in upper left
+                        checkmarks = '<div style="position: absolute; top: 2px; left: 2px; color: #e74c3c; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
+                    } else if (p1Marked && p2Marked) {
+                        // Both checkmarks (only on purple background)
+                        checkmarks = '<div style="position: absolute; top: 2px; left: 2px; color: white; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div><div style="position: absolute; top: 2px; right: 2px; color: white; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
+                    }
+
+                    return `
+                        <div
+                            onclick="toggleBingoSquare(${index})"
+                            style="
+                                aspect-ratio: 1;
+                                background: ${bgColor};
+                                border-radius: 8px;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                cursor: ${isFree ? 'default' : 'pointer'};
+                                transition: all 0.2s;
+                                box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
+                                padding: 0.25rem;
+                                text-align: center;
+                                font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+                                font-weight: ${(p1Marked && p2Marked) ? 'bold' : 'normal'};
+                                color: ${textColor};
+                                transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
+                                position: relative;
+                            "
+                            ${!isFree ? `onmouseover="if(!${isMarked}) this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(${isMarked ? '0.95' : '1'})'"` : ''}
+                        >
+                            ${checkmarks}
+                            ${item}
+                        </div>
+                    `;
                 } else {
                     // Team mode
                     isMarked = markedSquares[index];
                     bgColor = isMarked ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' : 'white';
                     textColor = isMarked ? 'white' : '#333';
-                }
 
-                return `
-                    <div
-                        onclick="toggleBingoSquare(${index})"
-                        style="
-                            aspect-ratio: 1;
-                            background: ${bgColor};
-                            border-radius: 8px;
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            cursor: ${isFree ? 'default' : 'pointer'};
-                            transition: all 0.2s;
-                            box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
-                            padding: 0.25rem;
-                            text-align: center;
-                            font-size: clamp(0.55rem, 1.8vw, 0.8rem);
-                            font-weight: ${isMarked ? 'bold' : 'normal'};
-                            color: ${textColor};
-                            transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
-                        "
-                        ${!isFree ? `onmouseover="if(!${isMarked}) this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(${isMarked ? '0.95' : '1'})'"` : ''}
-                    >
-                        ${item}
-                    </div>
-                `;
+                    return `
+                        <div
+                            onclick="toggleBingoSquare(${index})"
+                            style="
+                                aspect-ratio: 1;
+                                background: ${bgColor};
+                                border-radius: 8px;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                cursor: ${isFree ? 'default' : 'pointer'};
+                                transition: all 0.2s;
+                                box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
+                                padding: 0.25rem;
+                                text-align: center;
+                                font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+                                font-weight: ${isMarked ? 'bold' : 'normal'};
+                                color: ${textColor};
+                                transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
+                            "
+                            ${!isFree ? `onmouseover="if(!${isMarked}) this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(${isMarked ? '0.95' : '1'})'"` : ''}
+                        >
+                            ${item}
+                        </div>
+                    `;
+                }
             }).join('');
         }
 
