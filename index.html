@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.75.2';</script>
+    <script>window.APP_VERSION = '1.75.3';</script>
 
     <style>
         * {
@@ -245,6 +245,14 @@
             .feature-grid {
                 grid-template-columns: 1fr;
             }
+
+            .content {
+                padding: 1rem;
+            }
+
+            body {
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -334,8 +342,8 @@
                     <p id="bingoWinText" style="font-size: 1.5rem;">You got 5 in a row!</p>
                 </div>
 
-                <div style="max-width: 100%; margin: 0 auto;">
-                    <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.15rem; background: #667eea; padding: 0.25rem; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
+                <div style="max-width: 100%; margin: 0 auto; overflow: hidden;">
+                    <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.1rem; background: #667eea; padding: 0.1rem; border-radius: 6px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
 
                     <div style="margin-top: 2rem; text-align: center;">
                         <button onclick="generateNewBingoCard()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔄 New Card</button>
@@ -1194,7 +1202,7 @@
                             style="
                                 aspect-ratio: 1;
                                 background: ${bgColor};
-                                border-radius: 8px;
+                                border-radius: 6px;
                                 display: flex;
                                 flex-direction: column;
                                 align-items: center;
@@ -1202,9 +1210,9 @@
                                 cursor: ${isFree ? 'default' : 'pointer'};
                                 transition: all 0.2s;
                                 box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
-                                padding: 0.15rem;
+                                padding: 0.1rem;
                                 text-align: center;
-                                font-size: clamp(0.5rem, 1.6vw, 0.75rem);
+                                font-size: clamp(0.45rem, 1.5vw, 0.7rem);
                                 color: ${textColor};
                                 transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
                                 position: relative;
@@ -1227,7 +1235,7 @@
                             style="
                                 aspect-ratio: 1;
                                 background: ${bgColor};
-                                border-radius: 8px;
+                                border-radius: 6px;
                                 display: flex;
                                 flex-direction: column;
                                 align-items: center;
@@ -1235,9 +1243,9 @@
                                 cursor: ${isFree ? 'default' : 'pointer'};
                                 transition: all 0.2s;
                                 box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
-                                padding: 0.15rem;
+                                padding: 0.1rem;
                                 text-align: center;
-                                font-size: clamp(0.5rem, 1.6vw, 0.75rem);
+                                font-size: clamp(0.45rem, 1.5vw, 0.7rem);
                                 font-weight: ${isMarked ? 'bold' : 'normal'};
                                 color: ${textColor};
                                 transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
