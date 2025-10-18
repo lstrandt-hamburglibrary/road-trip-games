@@ -95,7 +95,11 @@
             gameState.currentEvent = event;
             gameState.message = event.text;
         } else {
-            gameState.message = '';
+            // Only clear message if it's not a police/important message
+            if (!gameState.message.includes('BUSTED') && !gameState.message.includes('Officer Hardass') &&
+                !gameState.message.includes('ARRESTED') && !gameState.message.includes('escaped')) {
+                gameState.message = '';
+            }
         }
 
         // Generate prices for each drug
@@ -173,7 +177,8 @@
     }
 
     function handlePoliceEncounter() {
-        showMessage('Officer Hardass is chasing you!');
+        gameState.message = '🚓 Officer Hardass is chasing you!';
+        updateDisplay();
 
         const modal = document.getElementById('drugwarsPoliceModal');
         modal.style.display = 'flex';
@@ -190,17 +195,17 @@
             modal.style.display = 'none';
             // 50% chance to escape
             if (Math.random() < 0.5) {
-                showMessage('You escaped!');
+                gameState.message = '✅ You escaped from Officer Hardass!';
             } else {
                 // Caught - lose some inventory or cash
                 if (gameState.usedSpaces > 0) {
                     gameState.inventory = {};
                     gameState.usedSpaces = 0;
-                    showMessage('Officer Hardass busted you! Lost all your drugs!');
+                    gameState.message = '🚨 BUSTED! Officer Hardass confiscated ALL your drugs!';
                 } else if (gameState.cash > 0) {
                     const fine = Math.floor(gameState.cash * 0.5);
                     gameState.cash -= fine;
-                    showMessage(`Officer Hardass fined you $${fine.toLocaleString()}!`);
+                    gameState.message = `💸 Officer Hardass fined you $${fine.toLocaleString()}!`;
                 }
             }
             updateDisplay();
@@ -213,18 +218,18 @@
                 if (Math.random() < 0.7) {
                     const reward = Math.floor(1000 + Math.random() * 2000);
                     gameState.cash += reward;
-                    showMessage(`You defeated Officer Hardass! Found $${reward.toLocaleString()} on him!`);
+                    gameState.message = `💪 You defeated Officer Hardass! Found $${reward.toLocaleString()} on him!`;
                 } else {
                     gameState.health -= 30;
-                    showMessage('Officer Hardass shot you! Lost 30 health!');
+                    gameState.message = '💥 Officer Hardass shot you! Lost 30 health!';
                     if (gameState.health <= 0) {
                         gameState.gameOver = true;
-                        showMessage('You died! Game Over!');
+                        gameState.message = '☠️ You died! Game Over!';
                         endGame();
                     }
                 }
             } else {
-                showMessage('You can\'t fight without guns! You were arrested!');
+                gameState.message = '🚨 ARRESTED! No guns to fight with! Lost ALL drugs and 70% of cash!';
                 gameState.inventory = {};
                 gameState.usedSpaces = 0;
                 gameState.cash = Math.floor(gameState.cash * 0.3);
@@ -254,7 +259,7 @@
         }
     }
 
-    function buyDrug(drug) {
+    async function buyDrug(drug) {
         if (gameState.gameOver) return;
         if (!gameState.prices[drug]) {
             showMessage(`${drug} is not available here!`);
@@ -275,7 +280,7 @@
             return;
         }
 
-        const quantity = parseInt(prompt(`How much ${drug}? (Max: ${maxCanBuy})`) || '0');
+        const quantity = await getNumberInput(`How much ${drug}? (Max: ${maxCanBuy})`, maxCanBuy);
 
         if (quantity > 0 && quantity <= maxCanBuy) {
             const cost = quantity * price;
@@ -287,7 +292,7 @@
         }
     }
 
-    function sellDrug(drug) {
+    async function sellDrug(drug) {
         if (gameState.gameOver) return;
         if (!gameState.inventory[drug] || gameState.inventory[drug] === 0) {
             showMessage(`You don't have any ${drug}!`);
@@ -299,7 +304,7 @@
         }
 
         const maxCanSell = gameState.inventory[drug];
-        const quantity = parseInt(prompt(`How much ${drug} to sell? (Max: ${maxCanSell})`) || '0');
+        const quantity = await getNumberInput(`How much ${drug} to sell? (Max: ${maxCanSell})`, maxCanSell);
 
         if (quantity > 0 && quantity <= maxCanSell) {
             const price = gameState.prices[drug];
@@ -312,7 +317,7 @@
         }
     }
 
-    function visitBank() {
+    async function visitBank() {
         if (gameState.location !== 'Bronx') {
             showMessage('The bank is only in the Bronx!');
             return;
@@ -321,7 +326,7 @@
         const action = prompt('Bank - (D)eposit or (W)ithdraw?').toLowerCase();
 
         if (action === 'd') {
-            const amount = parseInt(prompt(`Deposit how much? (You have $${gameState.cash.toLocaleString()})`) || '0');
+            const amount = await getNumberInput(`Deposit how much? (You have $${gameState.cash.toLocaleString()})`, gameState.cash);
             if (amount > 0 && amount <= gameState.cash) {
                 gameState.cash -= amount;
                 gameState.bankBalance += amount;
@@ -329,7 +334,7 @@
                 updateDisplay();
             }
         } else if (action === 'w') {
-            const amount = parseInt(prompt(`Withdraw how much? (Bank balance: $${gameState.bankBalance.toLocaleString()})`) || '0');
+            const amount = await getNumberInput(`Withdraw how much? (Bank balance: $${gameState.bankBalance.toLocaleString()})`, gameState.bankBalance);
             if (amount > 0 && amount <= gameState.bankBalance) {
                 gameState.bankBalance -= amount;
                 gameState.cash += amount;
@@ -339,7 +344,7 @@
         }
     }
 
-    function visitLoanShark() {
+    async function visitLoanShark() {
         if (gameState.location !== 'Bronx') {
             showMessage('The loan shark is only in the Bronx!');
             return;
@@ -348,7 +353,8 @@
         const action = prompt(`Loan Shark - You owe $${gameState.debt.toLocaleString()}. (P)ay or (B)orrow?`).toLowerCase();
 
         if (action === 'p') {
-            const amount = parseInt(prompt(`Pay how much? (You have $${gameState.cash.toLocaleString()})`) || '0');
+            const maxPay = Math.min(gameState.cash, gameState.debt);
+            const amount = await getNumberInput(`Pay how much? (You have $${gameState.cash.toLocaleString()})`, maxPay);
             if (amount > 0 && amount <= gameState.cash && amount <= gameState.debt) {
                 gameState.cash -= amount;
                 gameState.debt -= amount;
@@ -356,7 +362,7 @@
                 updateDisplay();
             }
         } else if (action === 'b') {
-            const amount = parseInt(prompt('Borrow how much?') || '0');
+            const amount = await getNumberInput('Borrow how much?', 999999999);
             if (amount > 0) {
                 gameState.cash += amount;
                 gameState.debt += amount;
@@ -373,6 +379,55 @@
             msgEl.textContent = msg;
             msgEl.style.display = 'block';
         }
+    }
+
+    // Custom number input with numeric keyboard
+    function getNumberInput(promptText, maxValue) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('drugwarsNumberInput');
+            const promptEl = document.getElementById('drugwarsNumberInputPrompt');
+            const inputEl = document.getElementById('drugwarsNumberInputField');
+            const okBtn = document.getElementById('drugwarsNumberInputOK');
+            const cancelBtn = document.getElementById('drugwarsNumberInputCancel');
+
+            promptEl.textContent = promptText;
+            inputEl.value = '';
+            inputEl.max = maxValue;
+            modal.style.display = 'flex';
+
+            // Focus and select the input to trigger keyboard
+            setTimeout(() => {
+                inputEl.focus();
+                inputEl.select();
+            }, 100);
+
+            // Clean up old listeners
+            const newOkBtn = okBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+            cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+
+            const handleOK = () => {
+                const value = parseInt(inputEl.value || '0');
+                modal.style.display = 'none';
+                resolve(value);
+            };
+
+            const handleCancel = () => {
+                modal.style.display = 'none';
+                resolve(0);
+            };
+
+            document.getElementById('drugwarsNumberInputOK').addEventListener('click', handleOK);
+            document.getElementById('drugwarsNumberInputCancel').addEventListener('click', handleCancel);
+
+            // Allow Enter key to submit
+            inputEl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleOK();
+                }
+            });
+        });
     }
 
     function endGame() {
@@ -452,9 +507,9 @@
                     <td style="padding: 0.25rem;">${drug}:</td>
                     <td style="padding: 0.25rem; ${priceStyle}">$${price.toLocaleString()}</td>
                     <td style="padding: 0.25rem;">${owned > 0 ? `(own ${owned})` : ''}</td>
-                    <td style="padding: 0.25rem;">
-                        <a href="#" onclick="window.drugWarsBuy('${drug}'); return false;">Buy</a> |
-                        <a href="#" onclick="window.drugWarsSell('${drug}'); return false;">Sell</a>
+                    <td style="padding: 0.5rem;">
+                        <button onclick="window.drugWarsBuy('${drug}')" style="background: #2ecc71; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; margin-right: 0.25rem; border-radius: 3px;">Buy</button>
+                        <button onclick="window.drugWarsSell('${drug}')" style="background: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; border-radius: 3px;">Sell</button>
                     </td>
                 `;
             }

@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.84.1';</script>
+    <script>window.APP_VERSION = '1.84.2';</script>
 
     <style>
         * {
@@ -946,6 +946,18 @@
                         <p style="font-size: 1.5rem; margin: 2rem 0;">Check your final score!</p>
                         <button onclick="drugWarsRestart()" style="background: #27ae60; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold; margin-right: 1rem;">🔄 Play Again</button>
                         <button onclick="exitDrugWars()" style="background: #95a5a6; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">🏠 Menu</button>
+                    </div>
+                </div>
+
+                <!-- Number Input Modal -->
+                <div id="drugwarsNumberInput" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1001;">
+                    <div style="background: white; padding: 2rem; border-radius: 10px; max-width: 400px; width: 90%;">
+                        <h3 id="drugwarsNumberInputPrompt" style="margin-top: 0;">Enter amount:</h3>
+                        <input type="number" id="drugwarsNumberInputField" inputmode="numeric" pattern="[0-9]*" style="width: 100%; padding: 1rem; font-size: 1.5rem; border: 2px solid #3498db; border-radius: 5px; text-align: center;" />
+                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                            <button id="drugwarsNumberInputCancel" style="flex: 1; background: #95a5a6; color: white; border: none; padding: 1rem; border-radius: 5px; cursor: pointer; font-size: 1rem;">Cancel</button>
+                            <button id="drugwarsNumberInputOK" style="flex: 1; background: #3498db; color: white; border: none; padding: 1rem; border-radius: 5px; cursor: pointer; font-size: 1rem;">OK</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2031,7 +2043,7 @@
     <script src="games/asteroids.js?v=1.68.0"></script>
     <script src="games/qix.js?v=1.69.0"></script>
     <script src="games/klax.js?v=1.70.0"></script>
-    <script src="games/drugwars.js?v=1.84.1"></script>
+    <script src="games/drugwars.js?v=1.84.2"></script>
     <script src="games/pharaoh.js?v=1.61.0"></script>
 </body>
 </html>
