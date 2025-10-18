@@ -335,7 +335,7 @@
                 </div>
 
                 <div style="max-width: 600px; margin: 0 auto;">
-                    <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; background: #667eea; padding: 1rem; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
+                    <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; background: #667eea; padding: 0.5rem; border-radius: 10px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
 
                     <div style="margin-top: 2rem; text-align: center;">
                         <button onclick="generateNewBingoCard()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔄 New Card</button>
@@ -1201,7 +1201,7 @@
                         style="
                             aspect-ratio: 1;
                             background: ${bgColor};
-                            border-radius: 10px;
+                            border-radius: 8px;
                             display: flex;
                             flex-direction: column;
                             align-items: center;
@@ -1209,9 +1209,9 @@
                             cursor: ${isFree ? 'default' : 'pointer'};
                             transition: all 0.2s;
                             box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
-                            padding: 0.5rem;
+                            padding: 0.25rem;
                             text-align: center;
-                            font-size: clamp(0.7rem, 2vw, 0.9rem);
+                            font-size: clamp(0.55rem, 1.8vw, 0.8rem);
                             font-weight: ${isMarked ? 'bold' : 'normal'};
                             color: ${textColor};
                             transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
