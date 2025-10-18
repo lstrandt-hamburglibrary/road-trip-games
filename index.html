@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.78.0';</script>
+    <script>window.APP_VERSION = '1.79.0';</script>
 
     <style>
         * {
@@ -477,9 +477,11 @@
                         <ul style="color: #666; line-height: 1.8;">
                             <li>Tap a square when you spot that item on your road trip</li>
                             <li>Get 5 in a row (horizontal, vertical, or diagonal) to win!</li>
+                            <li>⭐ BLACKOUT: Fill all 25 squares for an epic win!</li>
                             <li>The center square is a FREE space - already marked for you</li>
                             <li>Click "New Card" to generate a different set of items</li>
                             <li>Click "Clear Marks" to unmark all squares on current card</li>
+                            <li>Click "Stats" to view your wins and achievements</li>
                         </ul>
                     </div>
                 </div>
@@ -1199,6 +1201,7 @@
                     <li>${player2Name}: RED ✓ in upper left corner</li>
                     <li>Both can mark the same square - both checkmarks will show</li>
                     <li>First player to get 5 in a row with their color wins!</li>
+                    <li>⭐ BLACKOUT: Fill all 25 squares for an epic win!</li>
                     <li>The center square is a FREE space for both players</li>
                 </ul>
             `;
@@ -1236,6 +1239,7 @@
                     <li>Work together to spot items on your road trip</li>
                     <li>Anyone can mark any square when you see it</li>
                     <li>Get 5 in a row together to win as a team!</li>
+                    <li>⭐ BLACKOUT: Fill all 25 squares for an epic team win!</li>
                     <li>The center square is a FREE space - already marked for you</li>
                 </ul>
             `;
@@ -1451,20 +1455,35 @@
 
         function checkForBingo() {
             if (bingoGameMode === 'competitive') {
-                // Check Player 1
-                if (checkPlayerBingo(player1Marks)) {
-                    showBingoWin(1);
+                // Check Player 1 for blackout first (more impressive!)
+                if (checkPlayerBlackout(player1Marks)) {
+                    showBingoWin(1, 'blackout');
                     return;
                 }
-                // Check Player 2
+                // Check Player 2 for blackout
+                if (checkPlayerBlackout(player2Marks)) {
+                    showBingoWin(2, 'blackout');
+                    return;
+                }
+                // Check Player 1 for bingo
+                if (checkPlayerBingo(player1Marks)) {
+                    showBingoWin(1, 'bingo');
+                    return;
+                }
+                // Check Player 2 for bingo
                 if (checkPlayerBingo(player2Marks)) {
-                    showBingoWin(2);
+                    showBingoWin(2, 'bingo');
                     return;
                 }
             } else {
-                // Team mode
+                // Team mode - check blackout first
+                if (checkPlayerBlackout(markedSquares)) {
+                    showBingoWin(0, 'blackout');  // 0 = team
+                    return;
+                }
+                // Check for regular bingo
                 if (checkPlayerBingo(markedSquares)) {
-                    showBingoWin(0);  // 0 = team
+                    showBingoWin(0, 'bingo');  // 0 = team
                 }
             }
         }
@@ -1495,27 +1514,48 @@
             return false;
         }
 
-        function showBingoWin(winner) {
+        function checkPlayerBlackout(marks) {
+            // Check if all 25 squares are marked
+            return marks.every(mark => mark === true);
+        }
+
+        function showBingoWin(winner, winType = 'bingo') {
             const winMsg = document.getElementById('bingoWinMessage');
             const winText = document.getElementById('bingoWinText');
             let winnerName;
+            const isBlackout = winType === 'blackout';
 
             if (winner === 1) {
                 winnerName = player1Name || 'Player 1';
-                winText.textContent = `🔵 ${winnerName} Wins!`;
-                winMsg.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+                if (isBlackout) {
+                    winText.textContent = `⭐ BLACKOUT! ${winnerName} Wins! ⭐`;
+                    winMsg.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'; // Gold gradient
+                } else {
+                    winText.textContent = `🔵 ${winnerName} Wins!`;
+                    winMsg.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+                }
             } else if (winner === 2) {
                 winnerName = player2Name || 'Player 2';
-                winText.textContent = `🔴 ${winnerName} Wins!`;
-                winMsg.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';
+                if (isBlackout) {
+                    winText.textContent = `⭐ BLACKOUT! ${winnerName} Wins! ⭐`;
+                    winMsg.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'; // Gold gradient
+                } else {
+                    winText.textContent = `🔴 ${winnerName} Wins!`;
+                    winMsg.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';
+                }
             } else {
                 winnerName = 'Team';
-                winText.textContent = 'Team Bingo!';
-                winMsg.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100())';
+                if (isBlackout) {
+                    winText.textContent = '⭐ BLACKOUT! Team Wins! ⭐';
+                    winMsg.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'; // Gold gradient
+                } else {
+                    winText.textContent = 'Team Bingo!';
+                    winMsg.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                }
             }
 
             // Record the win in statistics
-            recordBingoWin(winnerName, 'bingo');
+            recordBingoWin(winnerName, winType);
 
             winMsg.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
