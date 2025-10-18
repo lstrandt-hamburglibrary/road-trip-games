@@ -36,18 +36,18 @@
     function showConnect4Setup() {
         const content = document.getElementById('connect4Content');
         content.innerHTML = `
-            <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
-                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">🔴 Welcome to Connect 4!</h2>
-                <p style="font-size: 1.2rem; margin-bottom: 2rem;">Drop your discs and connect four in a row!</p>
-                <div style="background: rgba(255,255,255,0.2); padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
-                    <h3 style="margin-bottom: 1rem;">How to Play:</h3>
-                    <p style="text-align: left; max-width: 500px; margin: 0 auto; line-height: 1.6;">
+            <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
+                <h2 style="font-size: 2rem; margin-bottom: 0.75rem;">🔴 Welcome to Connect 4!</h2>
+                <p style="font-size: 1.1rem; margin-bottom: 1rem;">Drop your discs and connect four in a row!</p>
+                <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                    <h3 style="margin-bottom: 0.5rem;">How to Play:</h3>
+                    <p style="text-align: left; max-width: 500px; margin: 0 auto; line-height: 1.5;">
                         1. Players take turns dropping colored discs<br>
                         2. Discs fall to the lowest available position<br>
                         3. First to get 4 in a row wins (horizontal, vertical, or diagonal)!
                     </p>
                 </div>
-                <h3 style="margin-bottom: 1rem;">Choose Game Mode:</h3>
+                <h3 style="margin-bottom: 0.75rem;">Choose Game Mode:</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; max-width: 600px; margin: 0 auto;">
                     <button onclick="selectConnect4PassAndPlay()" style="background: white; color: #f5576c; border: none; padding: 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                         👥 Pass & Play<br>
@@ -75,9 +75,9 @@
     function showConnect4PlayerNames() {
         const content = document.getElementById('connect4Content');
         content.innerHTML = `
-            <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
-                <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">🔴 Player Names</h2>
-                <div style="background: rgba(255,255,255,0.2); padding: 2rem; border-radius: 10px; max-width: 400px; margin: 0 auto;">
+            <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 15px; color: white;">
+                <h2 style="font-size: 2rem; margin-bottom: 1rem;">🔴 Player Names</h2>
+                <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px; max-width: 400px; margin: 0 auto;">
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">Player 1 Name (🔴 Red):</label>
                         <input type="text" id="connect4Player1Name" placeholder="Enter name" value="${connect4State.player1Name || ''}"
