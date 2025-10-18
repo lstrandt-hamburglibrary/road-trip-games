@@ -713,8 +713,11 @@
 
                 <!-- Mobile Controls - Standardized Layout -->
                 <div style="display: flex; gap: 0.5rem; justify-content: space-between; align-items: flex-end; margin-top: 1rem; max-width: 100%;">
-                    <!-- Left side: Fire button -->
-                    <button id="astFireBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.1rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
+                    <!-- Left side: Fire and Thrust stacked -->
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button id="astFireBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.1rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
+                        <button id="astThrustBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; border: none; border-radius: 50%; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">🚀</button>
+                    </div>
 
                     <!-- Right side: Directional controls -->
                     <div style="display: flex; gap: 0.5rem;">
@@ -750,6 +753,7 @@
         // Mobile button controls
         const leftBtn = document.getElementById('astLeftBtn');
         const rightBtn = document.getElementById('astRightBtn');
+        const thrustBtn = document.getElementById('astThrustBtn');
         const fireBtn = document.getElementById('astFireBtn');
 
         leftBtn.addEventListener('touchstart', () => gameState.ship.rotating = -1);
@@ -761,6 +765,11 @@
         rightBtn.addEventListener('touchend', () => gameState.ship.rotating = 0);
         rightBtn.addEventListener('mousedown', () => gameState.ship.rotating = 1);
         rightBtn.addEventListener('mouseup', () => gameState.ship.rotating = 0);
+
+        thrustBtn.addEventListener('touchstart', () => gameState.ship.thrusting = true);
+        thrustBtn.addEventListener('touchend', () => gameState.ship.thrusting = false);
+        thrustBtn.addEventListener('mousedown', () => gameState.ship.thrusting = true);
+        thrustBtn.addEventListener('mouseup', () => gameState.ship.thrusting = false);
 
         fireBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
