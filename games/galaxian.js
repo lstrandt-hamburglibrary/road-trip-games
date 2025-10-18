@@ -235,7 +235,8 @@
             this.divePhase = 0;
             this.diveStartX = this.x;
             this.diveStartY = this.y;
-            this.diveTargetX = gameState.player.x;
+            // Use player position if exists, otherwise use center screen
+            this.diveTargetX = gameState.player ? gameState.player.x : CANVAS_WIDTH / 2;
         }
 
         updateDive() {
