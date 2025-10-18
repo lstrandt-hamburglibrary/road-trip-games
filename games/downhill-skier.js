@@ -1052,40 +1052,40 @@
                 "></canvas>
 
                 <!-- Mode Selection Buttons (shown initially) -->
-                <div id="modeButtons" style="display: flex; gap: 1.5rem; margin-top: 1rem;">
+                <div id="modeButtons" style="display: flex; gap: 0.75rem; margin-top: 1rem;">
                     <button id="btnDownhill" style="
-                        width: 200px;
-                        padding: 1.5rem;
+                        width: 140px;
+                        padding: 1rem;
                         background: linear-gradient(135deg, #4169E1 0%, #2c4d9e 100%);
                         border: none;
-                        border-radius: 15px;
+                        border-radius: 12px;
                         color: white;
-                        font-size: 1.1rem;
+                        font-size: 0.95rem;
                         font-weight: bold;
                         cursor: pointer;
                         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                         transition: transform 0.2s;
                     ">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏔️</div>
+                        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🏔️</div>
                         <div>DOWNHILL</div>
-                        <div style="font-size: 0.8rem; font-weight: normal; margin-top: 0.5rem; opacity: 0.9;">Go for distance!</div>
+                        <div style="font-size: 0.7rem; font-weight: normal; margin-top: 0.25rem; opacity: 0.9;">Go for distance!</div>
                     </button>
                     <button id="btnSlalom" style="
-                        width: 200px;
-                        padding: 1.5rem;
+                        width: 140px;
+                        padding: 1rem;
                         background: linear-gradient(135deg, #DC143C 0%, #a01028 100%);
                         border: none;
-                        border-radius: 15px;
+                        border-radius: 12px;
                         color: white;
-                        font-size: 1.1rem;
+                        font-size: 0.95rem;
                         font-weight: bold;
                         cursor: pointer;
                         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                         transition: transform 0.2s;
                     ">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⛳</div>
+                        <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">⛳</div>
                         <div>SLALOM</div>
-                        <div style="font-size: 0.8rem; font-weight: normal; margin-top: 0.5rem; opacity: 0.9;">Race the clock!</div>
+                        <div style="font-size: 0.7rem; font-weight: normal; margin-top: 0.25rem; opacity: 0.9;">Race the clock!</div>
                     </button>
                 </div>
 

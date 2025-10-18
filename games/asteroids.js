@@ -711,27 +711,17 @@
 
                 <canvas id="asteroidsCanvas" width="800" height="600" style="border: 4px solid #333; border-radius: 10px; background: #000; max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
 
-                <!-- Mobile Controls -->
-                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button id="astLeftBtn" style="background: #667eea; color: white; border: none; padding: 1rem 1.5rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold; touch-action: manipulation;">
-                            ↶ LEFT
-                        </button>
-                        <button id="astRightBtn" style="background: #667eea; color: white; border: none; padding: 1rem 1.5rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold; touch-action: manipulation;">
-                            RIGHT ↷
-                        </button>
+                <!-- Mobile Controls - Standardized Layout -->
+                <div style="display: flex; gap: 1rem; justify-content: space-between; margin-top: 1rem; padding: 0 1rem; flex-wrap: wrap;">
+                    <button id="astFireBtn" style="width: 90px; height: 90px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
+                    <button id="astHyperspaceBtn" style="width: 90px; height: 90px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; border: none; border-radius: 50%; font-size: 0.9rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">HYPER<br>SPACE</button>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button id="astThrustBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; border: none; border-radius: 15px; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">⬆️</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button id="astLeftBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">↶</button>
+                            <button id="astRightBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">↷</button>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button id="astThrustBtn" style="background: #28a745; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold; touch-action: manipulation;">
-                            ⬆️ THRUST
-                        </button>
-                        <button id="astFireBtn" style="background: #dc3545; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold; touch-action: manipulation;">
-                            🔥 FIRE
-                        </button>
-                    </div>
-                    <button id="astHyperspaceBtn" style="background: #ff9800; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold; touch-action: manipulation;">
-                        ⚡ HYPERSPACE
-                    </button>
                 </div>
 
                 <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">

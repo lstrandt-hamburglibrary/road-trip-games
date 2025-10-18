@@ -5,9 +5,9 @@
     const CANVAS_WIDTH = 800;
     const CANVAS_HEIGHT = 600;
     const GRAVITY = 0.5;
-    const FLAP_POWER = -3; // Reduced for continuous flapping
+    const FLAP_POWER = -8; // Stronger flap for tap controls
     const MOVE_SPEED = 4;
-    const FLAP_COOLDOWN = 4; // Frames between flaps when holding button
+    const FLAP_COOLDOWN = 8; // Cooldown to prevent spam-tapping
 
     let gameState = {
         player: null,
@@ -663,11 +663,6 @@
     function update() {
         if (!gameState.gameStarted || gameState.gameOver) return;
 
-        // Continuous flapping when button held
-        if (gameState.flapHeld) {
-            gameState.player.flap();
-        }
-
         // Update player - add momentum instead of instant movement
         if (gameState.keys['ArrowLeft'] || gameState.keys['a']) {
             gameState.player.velocityX -= 0.5; // Accelerate left
@@ -819,7 +814,7 @@
             ctx.fillStyle = 'white';
             ctx.font = '32px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('HOLD SPACE or button to flap!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+            ctx.fillText('TAP SPACE or button to flap!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
             ctx.font = '24px Arial';
             ctx.fillText('Arrow keys or buttons to move', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 40);
             ctx.fillText('Defeat enemies from above!', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 70);
@@ -833,6 +828,9 @@
     }
 
     function handleKeyDown(e) {
+        // Prevent repeated flapping from holding key down
+        if (e.repeat) return;
+
         gameState.keys[e.key] = true;
 
         if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w')) {
@@ -843,17 +841,13 @@
             }
 
             if (gameState.gameStarted) {
-                gameState.flapHeld = true;
+                gameState.player.flap(); // Single flap on key press
             }
         }
     }
 
     function handleKeyUp(e) {
         gameState.keys[e.key] = false;
-
-        if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w')) {
-            gameState.flapHeld = false;
-        }
     }
 
     window.launchJoust = function() {
@@ -903,7 +897,7 @@
                     <h4 style="color: #333; margin-bottom: 1rem;">How to Play:</h4>
                     <ul style="color: #666; text-align: left; line-height: 1.8;">
                         <li>🦤 Ride your ostrich and joust enemy riders!</li>
-                        <li>🪽 HOLD flap button/spacebar for continuous flight control</li>
+                        <li>🪽 TAP flap button or press spacebar to fly - tap repeatedly for height!</li>
                         <li>⚔️ Defeat enemies by hitting them from ABOVE</li>
                         <li>🥚 Collect eggs (250 pts) before they hatch into new enemies</li>
                         <li>🦖 PTERODACTYL spawns after 45 seconds - instant death!</li>
@@ -935,33 +929,18 @@
                 gameState.gameStarted = true;
             }
             if (gameState.gameStarted) {
-                gameState.flapHeld = true;
+                gameState.player.flap(); // Single flap on tap
             }
         });
 
-        flapBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            gameState.flapHeld = false;
-        });
-
-        flapBtn.addEventListener('mousedown', (e) => {
+        flapBtn.addEventListener('click', (e) => {
             e.preventDefault();
             if (!gameState.gameStarted && !gameState.gameOver) {
                 gameState.gameStarted = true;
             }
             if (gameState.gameStarted) {
-                gameState.flapHeld = true;
+                gameState.player.flap(); // Single flap on click
             }
-        });
-
-        flapBtn.addEventListener('mouseup', (e) => {
-            e.preventDefault();
-            gameState.flapHeld = false;
-        });
-
-        flapBtn.addEventListener('mouseleave', (e) => {
-            e.preventDefault();
-            gameState.flapHeld = false;
         });
 
         leftBtn.addEventListener('touchstart', (e) => {
