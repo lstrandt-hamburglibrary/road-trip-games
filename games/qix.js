@@ -577,7 +577,7 @@
             ctx.fillText('QIX', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80);
 
             ctx.font = '24px monospace';
-            ctx.fillText('Press SPACE to start', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+            ctx.fillText('Press any direction to start', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
 
             ctx.font = '18px monospace';
             ctx.fillText('Arrow Keys / WASD to move', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
@@ -761,24 +761,64 @@
         const fastBtn = document.getElementById('qixFastBtn');
         const slowBtn = document.getElementById('qixSlowBtn');
 
-        upBtn.addEventListener('touchstart', () => gameState.keys['ArrowUp'] = true);
+        upBtn.addEventListener('touchstart', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowUp'] = true;
+        });
         upBtn.addEventListener('touchend', () => gameState.keys['ArrowUp'] = false);
-        upBtn.addEventListener('mousedown', () => gameState.keys['ArrowUp'] = true);
+        upBtn.addEventListener('mousedown', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowUp'] = true;
+        });
         upBtn.addEventListener('mouseup', () => gameState.keys['ArrowUp'] = false);
 
-        downBtn.addEventListener('touchstart', () => gameState.keys['ArrowDown'] = true);
+        downBtn.addEventListener('touchstart', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowDown'] = true;
+        });
         downBtn.addEventListener('touchend', () => gameState.keys['ArrowDown'] = false);
-        downBtn.addEventListener('mousedown', () => gameState.keys['ArrowDown'] = true);
+        downBtn.addEventListener('mousedown', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowDown'] = true;
+        });
         downBtn.addEventListener('mouseup', () => gameState.keys['ArrowDown'] = false);
 
-        leftBtn.addEventListener('touchstart', () => gameState.keys['ArrowLeft'] = true);
+        leftBtn.addEventListener('touchstart', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowLeft'] = true;
+        });
         leftBtn.addEventListener('touchend', () => gameState.keys['ArrowLeft'] = false);
-        leftBtn.addEventListener('mousedown', () => gameState.keys['ArrowLeft'] = true);
+        leftBtn.addEventListener('mousedown', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowLeft'] = true;
+        });
         leftBtn.addEventListener('mouseup', () => gameState.keys['ArrowLeft'] = false);
 
-        rightBtn.addEventListener('touchstart', () => gameState.keys['ArrowRight'] = true);
+        rightBtn.addEventListener('touchstart', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowRight'] = true;
+        });
         rightBtn.addEventListener('touchend', () => gameState.keys['ArrowRight'] = false);
-        rightBtn.addEventListener('mousedown', () => gameState.keys['ArrowRight'] = true);
+        rightBtn.addEventListener('mousedown', () => {
+            if (!gameState.gameStarted && !gameState.gameOver) {
+                gameState.gameStarted = true;
+            }
+            gameState.keys['ArrowRight'] = true;
+        });
         rightBtn.addEventListener('mouseup', () => gameState.keys['ArrowRight'] = false);
 
         fastBtn.addEventListener('click', () => {
