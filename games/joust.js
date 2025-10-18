@@ -878,16 +878,16 @@
                     <canvas id="joustCanvas" width="800" height="600" style="border: 4px solid #333; border-radius: 10px; background: #000; max-width: 100%; height: auto; display: block;"></canvas>
 
                     <!-- Mobile Controls -->
-                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
-                        <button id="joustFlapBtn" style="background: #28a745; color: white; border: none; padding: 1.5rem 3rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation;">
-                            ⬆️ FLAP
+                    <div style="display: flex; gap: 0.5rem; justify-content: space-between; align-items: flex-end; margin-top: 1rem; max-width: 100%;">
+                        <button id="joustFlapBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 1.1rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                            FLAP
                         </button>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button id="joustLeftBtn" style="background: #667eea; color: white; border: none; padding: 1.5rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation;">
-                                ⬅️
+                            <button id="joustLeftBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 2rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                                ◀
                             </button>
-                            <button id="joustRightBtn" style="background: #667eea; color: white; border: none; padding: 1.5rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation;">
-                                ➡️
+                            <button id="joustRightBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 2rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                                ▶
                             </button>
                         </div>
                     </div>
