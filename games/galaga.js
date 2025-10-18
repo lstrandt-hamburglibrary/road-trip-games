@@ -44,8 +44,6 @@
         keys: {},
         shootCooldown: 0,
         dualFighter: false,
-        challengeStage: false,
-        challengeTimer: 0,
         formingUp: true,
         formationComplete: false,
         enemiesEntering: [],
@@ -300,15 +298,15 @@
                 this.x = this.homeX + formationOffsetX;
                 this.y = this.homeY;
 
-                // Random chance to start diving (reduced frequency)
+                // Random chance to start diving
                 const divingCount = gameState.enemies.filter(e => e.alive && e.diving).length;
-                if (divingCount < 3 && Math.random() < 0.0003) {
+                if (divingCount < 6 && Math.random() < 0.0008) {
                     this.startDive();
                 }
             }
 
-            // Shoot occasionally when diving (not in challenge stage)
-            if (this.diving && !gameState.challengeStage && Math.random() < 0.02) {
+            // Shoot occasionally when diving
+            if (this.diving && Math.random() < 0.02) {
                 this.shoot();
             }
         }
@@ -441,7 +439,6 @@
         gameState.formationDirection = 1;
         gameState.shootCooldown = 0;
         gameState.dualFighter = false;
-        gameState.challengeStage = false;
         gameState.formingUp = true;
         gameState.respawning = false;
         gameState.respawnTimer = 0;
@@ -459,14 +456,6 @@
     }
 
     function startStage() {
-        // Every 3rd stage is a challenge stage
-        if (gameState.level % 3 === 0) {
-            gameState.challengeStage = true;
-            gameState.challengeTimer = 300; // 5 seconds
-        } else {
-            gameState.challengeStage = false;
-        }
-
         createEnemyFormation();
     }
 
@@ -658,8 +647,8 @@
             }
         }
 
-        // Enemy bullets hit player (not in challenge stage, not invincible, player exists)
-        if (!gameState.challengeStage && !gameState.invincible && gameState.player) {
+        // Enemy bullets hit player (not invincible, player exists)
+        if (!gameState.invincible && gameState.player) {
             for (let i = gameState.enemyBullets.length - 1; i >= 0; i--) {
                 const bullet = gameState.enemyBullets[i];
                 if (checkRectCollision(bullet, gameState.player)) {
@@ -707,17 +696,9 @@
     function checkLevelComplete() {
         const aliveEnemies = gameState.enemies.filter(e => e.alive).length;
 
-        if (gameState.challengeStage) {
-            // Don't advance during formation, then check if all enemies dead or timer expired
-            if (!gameState.formingUp && (aliveEnemies === 0 || gameState.challengeTimer <= 0)) {
-                gameState.level++;
-                startStage();
-            }
-        } else {
-            if (aliveEnemies === 0 && !gameState.formingUp) {
-                gameState.level++;
-                startStage();
-            }
+        if (aliveEnemies === 0 && !gameState.formingUp) {
+            gameState.level++;
+            startStage();
         }
     }
 
@@ -755,11 +736,6 @@
 
         handleInput();
         updateFormation();
-
-        // Update challenge stage timer (only after enemies finish forming up)
-        if (gameState.challengeStage && !gameState.formingUp) {
-            gameState.challengeTimer--;
-        }
 
         // Update stars
         gameState.stars.forEach(star => star.update());
@@ -823,10 +799,6 @@
         // Draw UI
         drawUI(ctx);
 
-        if (gameState.challengeStage && !gameState.formingUp) {
-            drawChallengeStage(ctx);
-        }
-
         if (gameState.gameOver) {
             drawGameOver(ctx);
         }
@@ -842,14 +814,6 @@
         if (gameState.dualFighter) {
             ctx.fillText('DUAL FIGHTER!', CANVAS_WIDTH - 130, 40);
         }
-    }
-
-    function drawChallengeStage(ctx) {
-        ctx.fillStyle = '#00FFFF';
-        ctx.font = 'bold 24px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('CHALLENGE STAGE', CANVAS_WIDTH / 2, 30);
-        ctx.textAlign = 'left';
     }
 
     function drawGameOver(ctx) {
