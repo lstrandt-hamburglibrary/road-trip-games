@@ -1003,7 +1003,7 @@
                     <li>When you spot an item, click it to mark it with your checkmark</li>
                     <li>Player 1: BLUE ✓ in upper right corner</li>
                     <li>Player 2: RED ✓ in upper left corner</li>
-                    <li>If both mark the same square, it turns PURPLE</li>
+                    <li>Both can mark the same square - both checkmarks will show</li>
                     <li>First player to get 5 in a row with their color wins!</li>
                     <li>The center square is a FREE space for both players</li>
                 </ul>
@@ -1172,29 +1172,20 @@
                     const p1Marked = player1Marks[index];
                     const p2Marked = player2Marks[index];
 
-                    if (p1Marked && p2Marked) {
-                        // Both marked - show purple background
-                        isMarked = true;
-                        bgColor = 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)';
-                        textColor = 'white';
-                    } else {
-                        // Not both marked - keep white background
-                        isMarked = p1Marked || p2Marked;
-                        bgColor = 'white';
-                        textColor = '#333';
-                    }
+                    // Always white background in competitive mode
+                    isMarked = p1Marked || p2Marked;
+                    bgColor = 'white';
+                    textColor = '#333';
 
                     // Generate checkmark overlays
                     let checkmarks = '';
-                    if (p1Marked && !p2Marked) {
+                    if (p1Marked) {
                         // Blue checkmark in upper right
-                        checkmarks = '<div style="position: absolute; top: 2px; right: 2px; color: #007bff; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
-                    } else if (p2Marked && !p1Marked) {
+                        checkmarks += '<div style="position: absolute; top: 2px; right: 2px; color: #007bff; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
+                    }
+                    if (p2Marked) {
                         // Red checkmark in upper left
-                        checkmarks = '<div style="position: absolute; top: 2px; left: 2px; color: #e74c3c; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
-                    } else if (p1Marked && p2Marked) {
-                        // Both checkmarks (only on purple background)
-                        checkmarks = '<div style="position: absolute; top: 2px; left: 2px; color: white; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div><div style="position: absolute; top: 2px; right: 2px; color: white; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
+                        checkmarks += '<div style="position: absolute; top: 2px; left: 2px; color: #e74c3c; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
                     }
 
                     return `
@@ -1214,7 +1205,6 @@
                                 padding: 0.25rem;
                                 text-align: center;
                                 font-size: clamp(0.55rem, 1.8vw, 0.8rem);
-                                font-weight: ${(p1Marked && p2Marked) ? 'bold' : 'normal'};
                                 color: ${textColor};
                                 transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
                                 position: relative;
