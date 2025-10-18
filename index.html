@@ -320,7 +320,14 @@
                     <button onclick="backToModeSelection()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back</button>
                 </div>
 
-                <div id="bingoCurrentPlayer" style="display: none; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+                <!-- Player Selector for Competitive Mode -->
+                <div id="bingoPlayerSelector" style="display: none; text-align: center; margin-bottom: 1rem;">
+                    <p style="color: #666; margin-bottom: 0.5rem; font-size: 0.9rem;">I am:</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button id="selectPlayer1" onclick="selectPlayer(1)" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); min-width: 120px;">🔵 Player 1</button>
+                        <button id="selectPlayer2" onclick="selectPlayer(2)" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); min-width: 120px; opacity: 0.5;">🔴 Player 2</button>
+                    </div>
+                </div>
 
                 <div id="bingoWinMessage" style="display: none; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center; animation: pulse 1s infinite;">
                     <h2 style="font-size: 3rem; margin-bottom: 1rem;">🎉 BINGO! 🎉</h2>
@@ -988,11 +995,12 @@
             document.getElementById('bingoModeSelection').style.display = 'none';
             document.getElementById('travelBingo').style.display = 'block';
             document.getElementById('bingoTitle').textContent = '🏁 Competitive Bingo';
-            document.getElementById('bingoCurrentPlayer').style.display = 'block';
+            document.getElementById('bingoPlayerSelector').style.display = 'block';
             document.getElementById('bingoInstructions').innerHTML = `
                 <h3 style="color: #333; margin-bottom: 1rem;">How to Play:</h3>
                 <ul style="color: #666; line-height: 1.8;">
-                    <li>Players take turns marking squares when they spot items</li>
+                    <li>Select your player number above before marking squares</li>
+                    <li>When you spot an item, click it to mark it in your color</li>
                     <li>Player 1 marks in BLUE, Player 2 marks in RED</li>
                     <li>First player to get 5 in a row with their color wins!</li>
                     <li>The center square is a FREE space for both players</li>
@@ -1016,7 +1024,7 @@
                 generateNewBingoCard();
             }
 
-            updateCurrentPlayerDisplay();
+            updatePlayerSelector();
             renderBingoCard();
         }
 
@@ -1051,14 +1059,26 @@
             renderBingoCard();
         }
 
-        function updateCurrentPlayerDisplay() {
-            const display = document.getElementById('bingoCurrentPlayer');
+        function selectPlayer(playerNum) {
+            currentPlayer = playerNum;
+            localStorage.setItem('currentPlayer', currentPlayer);
+            updatePlayerSelector();
+        }
+
+        function updatePlayerSelector() {
+            const btn1 = document.getElementById('selectPlayer1');
+            const btn2 = document.getElementById('selectPlayer2');
+
             if (currentPlayer === 1) {
-                display.textContent = "🔵 Player 1's Turn (Blue)";
-                display.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+                btn1.style.opacity = '1';
+                btn1.style.transform = 'scale(1.05)';
+                btn2.style.opacity = '0.5';
+                btn2.style.transform = 'scale(1)';
             } else {
-                display.textContent = "🔴 Player 2's Turn (Red)";
-                display.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';
+                btn1.style.opacity = '0.5';
+                btn1.style.transform = 'scale(1)';
+                btn2.style.opacity = '1';
+                btn2.style.transform = 'scale(1.05)';
             }
         }
 
@@ -1080,7 +1100,7 @@
                 localStorage.setItem('player1Marks', JSON.stringify(player1Marks));
                 localStorage.setItem('player2Marks', JSON.stringify(player2Marks));
                 localStorage.setItem('currentPlayer', currentPlayer);
-                updateCurrentPlayerDisplay();
+                updatePlayerSelector();
             } else {
                 markedSquares = Array(25).fill(false);
                 markedSquares[12] = true;  // Center is FREE
@@ -1104,7 +1124,7 @@
                 localStorage.setItem('player1Marks', JSON.stringify(player1Marks));
                 localStorage.setItem('player2Marks', JSON.stringify(player2Marks));
                 localStorage.setItem('currentPlayer', currentPlayer);
-                updateCurrentPlayerDisplay();
+                updatePlayerSelector();
             } else {
                 markedSquares = Array(25).fill(false);
                 markedSquares[12] = true;
@@ -1121,25 +1141,15 @@
             if (index === 12) return;
 
             if (bingoGameMode === 'competitive') {
-                // In competitive mode, mark for current player and switch turns
+                // In competitive mode, mark for selected player
                 if (currentPlayer === 1) {
                     player1Marks[index] = !player1Marks[index];
-                    // If marking (not unmarking), switch to other player
-                    if (player1Marks[index]) {
-                        currentPlayer = 2;
-                    }
                 } else {
                     player2Marks[index] = !player2Marks[index];
-                    // If marking (not unmarking), switch to other player
-                    if (player2Marks[index]) {
-                        currentPlayer = 1;
-                    }
                 }
 
                 localStorage.setItem('player1Marks', JSON.stringify(player1Marks));
                 localStorage.setItem('player2Marks', JSON.stringify(player2Marks));
-                localStorage.setItem('currentPlayer', currentPlayer);
-                updateCurrentPlayerDisplay();
             } else {
                 // Team mode
                 markedSquares[index] = !markedSquares[index];
