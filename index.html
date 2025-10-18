@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.75.3';</script>
+    <script>window.APP_VERSION = '1.75.4';</script>
 
     <style>
         * {
@@ -1189,11 +1189,11 @@
                     let checkmarks = '';
                     if (p1Marked) {
                         // Blue checkmark in upper right
-                        checkmarks += '<div style="position: absolute; top: 2px; right: 2px; color: #007bff; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
+                        checkmarks += '<div style="position: absolute; top: 2px; right: 2px; color: #007bff; font-size: clamp(1rem, 3vw, 1.5rem); font-weight: bold; line-height: 1;">✓</div>';
                     }
                     if (p2Marked) {
                         // Red checkmark in upper left
-                        checkmarks += '<div style="position: absolute; top: 2px; left: 2px; color: #e74c3c; font-size: clamp(0.8rem, 2.5vw, 1.2rem); font-weight: bold; line-height: 1;">✓</div>';
+                        checkmarks += '<div style="position: absolute; top: 2px; left: 2px; color: #e74c3c; font-size: clamp(1rem, 3vw, 1.5rem); font-weight: bold; line-height: 1;">✓</div>';
                     }
 
                     return `
@@ -1212,7 +1212,7 @@
                                 box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
                                 padding: 0.1rem;
                                 text-align: center;
-                                font-size: clamp(0.45rem, 1.5vw, 0.7rem);
+                                font-size: clamp(0.6rem, 2vw, 0.9rem);
                                 color: ${textColor};
                                 transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
                                 position: relative;
@@ -1245,7 +1245,7 @@
                                 box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
                                 padding: 0.1rem;
                                 text-align: center;
-                                font-size: clamp(0.45rem, 1.5vw, 0.7rem);
+                                font-size: clamp(0.6rem, 2vw, 0.9rem);
                                 font-weight: ${isMarked ? 'bold' : 'normal'};
                                 color: ${textColor};
                                 transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
