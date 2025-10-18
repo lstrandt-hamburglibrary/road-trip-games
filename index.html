@@ -287,16 +287,44 @@
                 </div>
             </div>
 
-            <!-- Travel Bingo Section (hidden by default) -->
-            <div id="travelBingo" style="display: none;">
+            <!-- Travel Bingo Mode Selection -->
+            <div id="bingoModeSelection" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h2>🎯 Travel Bingo</h2>
                     <button onclick="showHome()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Home</button>
                 </div>
 
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h3 style="color: #333; margin-bottom: 1rem;">Choose Game Mode</h3>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; max-width: 600px; margin: 0 auto;">
+                    <div onclick="startCompetitiveMode()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 2rem; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <h3 style="font-size: 2rem; margin-bottom: 1rem;">🏁 Competitive</h3>
+                        <p style="opacity: 0.9; margin-bottom: 0.5rem;">Same card, different colors</p>
+                        <p style="opacity: 0.9;">Race to get 5 in a row first!</p>
+                    </div>
+
+                    <div onclick="startTeamMode()" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 2rem; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <h3 style="font-size: 2rem; margin-bottom: 1rem;">🤝 Team</h3>
+                        <p style="opacity: 0.9; margin-bottom: 0.5rem;">Work together</p>
+                        <p style="opacity: 0.9;">Get bingo as a team!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Travel Bingo Game Section (hidden by default) -->
+            <div id="travelBingo" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 id="bingoTitle">🎯 Travel Bingo</h2>
+                    <button onclick="backToModeSelection()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back</button>
+                </div>
+
+                <div id="bingoCurrentPlayer" style="display: none; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+
                 <div id="bingoWinMessage" style="display: none; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center; animation: pulse 1s infinite;">
                     <h2 style="font-size: 3rem; margin-bottom: 1rem;">🎉 BINGO! 🎉</h2>
-                    <p style="font-size: 1.5rem;">You got 5 in a row!</p>
+                    <p id="bingoWinText" style="font-size: 1.5rem;">You got 5 in a row!</p>
                 </div>
 
                 <div style="max-width: 600px; margin: 0 auto;">
@@ -307,7 +335,7 @@
                         <button onclick="resetBingoCard()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-left: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↺ Clear Marks</button>
                     </div>
 
-                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">
+                    <div id="bingoInstructions" style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">
                         <h3 style="color: #333; margin-bottom: 1rem;">How to Play:</h3>
                         <ul style="color: #666; line-height: 1.8;">
                             <li>Tap a square when you spot that item on your road trip</li>
@@ -934,7 +962,11 @@
         ];
 
         let bingoCard = [];
-        let markedSquares = [];
+        let markedSquares = [];  // For team mode: boolean array
+        let player1Marks = [];    // For competitive mode
+        let player2Marks = [];    // For competitive mode
+        let currentPlayer = 1;    // For competitive mode
+        let bingoGameMode = 'team';  // 'team' or 'competitive'
 
         function showTravelBingo() {
             document.querySelector('.welcome').style.display = 'none';
@@ -942,21 +974,92 @@
             document.querySelector('.roadmap').style.display = 'none';
             document.getElementById('plateTracker').style.display = 'none';
             document.getElementById('gamesMenu').style.display = 'none';
-            document.getElementById('travelBingo').style.display = 'block';
+            document.getElementById('travelBingo').style.display = 'none';
+            document.getElementById('bingoModeSelection').style.display = 'block';
+        }
 
-            // Load saved card or generate new one
-            const savedCard = localStorage.getItem('bingoCard');
-            const savedMarks = localStorage.getItem('bingoMarks');
+        function backToModeSelection() {
+            document.getElementById('travelBingo').style.display = 'none';
+            document.getElementById('bingoModeSelection').style.display = 'block';
+        }
+
+        function startCompetitiveMode() {
+            bingoGameMode = 'competitive';
+            document.getElementById('bingoModeSelection').style.display = 'none';
+            document.getElementById('travelBingo').style.display = 'block';
+            document.getElementById('bingoTitle').textContent = '🏁 Competitive Bingo';
+            document.getElementById('bingoCurrentPlayer').style.display = 'block';
+            document.getElementById('bingoInstructions').innerHTML = `
+                <h3 style="color: #333; margin-bottom: 1rem;">How to Play:</h3>
+                <ul style="color: #666; line-height: 1.8;">
+                    <li>Players take turns marking squares when they spot items</li>
+                    <li>Player 1 marks in BLUE, Player 2 marks in RED</li>
+                    <li>First player to get 5 in a row with their color wins!</li>
+                    <li>The center square is a FREE space for both players</li>
+                </ul>
+            `;
+
+            // Load saved competitive game or generate new one
+            const savedCard = localStorage.getItem('bingoCard_competitive');
+            const savedP1 = localStorage.getItem('player1Marks');
+            const savedP2 = localStorage.getItem('player2Marks');
+            const savedCurrent = localStorage.getItem('currentPlayer');
+
+            if (savedCard) {
+                bingoCard = JSON.parse(savedCard);
+                player1Marks = savedP1 ? JSON.parse(savedP1) : Array(25).fill(false);
+                player2Marks = savedP2 ? JSON.parse(savedP2) : Array(25).fill(false);
+                player1Marks[12] = true;  // Center FREE for both
+                player2Marks[12] = true;
+                currentPlayer = savedCurrent ? parseInt(savedCurrent) : 1;
+            } else {
+                generateNewBingoCard();
+            }
+
+            updateCurrentPlayerDisplay();
+            renderBingoCard();
+        }
+
+        function startTeamMode() {
+            bingoGameMode = 'team';
+            document.getElementById('bingoModeSelection').style.display = 'none';
+            document.getElementById('travelBingo').style.display = 'block';
+            document.getElementById('bingoTitle').textContent = '🤝 Team Bingo';
+            document.getElementById('bingoCurrentPlayer').style.display = 'none';
+            document.getElementById('bingoInstructions').innerHTML = `
+                <h3 style="color: #333; margin-bottom: 1rem;">How to Play:</h3>
+                <ul style="color: #666; line-height: 1.8;">
+                    <li>Work together to spot items on your road trip</li>
+                    <li>Anyone can mark any square when you see it</li>
+                    <li>Get 5 in a row together to win as a team!</li>
+                    <li>The center square is a FREE space - already marked for you</li>
+                </ul>
+            `;
+
+            // Load saved team game or generate new one
+            const savedCard = localStorage.getItem('bingoCard_team');
+            const savedMarks = localStorage.getItem('bingoMarks_team');
 
             if (savedCard) {
                 bingoCard = JSON.parse(savedCard);
                 markedSquares = savedMarks ? JSON.parse(savedMarks) : Array(25).fill(false);
-                markedSquares[12] = true; // Center is always marked (FREE space)
+                markedSquares[12] = true;  // Center is FREE
             } else {
                 generateNewBingoCard();
             }
 
             renderBingoCard();
+        }
+
+        function updateCurrentPlayerDisplay() {
+            const display = document.getElementById('bingoCurrentPlayer');
+            if (currentPlayer === 1) {
+                display.textContent = "🔵 Player 1's Turn (Blue)";
+                display.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+            } else {
+                display.textContent = "🔴 Player 2's Turn (Red)";
+                display.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';
+            }
         }
 
         function generateNewBingoCard() {
@@ -966,28 +1069,50 @@
             // Insert FREE space in the middle (index 12)
             bingoCard.splice(12, 0, '⭐ FREE');
 
-            // Reset all marks except center
-            markedSquares = Array(25).fill(false);
-            markedSquares[12] = true; // Center is FREE
+            if (bingoGameMode === 'competitive') {
+                player1Marks = Array(25).fill(false);
+                player2Marks = Array(25).fill(false);
+                player1Marks[12] = true;  // Center is FREE for both
+                player2Marks[12] = true;
+                currentPlayer = 1;
 
-            // Save to localStorage
-            localStorage.setItem('bingoCard', JSON.stringify(bingoCard));
-            localStorage.setItem('bingoMarks', JSON.stringify(markedSquares));
+                localStorage.setItem('bingoCard_competitive', JSON.stringify(bingoCard));
+                localStorage.setItem('player1Marks', JSON.stringify(player1Marks));
+                localStorage.setItem('player2Marks', JSON.stringify(player2Marks));
+                localStorage.setItem('currentPlayer', currentPlayer);
+                updateCurrentPlayerDisplay();
+            } else {
+                markedSquares = Array(25).fill(false);
+                markedSquares[12] = true;  // Center is FREE
 
-            // Hide win message
+                localStorage.setItem('bingoCard_team', JSON.stringify(bingoCard));
+                localStorage.setItem('bingoMarks_team', JSON.stringify(markedSquares));
+            }
+
             document.getElementById('bingoWinMessage').style.display = 'none';
-
             renderBingoCard();
         }
 
         function resetBingoCard() {
-            // Keep same card, just clear marks
-            markedSquares = Array(25).fill(false);
-            markedSquares[12] = true; // Center stays marked (FREE)
+            if (bingoGameMode === 'competitive') {
+                player1Marks = Array(25).fill(false);
+                player2Marks = Array(25).fill(false);
+                player1Marks[12] = true;
+                player2Marks[12] = true;
+                currentPlayer = 1;
 
-            localStorage.setItem('bingoMarks', JSON.stringify(markedSquares));
+                localStorage.setItem('player1Marks', JSON.stringify(player1Marks));
+                localStorage.setItem('player2Marks', JSON.stringify(player2Marks));
+                localStorage.setItem('currentPlayer', currentPlayer);
+                updateCurrentPlayerDisplay();
+            } else {
+                markedSquares = Array(25).fill(false);
+                markedSquares[12] = true;
+
+                localStorage.setItem('bingoMarks_team', JSON.stringify(markedSquares));
+            }
+
             document.getElementById('bingoWinMessage').style.display = 'none';
-
             renderBingoCard();
         }
 
@@ -995,8 +1120,31 @@
             // Can't toggle FREE space
             if (index === 12) return;
 
-            markedSquares[index] = !markedSquares[index];
-            localStorage.setItem('bingoMarks', JSON.stringify(markedSquares));
+            if (bingoGameMode === 'competitive') {
+                // In competitive mode, mark for current player and switch turns
+                if (currentPlayer === 1) {
+                    player1Marks[index] = !player1Marks[index];
+                    // If marking (not unmarking), switch to other player
+                    if (player1Marks[index]) {
+                        currentPlayer = 2;
+                    }
+                } else {
+                    player2Marks[index] = !player2Marks[index];
+                    // If marking (not unmarking), switch to other player
+                    if (player2Marks[index]) {
+                        currentPlayer = 1;
+                    }
+                }
+
+                localStorage.setItem('player1Marks', JSON.stringify(player1Marks));
+                localStorage.setItem('player2Marks', JSON.stringify(player2Marks));
+                localStorage.setItem('currentPlayer', currentPlayer);
+                updateCurrentPlayerDisplay();
+            } else {
+                // Team mode
+                markedSquares[index] = !markedSquares[index];
+                localStorage.setItem('bingoMarks_team', JSON.stringify(markedSquares));
+            }
 
             renderBingoCard();
             checkForBingo();
@@ -1005,15 +1153,44 @@
         function renderBingoCard() {
             const grid = document.getElementById('bingoGrid');
             grid.innerHTML = bingoCard.map((item, index) => {
-                const isMarked = markedSquares[index];
                 const isFree = index === 12;
+                let isMarked, bgColor, textColor;
+
+                if (bingoGameMode === 'competitive') {
+                    const p1Marked = player1Marks[index];
+                    const p2Marked = player2Marks[index];
+
+                    if (p1Marked && p2Marked) {
+                        // Both marked (shouldn't happen except FREE) - show purple
+                        isMarked = true;
+                        bgColor = 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)';
+                        textColor = 'white';
+                    } else if (p1Marked) {
+                        isMarked = true;
+                        bgColor = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';  // Blue for Player 1
+                        textColor = 'white';
+                    } else if (p2Marked) {
+                        isMarked = true;
+                        bgColor = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';  // Red for Player 2
+                        textColor = 'white';
+                    } else {
+                        isMarked = false;
+                        bgColor = 'white';
+                        textColor = '#333';
+                    }
+                } else {
+                    // Team mode
+                    isMarked = markedSquares[index];
+                    bgColor = isMarked ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' : 'white';
+                    textColor = isMarked ? 'white' : '#333';
+                }
 
                 return `
                     <div
                         onclick="toggleBingoSquare(${index})"
                         style="
                             aspect-ratio: 1;
-                            background: ${isMarked ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' : 'white'};
+                            background: ${bgColor};
                             border-radius: 10px;
                             display: flex;
                             flex-direction: column;
@@ -1021,12 +1198,12 @@
                             justify-content: center;
                             cursor: ${isFree ? 'default' : 'pointer'};
                             transition: all 0.2s;
-                            box-shadow: ${isMarked ? '0 4px 8px rgba(40, 167, 69, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
+                            box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
                             padding: 0.5rem;
                             text-align: center;
                             font-size: clamp(0.7rem, 2vw, 0.9rem);
                             font-weight: ${isMarked ? 'bold' : 'normal'};
-                            color: ${isMarked ? 'white' : '#333'};
+                            color: ${textColor};
                             transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
                         "
                         ${!isFree ? `onmouseover="if(!${isMarked}) this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(${isMarked ? '0.95' : '1'})'"` : ''}
@@ -1038,38 +1215,67 @@
         }
 
         function checkForBingo() {
+            if (bingoGameMode === 'competitive') {
+                // Check Player 1
+                if (checkPlayerBingo(player1Marks)) {
+                    showBingoWin(1);
+                    return;
+                }
+                // Check Player 2
+                if (checkPlayerBingo(player2Marks)) {
+                    showBingoWin(2);
+                    return;
+                }
+            } else {
+                // Team mode
+                if (checkPlayerBingo(markedSquares)) {
+                    showBingoWin(0);  // 0 = team
+                }
+            }
+        }
+
+        function checkPlayerBingo(marks) {
             // Check rows
             for (let row = 0; row < 5; row++) {
-                if (markedSquares[row * 5] && markedSquares[row * 5 + 1] && markedSquares[row * 5 + 2] && markedSquares[row * 5 + 3] && markedSquares[row * 5 + 4]) {
-                    showBingoWin();
-                    return;
+                if (marks[row * 5] && marks[row * 5 + 1] && marks[row * 5 + 2] && marks[row * 5 + 3] && marks[row * 5 + 4]) {
+                    return true;
                 }
             }
 
             // Check columns
             for (let col = 0; col < 5; col++) {
-                if (markedSquares[col] && markedSquares[col + 5] && markedSquares[col + 10] && markedSquares[col + 15] && markedSquares[col + 20]) {
-                    showBingoWin();
-                    return;
+                if (marks[col] && marks[col + 5] && marks[col + 10] && marks[col + 15] && marks[col + 20]) {
+                    return true;
                 }
             }
 
-            // Check diagonal (top-left to bottom-right)
-            if (markedSquares[0] && markedSquares[6] && markedSquares[12] && markedSquares[18] && markedSquares[24]) {
-                showBingoWin();
-                return;
+            // Check diagonals
+            if (marks[0] && marks[6] && marks[12] && marks[18] && marks[24]) {
+                return true;
+            }
+            if (marks[4] && marks[8] && marks[12] && marks[16] && marks[20]) {
+                return true;
             }
 
-            // Check diagonal (top-right to bottom-left)
-            if (markedSquares[4] && markedSquares[8] && markedSquares[12] && markedSquares[16] && markedSquares[20]) {
-                showBingoWin();
-                return;
-            }
+            return false;
         }
 
-        function showBingoWin() {
-            document.getElementById('bingoWinMessage').style.display = 'block';
-            // Scroll to top to see the message
+        function showBingoWin(winner) {
+            const winMsg = document.getElementById('bingoWinMessage');
+            const winText = document.getElementById('bingoWinText');
+
+            if (winner === 1) {
+                winText.textContent = '🔵 Player 1 Wins!';
+                winMsg.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
+            } else if (winner === 2) {
+                winText.textContent = '🔴 Player 2 Wins!';
+                winMsg.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';
+            } else {
+                winText.textContent = 'Team Bingo!';
+                winMsg.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100())';
+            }
+
+            winMsg.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
