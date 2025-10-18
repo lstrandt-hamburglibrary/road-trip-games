@@ -406,10 +406,10 @@
 
     function updateDisplay() {
         // Update stats
-        document.getElementById('drugwarsCash').textContent = `$${gameState.cash.toLocaleString()}`;
-        document.getElementById('drugwarsDebt').textContent = `$${gameState.debt.toLocaleString()}`;
-        document.getElementById('drugwarsBank').textContent = `$${gameState.bankBalance.toLocaleString()}`;
-        document.getElementById('drugwarsDay').textContent = `${gameState.day}/${TOTAL_DAYS}`;
+        document.getElementById('drugwarsCash').textContent = gameState.cash.toLocaleString();
+        document.getElementById('drugwarsDebt').textContent = gameState.debt.toLocaleString();
+        document.getElementById('drugwarsBank').textContent = gameState.bankBalance.toLocaleString();
+        document.getElementById('drugwarsDay').textContent = gameState.day;
         document.getElementById('drugwarsLocation').textContent = gameState.location;
         document.getElementById('drugwarsSpace').textContent = `${gameState.usedSpaces}/${gameState.maxSpaces}`;
         document.getElementById('drugwarsGuns').textContent = gameState.guns;
@@ -419,57 +419,68 @@
         const netWorth = gameState.cash + gameState.bankBalance - gameState.debt;
         const netWorthEl = document.getElementById('drugwarsNetWorth');
         netWorthEl.textContent = `$${netWorth.toLocaleString()}`;
-        netWorthEl.style.color = netWorth >= 0 ? '#28a745' : '#dc3545';
+        netWorthEl.style.color = netWorth >= 0 ? '#2ecc71' : '#e74c3c';
 
         // Update message
-        document.getElementById('drugwarsMessage').textContent = gameState.message;
+        const msgEl = document.getElementById('drugwarsMessage');
+        if (gameState.message) {
+            msgEl.textContent = gameState.message;
+            msgEl.style.display = 'block';
+        } else {
+            msgEl.style.display = 'none';
+        }
+
+        // Show/hide Bronx actions
+        const isBronx = gameState.location === 'Bronx';
+        document.getElementById('drugwarsBronxActions').style.display = isBronx ? 'block' : 'none';
 
         // Update prices table
-        const tbody = document.getElementById('drugwarsPrices');
-        tbody.innerHTML = '';
+        const table = document.getElementById('drugwarsPrices');
+        table.innerHTML = '';
 
         for (const [drug, price] of Object.entries(gameState.prices)) {
             const row = document.createElement('tr');
             const owned = gameState.inventory[drug] || 0;
 
             if (price === null) {
-                row.innerHTML = `
-                    <td>${drug}</td>
-                    <td colspan="3" style="text-align: center; color: #888;">Not Available</td>
-                `;
+                row.innerHTML = `<td colspan="4" style="padding: 0.25rem; color: #888;">${drug}: Not available</td>`;
             } else {
                 const isEvent = gameState.currentEvent && gameState.currentEvent.drug === drug;
                 const priceStyle = isEvent ? 'color: #ff00ff; font-weight: bold;' : '';
 
                 row.innerHTML = `
-                    <td>${drug}</td>
-                    <td style="${priceStyle}">$${price.toLocaleString()}</td>
-                    <td>${owned}</td>
-                    <td>
-                        <button class="btn-small" onclick="window.drugWarsBuy('${drug}')">Buy</button>
-                        <button class="btn-small" onclick="window.drugWarsSell('${drug}')">Sell</button>
+                    <td style="padding: 0.25rem;">${drug}:</td>
+                    <td style="padding: 0.25rem; ${priceStyle}">$${price.toLocaleString()}</td>
+                    <td style="padding: 0.25rem;">${owned > 0 ? `(own ${owned})` : ''}</td>
+                    <td style="padding: 0.25rem;">
+                        <a href="#" onclick="window.drugWarsBuy('${drug}'); return false;">Buy</a> |
+                        <a href="#" onclick="window.drugWarsSell('${drug}'); return false;">Sell</a>
                     </td>
                 `;
             }
-            tbody.appendChild(row);
+            table.appendChild(row);
         }
 
         // Update locations
         const locationsDiv = document.getElementById('drugwarsLocations');
         locationsDiv.innerHTML = '';
 
-        LOCATIONS.forEach(loc => {
-            const btn = document.createElement('button');
-            btn.textContent = loc;
-            btn.className = loc === gameState.location ? 'location-btn active' : 'location-btn';
-            btn.onclick = () => travel(loc);
-            locationsDiv.appendChild(btn);
-        });
+        LOCATIONS.forEach((loc, i) => {
+            if (i > 0) locationsDiv.appendChild(document.createTextNode(' | '));
 
-        // Show/hide Bronx-only buttons
-        const isBronx = gameState.location === 'Bronx';
-        document.getElementById('drugwarsBankBtn').style.display = isBronx ? 'inline-block' : 'none';
-        document.getElementById('drugwarsLoanBtn').style.display = isBronx ? 'inline-block' : 'none';
+            if (loc === gameState.location) {
+                const span = document.createElement('strong');
+                span.textContent = loc;
+                span.style.color = '#3498db';
+                locationsDiv.appendChild(span);
+            } else {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.textContent = loc;
+                link.onclick = () => { travel(loc); return false; };
+                locationsDiv.appendChild(link);
+            }
+        });
 
         // Show game over screen if needed
         if (gameState.gameOver) {
