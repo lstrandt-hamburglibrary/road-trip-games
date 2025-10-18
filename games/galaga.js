@@ -44,6 +44,7 @@
         keys: {},
         shootCooldown: 0,
         dualFighter: false,
+        challengeStage: false,
         formingUp: true,
         formationComplete: false,
         enemiesEntering: [],
@@ -298,15 +299,17 @@
                 this.x = this.homeX + formationOffsetX;
                 this.y = this.homeY;
 
-                // Random chance to start diving
-                const divingCount = gameState.enemies.filter(e => e.alive && e.diving).length;
-                if (divingCount < 6 && Math.random() < 0.0008) {
-                    this.startDive();
+                // Random chance to start diving (not in challenge stage)
+                if (!gameState.challengeStage) {
+                    const divingCount = gameState.enemies.filter(e => e.alive && e.diving).length;
+                    if (divingCount < 3 && Math.random() < 0.0003) {
+                        this.startDive();
+                    }
                 }
             }
 
-            // Shoot occasionally when diving
-            if (this.diving && Math.random() < 0.02) {
+            // Shoot occasionally when diving (not in challenge stage)
+            if (this.diving && !gameState.challengeStage && Math.random() < 0.02) {
                 this.shoot();
             }
         }
@@ -439,6 +442,7 @@
         gameState.formationDirection = 1;
         gameState.shootCooldown = 0;
         gameState.dualFighter = false;
+        gameState.challengeStage = false;
         gameState.formingUp = true;
         gameState.respawning = false;
         gameState.respawnTimer = 0;
@@ -456,6 +460,13 @@
     }
 
     function startStage() {
+        // Every 3rd stage is a challenge stage (no timer, just more enemies)
+        if (gameState.level % 3 === 0) {
+            gameState.challengeStage = true;
+        } else {
+            gameState.challengeStage = false;
+        }
+
         createEnemyFormation();
     }
 
@@ -472,28 +483,13 @@
 
         let enemyIndex = 0;
 
-        // Top row - 4 Boss Galaga
-        for (let col = 3; col < 7; col++) {
-            const x = startX + col * spacingX;
-            const y = startY;
-            const enemy = new Enemy(x, y, ENEMY_TYPES.BOSS, 0, col);
-            enemy.x = -50;
-            enemy.y = -50;
-            gameState.enemies.push(enemy);
-            gameState.enemiesEntering.push({
-                enemy: enemy,
-                delay: enemyIndex * 8,
-                entered: false
-            });
-            enemyIndex++;
-        }
-
-        // Rows 1-2 - Butterflies
-        for (let row = 1; row < 3; row++) {
+        // Challenge stages have more enemies!
+        if (gameState.challengeStage) {
+            // Top row - 6 Boss Galaga (instead of 4)
             for (let col = 2; col < 8; col++) {
                 const x = startX + col * spacingX;
-                const y = startY + row * spacingY;
-                const enemy = new Enemy(x, y, ENEMY_TYPES.BUTTERFLY, row, col);
+                const y = startY;
+                const enemy = new Enemy(x, y, ENEMY_TYPES.BOSS, 0, col);
                 enemy.x = -50;
                 enemy.y = -50;
                 gameState.enemies.push(enemy);
@@ -504,14 +500,49 @@
                 });
                 enemyIndex++;
             }
-        }
 
-        // Rows 3-4 - Bees
-        for (let row = 3; row < 5; row++) {
-            for (let col = 1; col < 9; col++) {
+            // Rows 1-2 - Butterflies (full width)
+            for (let row = 1; row < 3; row++) {
+                for (let col = 1; col < 9; col++) {
+                    const x = startX + col * spacingX;
+                    const y = startY + row * spacingY;
+                    const enemy = new Enemy(x, y, ENEMY_TYPES.BUTTERFLY, row, col);
+                    enemy.x = -50;
+                    enemy.y = -50;
+                    gameState.enemies.push(enemy);
+                    gameState.enemiesEntering.push({
+                        enemy: enemy,
+                        delay: enemyIndex * 8,
+                        entered: false
+                    });
+                    enemyIndex++;
+                }
+            }
+
+            // Rows 3-5 - Bees (3 rows instead of 2)
+            for (let row = 3; row < 6; row++) {
+                for (let col = 0; col < 10; col++) {
+                    const x = startX + col * spacingX;
+                    const y = startY + row * spacingY;
+                    const enemy = new Enemy(x, y, ENEMY_TYPES.BEE, row, col);
+                    enemy.x = -50;
+                    enemy.y = -50;
+                    gameState.enemies.push(enemy);
+                    gameState.enemiesEntering.push({
+                        enemy: enemy,
+                        delay: enemyIndex * 8,
+                        entered: false
+                    });
+                    enemyIndex++;
+                }
+            }
+        } else {
+            // Normal stage - original enemy count
+            // Top row - 4 Boss Galaga
+            for (let col = 3; col < 7; col++) {
                 const x = startX + col * spacingX;
-                const y = startY + row * spacingY;
-                const enemy = new Enemy(x, y, ENEMY_TYPES.BEE, row, col);
+                const y = startY;
+                const enemy = new Enemy(x, y, ENEMY_TYPES.BOSS, 0, col);
                 enemy.x = -50;
                 enemy.y = -50;
                 gameState.enemies.push(enemy);
@@ -521,6 +552,42 @@
                     entered: false
                 });
                 enemyIndex++;
+            }
+
+            // Rows 1-2 - Butterflies
+            for (let row = 1; row < 3; row++) {
+                for (let col = 2; col < 8; col++) {
+                    const x = startX + col * spacingX;
+                    const y = startY + row * spacingY;
+                    const enemy = new Enemy(x, y, ENEMY_TYPES.BUTTERFLY, row, col);
+                    enemy.x = -50;
+                    enemy.y = -50;
+                    gameState.enemies.push(enemy);
+                    gameState.enemiesEntering.push({
+                        enemy: enemy,
+                        delay: enemyIndex * 8,
+                        entered: false
+                    });
+                    enemyIndex++;
+                }
+            }
+
+            // Rows 3-4 - Bees
+            for (let row = 3; row < 5; row++) {
+                for (let col = 1; col < 9; col++) {
+                    const x = startX + col * spacingX;
+                    const y = startY + row * spacingY;
+                    const enemy = new Enemy(x, y, ENEMY_TYPES.BEE, row, col);
+                    enemy.x = -50;
+                    enemy.y = -50;
+                    gameState.enemies.push(enemy);
+                    gameState.enemiesEntering.push({
+                        enemy: enemy,
+                        delay: enemyIndex * 8,
+                        entered: false
+                    });
+                    enemyIndex++;
+                }
             }
         }
     }
@@ -647,8 +714,8 @@
             }
         }
 
-        // Enemy bullets hit player (not invincible, player exists)
-        if (!gameState.invincible && gameState.player) {
+        // Enemy bullets hit player (not in challenge stage, not invincible, player exists)
+        if (!gameState.challengeStage && !gameState.invincible && gameState.player) {
             for (let i = gameState.enemyBullets.length - 1; i >= 0; i--) {
                 const bullet = gameState.enemyBullets[i];
                 if (checkRectCollision(bullet, gameState.player)) {
@@ -799,6 +866,10 @@
         // Draw UI
         drawUI(ctx);
 
+        if (gameState.challengeStage && !gameState.formingUp) {
+            drawChallengeStage(ctx);
+        }
+
         if (gameState.gameOver) {
             drawGameOver(ctx);
         }
@@ -814,6 +885,14 @@
         if (gameState.dualFighter) {
             ctx.fillText('DUAL FIGHTER!', CANVAS_WIDTH - 130, 40);
         }
+    }
+
+    function drawChallengeStage(ctx) {
+        ctx.fillStyle = '#00FFFF';
+        ctx.font = 'bold 24px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('CHALLENGE STAGE', CANVAS_WIDTH / 2, 30);
+        ctx.textAlign = 'left';
     }
 
     function drawGameOver(ctx) {
