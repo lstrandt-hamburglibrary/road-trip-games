@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.75.4';</script>
+    <script>window.APP_VERSION = '1.76.0';</script>
 
     <style>
         * {
@@ -321,6 +321,32 @@
                 </div>
             </div>
 
+            <!-- Travel Bingo Name Entry (hidden by default) -->
+            <div id="bingoNameEntry" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>🏁 Enter Player Names</h2>
+                    <button onclick="backToModeSelection()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back</button>
+                </div>
+
+                <div style="max-width: 500px; margin: 0 auto; background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                    <p style="color: #666; text-align: center; margin-bottom: 2rem;">Enter names for both players to track your progress:</p>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; color: #007bff; font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem;">🔵 Player 1 Name:</label>
+                        <input type="text" id="player1NameInput" placeholder="Enter Player 1's name" maxlength="20" style="width: 100%; padding: 0.75rem; border: 2px solid #007bff; border-radius: 10px; font-size: 1rem; box-sizing: border-box;">
+                    </div>
+
+                    <div style="margin-bottom: 2rem;">
+                        <label style="display: block; color: #e74c3c; font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem;">🔴 Player 2 Name:</label>
+                        <input type="text" id="player2NameInput" placeholder="Enter Player 2's name" maxlength="20" style="width: 100%; padding: 0.75rem; border: 2px solid #e74c3c; border-radius: 10px; font-size: 1rem; box-sizing: border-box;">
+                    </div>
+
+                    <button onclick="submitPlayerNames()" style="width: 100%; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">Start Game</button>
+
+                    <p style="color: #999; font-size: 0.85rem; text-align: center; margin-top: 1rem;">You can change names later from the game screen</p>
+                </div>
+            </div>
+
             <!-- Travel Bingo Game Section (hidden by default) -->
             <div id="travelBingo" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -331,9 +357,10 @@
                 <!-- Player Selector for Competitive Mode -->
                 <div id="bingoPlayerSelector" style="display: none; text-align: center; margin-bottom: 1rem;">
                     <p style="color: #666; margin-bottom: 0.5rem; font-size: 0.9rem;">I am:</p>
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <button id="selectPlayer1" onclick="selectPlayer(1)" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); min-width: 120px;">🔵 Player 1</button>
-                        <button id="selectPlayer2" onclick="selectPlayer(2)" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); min-width: 120px; opacity: 0.5;">🔴 Player 2</button>
+                    <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                        <button id="selectPlayer1" onclick="selectPlayer(1)" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); min-width: 120px;">🔵 <span id="player1ButtonName">Player 1</span></button>
+                        <button id="selectPlayer2" onclick="selectPlayer(2)" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); min-width: 120px; opacity: 0.5;">🔴 <span id="player2ButtonName">Player 2</span></button>
+                        <button onclick="showNameEntry()" style="background: #6c757d; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">✏️ Change Names</button>
                     </div>
                 </div>
 
@@ -982,6 +1009,8 @@
         let player2Marks = [];    // For competitive mode
         let currentPlayer = 1;    // For competitive mode
         let bingoGameMode = 'team';  // 'team' or 'competitive'
+        let player1Name = '';     // Player 1's name
+        let player2Name = '';     // Player 2's name
 
         function showTravelBingo() {
             document.querySelector('.welcome').style.display = 'none';
@@ -995,11 +1024,57 @@
 
         function backToModeSelection() {
             document.getElementById('travelBingo').style.display = 'none';
+            document.getElementById('bingoNameEntry').style.display = 'none';
             document.getElementById('bingoModeSelection').style.display = 'block';
+        }
+
+        function showNameEntry() {
+            // Hide game, show name entry
+            document.getElementById('travelBingo').style.display = 'none';
+            document.getElementById('bingoModeSelection').style.display = 'none';
+            document.getElementById('bingoNameEntry').style.display = 'block';
+
+            // Pre-fill with existing names if available
+            const p1Name = localStorage.getItem('player1Name') || '';
+            const p2Name = localStorage.getItem('player2Name') || '';
+            document.getElementById('player1NameInput').value = p1Name;
+            document.getElementById('player2NameInput').value = p2Name;
+        }
+
+        function submitPlayerNames() {
+            const p1Input = document.getElementById('player1NameInput').value.trim();
+            const p2Input = document.getElementById('player2NameInput').value.trim();
+
+            // Use entered names or default to "Player 1" / "Player 2"
+            player1Name = p1Input || 'Player 1';
+            player2Name = p2Input || 'Player 2';
+
+            // Save to localStorage
+            localStorage.setItem('player1Name', player1Name);
+            localStorage.setItem('player2Name', player2Name);
+
+            // Show the game
+            document.getElementById('bingoNameEntry').style.display = 'none';
+            document.getElementById('travelBingo').style.display = 'block';
+
+            // Update button labels
+            updatePlayerSelector();
         }
 
         function startCompetitiveMode() {
             bingoGameMode = 'competitive';
+
+            // Load names from localStorage
+            player1Name = localStorage.getItem('player1Name') || '';
+            player2Name = localStorage.getItem('player2Name') || '';
+
+            // If names aren't set, show name entry screen
+            if (!player1Name || !player2Name) {
+                showNameEntry();
+                return;
+            }
+
+            // Otherwise, proceed to game
             document.getElementById('bingoModeSelection').style.display = 'none';
             document.getElementById('travelBingo').style.display = 'block';
             document.getElementById('bingoTitle').textContent = '🏁 Competitive Bingo';
@@ -1009,8 +1084,8 @@
                 <ul style="color: #666; line-height: 1.8;">
                     <li>Select your player number above before marking squares</li>
                     <li>When you spot an item, click it to mark it with your checkmark</li>
-                    <li>Player 1: BLUE ✓ in upper right corner</li>
-                    <li>Player 2: RED ✓ in upper left corner</li>
+                    <li>${player1Name}: BLUE ✓ in upper right corner</li>
+                    <li>${player2Name}: RED ✓ in upper left corner</li>
                     <li>Both can mark the same square - both checkmarks will show</li>
                     <li>First player to get 5 in a row with their color wins!</li>
                     <li>The center square is a FREE space for both players</li>
@@ -1078,6 +1153,10 @@
         function updatePlayerSelector() {
             const btn1 = document.getElementById('selectPlayer1');
             const btn2 = document.getElementById('selectPlayer2');
+
+            // Update button labels with player names
+            document.getElementById('player1ButtonName').textContent = player1Name || 'Player 1';
+            document.getElementById('player2ButtonName').textContent = player2Name || 'Player 2';
 
             if (currentPlayer === 1) {
                 btn1.style.opacity = '1';
@@ -1310,10 +1389,10 @@
             const winText = document.getElementById('bingoWinText');
 
             if (winner === 1) {
-                winText.textContent = '🔵 Player 1 Wins!';
+                winText.textContent = `🔵 ${player1Name || 'Player 1'} Wins!`;
                 winMsg.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
             } else if (winner === 2) {
-                winText.textContent = '🔴 Player 2 Wins!';
+                winText.textContent = `🔴 ${player2Name || 'Player 2'} Wins!`;
                 winMsg.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';
             } else {
                 winText.textContent = 'Team Bingo!';
