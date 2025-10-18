@@ -592,12 +592,12 @@
             ctx.fillText('ASTEROIDS', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 80);
 
             ctx.font = '24px monospace';
-            ctx.fillText('Press SPACE or tap to start', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
+            ctx.fillText('Press FIRE or tap to start', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20);
 
             ctx.font = '18px monospace';
-            ctx.fillText('Arrow Keys / WASD to rotate and thrust', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
-            ctx.fillText('Hold SPACE for continuous fire', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
-            ctx.fillText('SHIFT for Hyperspace', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
+            ctx.fillText('Arrow Keys / WASD to rotate', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
+            ctx.fillText('Hold SPACE/FIRE for continuous fire', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
+            ctx.fillText('SHIFT/Button for Hyperspace', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
         }
 
         // Game over screen
@@ -712,15 +712,10 @@
                 <canvas id="asteroidsCanvas" width="800" height="600" style="border: 4px solid #333; border-radius: 10px; background: #000; max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
 
                 <!-- Mobile Controls - Standardized Layout -->
-                <div style="display: flex; gap: 0.5rem; justify-content: center; align-items: flex-end; margin-top: 1rem; max-width: 100%; flex-wrap: wrap;">
-                    <!-- Left side: Fire and Thrust stacked -->
+                <div style="display: flex; gap: 0.5rem; justify-content: space-between; align-items: flex-end; margin-top: 1rem; max-width: 100%;">
+                    <!-- Left side: Fire and Hyperspace stacked -->
                     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                         <button id="astFireBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.1rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
-                        <button id="astThrustBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; border: none; border-radius: 50%; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">🚀</button>
-                    </div>
-
-                    <!-- Center: Hyperspace -->
-                    <div style="display: flex; align-items: flex-end;">
                         <button id="astHyperspaceBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; border: none; border-radius: 50%; font-size: 0.8rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); line-height: 1.2;">HYPER<br>SPACE</button>
                     </div>
 
@@ -738,8 +733,8 @@
                         <li>🪨 Large asteroids break into medium (20 pts), medium into small (50 pts), small destroyed (100 pts)</li>
                         <li>🛸 UFOs appear and shoot at you - destroy them for bonus points!</li>
                         <li>⚡ <strong>Hyperspace:</strong> Emergency teleport (risky - 10% chance of self-destruct!)</li>
-                        <li>🚀 Your ship has realistic inertia - you keep drifting unless you counter-thrust</li>
                         <li>🔫 Hold fire button for continuous automatic shooting!</li>
+                        <li>🎮 Rotate left/right to aim your ship</li>
                         <li>💡 Screen wraps - everything that goes off one edge appears on the opposite side</li>
                     </ul>
                 </div>
@@ -758,7 +753,6 @@
         // Mobile button controls
         const leftBtn = document.getElementById('astLeftBtn');
         const rightBtn = document.getElementById('astRightBtn');
-        const thrustBtn = document.getElementById('astThrustBtn');
         const fireBtn = document.getElementById('astFireBtn');
         const hyperspaceBtn = document.getElementById('astHyperspaceBtn');
 
@@ -771,11 +765,6 @@
         rightBtn.addEventListener('touchend', () => gameState.ship.rotating = 0);
         rightBtn.addEventListener('mousedown', () => gameState.ship.rotating = 1);
         rightBtn.addEventListener('mouseup', () => gameState.ship.rotating = 0);
-
-        thrustBtn.addEventListener('touchstart', () => gameState.ship.thrusting = true);
-        thrustBtn.addEventListener('touchend', () => gameState.ship.thrusting = false);
-        thrustBtn.addEventListener('mousedown', () => gameState.ship.thrusting = true);
-        thrustBtn.addEventListener('mouseup', () => gameState.ship.thrusting = false);
 
         fireBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
