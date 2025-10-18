@@ -597,7 +597,7 @@
             ctx.font = '18px monospace';
             ctx.fillText('Arrow Keys / WASD to rotate', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 30);
             ctx.fillText('Hold SPACE/FIRE for continuous fire', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
-            ctx.fillText('SHIFT/Button for Hyperspace', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
+            ctx.fillText('SHIFT for Hyperspace (keyboard only)', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 90);
         }
 
         // Game over screen
@@ -713,11 +713,8 @@
 
                 <!-- Mobile Controls - Standardized Layout -->
                 <div style="display: flex; gap: 0.5rem; justify-content: space-between; align-items: flex-end; margin-top: 1rem; max-width: 100%;">
-                    <!-- Left side: Fire and Hyperspace stacked -->
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        <button id="astFireBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.1rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
-                        <button id="astHyperspaceBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; border: none; border-radius: 50%; font-size: 0.8rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); line-height: 1.2;">HYPER<br>SPACE</button>
-                    </div>
+                    <!-- Left side: Fire button -->
+                    <button id="astFireBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.1rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
 
                     <!-- Right side: Directional controls -->
                     <div style="display: flex; gap: 0.5rem;">
@@ -754,7 +751,6 @@
         const leftBtn = document.getElementById('astLeftBtn');
         const rightBtn = document.getElementById('astRightBtn');
         const fireBtn = document.getElementById('astFireBtn');
-        const hyperspaceBtn = document.getElementById('astHyperspaceBtn');
 
         leftBtn.addEventListener('touchstart', () => gameState.ship.rotating = -1);
         leftBtn.addEventListener('touchend', () => gameState.ship.rotating = 0);
@@ -785,12 +781,6 @@
         });
         fireBtn.addEventListener('mouseup', () => {
             gameState.firing = false;
-        });
-
-        hyperspaceBtn.addEventListener('click', () => {
-            if (gameState.gameStarted && !gameState.gameOver) {
-                hyperspace();
-            }
         });
 
         // Start game loop
