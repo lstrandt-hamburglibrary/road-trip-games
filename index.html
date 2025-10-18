@@ -281,9 +281,42 @@
                     <p>Learn interesting facts about places you're driving through</p>
                 </div>
 
-                <div class="feature-card" onclick="alert('Trip Bingo - Coming Soon!')">
+                <div class="feature-card" onclick="showTravelBingo()">
                     <h3>🎯 Travel Bingo</h3>
                     <p>Spot common road trip sights and win!</p>
+                </div>
+            </div>
+
+            <!-- Travel Bingo Section (hidden by default) -->
+            <div id="travelBingo" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>🎯 Travel Bingo</h2>
+                    <button onclick="showHome()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Home</button>
+                </div>
+
+                <div id="bingoWinMessage" style="display: none; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; text-align: center; animation: pulse 1s infinite;">
+                    <h2 style="font-size: 3rem; margin-bottom: 1rem;">🎉 BINGO! 🎉</h2>
+                    <p style="font-size: 1.5rem;">You got 5 in a row!</p>
+                </div>
+
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; background: #667eea; padding: 1rem; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
+
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button onclick="generateNewBingoCard()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔄 New Card</button>
+                        <button onclick="resetBingoCard()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-left: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↺ Clear Marks</button>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">
+                        <h3 style="color: #333; margin-bottom: 1rem;">How to Play:</h3>
+                        <ul style="color: #666; line-height: 1.8;">
+                            <li>Tap a square when you spot that item on your road trip</li>
+                            <li>Get 5 in a row (horizontal, vertical, or diagonal) to win!</li>
+                            <li>The center square is a FREE space - already marked for you</li>
+                            <li>Click "New Card" to generate a different set of items</li>
+                            <li>Click "Clear Marks" to unmark all squares on current card</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -798,6 +831,7 @@
             document.querySelector('.feature-grid').style.display = 'grid';
             document.querySelector('.roadmap').style.display = 'block';
             document.getElementById('plateTracker').style.display = 'none';
+            document.getElementById('travelBingo').style.display = 'none';
             document.getElementById('gamesMenu').style.display = 'none';
         }
 
@@ -885,7 +919,156 @@
             document.getElementById('canadaProgress').textContent = `${canadaCollected} / ${canadaTotal}`;
         }
 
+        // Travel Bingo functionality
+        const BINGO_ITEMS = [
+            '🐄 Cow', '🗼 Water Tower', '🌉 Bridge', '📻 Billboard', '⛽ Gas Station',
+            '🏍️ Motorcycle', '🚛 Semi Truck', '🛑 Stop Sign', '🚔 Police Car', '🟡 Yellow Car',
+            '⛪ Church', '🏚️ Barn', '🌾 Silo', '🪦 Cemetery', '🚌 School Bus',
+            '⚠️ Speed Limit Sign', '🚂 Train', '🏞️ Lake/Pond', '⛰️ Mountains', '🐦 Birds on Wire',
+            '🏖️ Playground', '🍔 Fast Food', '🌬️ Windmill', '🛣️ Exit Sign', '🚜 Tractor',
+            '🏪 Convenience Store', '🦌 Deer Crossing Sign', '🌳 Tree Grove', '🏭 Factory', '⛲ Fountain',
+            '🚁 Helicopter', '🏫 School', '🏥 Hospital', '🏨 Hotel', '🌻 Sunflowers'
+        ];
 
+        let bingoCard = [];
+        let markedSquares = [];
+
+        function showTravelBingo() {
+            document.querySelector('.welcome').style.display = 'none';
+            document.querySelector('.feature-grid').style.display = 'none';
+            document.querySelector('.roadmap').style.display = 'none';
+            document.getElementById('plateTracker').style.display = 'none';
+            document.getElementById('gamesMenu').style.display = 'none';
+            document.getElementById('travelBingo').style.display = 'block';
+
+            // Load saved card or generate new one
+            const savedCard = localStorage.getItem('bingoCard');
+            const savedMarks = localStorage.getItem('bingoMarks');
+
+            if (savedCard) {
+                bingoCard = JSON.parse(savedCard);
+                markedSquares = savedMarks ? JSON.parse(savedMarks) : Array(25).fill(false);
+                markedSquares[12] = true; // Center is always marked (FREE space)
+            } else {
+                generateNewBingoCard();
+            }
+
+            renderBingoCard();
+        }
+
+        function generateNewBingoCard() {
+            // Shuffle and pick 24 random items (center will be FREE)
+            const shuffled = [...BINGO_ITEMS].sort(() => Math.random() - 0.5);
+            bingoCard = shuffled.slice(0, 24);
+            // Insert FREE space in the middle (index 12)
+            bingoCard.splice(12, 0, '⭐ FREE');
+
+            // Reset all marks except center
+            markedSquares = Array(25).fill(false);
+            markedSquares[12] = true; // Center is FREE
+
+            // Save to localStorage
+            localStorage.setItem('bingoCard', JSON.stringify(bingoCard));
+            localStorage.setItem('bingoMarks', JSON.stringify(markedSquares));
+
+            // Hide win message
+            document.getElementById('bingoWinMessage').style.display = 'none';
+
+            renderBingoCard();
+        }
+
+        function resetBingoCard() {
+            // Keep same card, just clear marks
+            markedSquares = Array(25).fill(false);
+            markedSquares[12] = true; // Center stays marked (FREE)
+
+            localStorage.setItem('bingoMarks', JSON.stringify(markedSquares));
+            document.getElementById('bingoWinMessage').style.display = 'none';
+
+            renderBingoCard();
+        }
+
+        function toggleBingoSquare(index) {
+            // Can't toggle FREE space
+            if (index === 12) return;
+
+            markedSquares[index] = !markedSquares[index];
+            localStorage.setItem('bingoMarks', JSON.stringify(markedSquares));
+
+            renderBingoCard();
+            checkForBingo();
+        }
+
+        function renderBingoCard() {
+            const grid = document.getElementById('bingoGrid');
+            grid.innerHTML = bingoCard.map((item, index) => {
+                const isMarked = markedSquares[index];
+                const isFree = index === 12;
+
+                return `
+                    <div
+                        onclick="toggleBingoSquare(${index})"
+                        style="
+                            aspect-ratio: 1;
+                            background: ${isMarked ? 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' : 'white'};
+                            border-radius: 10px;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            cursor: ${isFree ? 'default' : 'pointer'};
+                            transition: all 0.2s;
+                            box-shadow: ${isMarked ? '0 4px 8px rgba(40, 167, 69, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
+                            padding: 0.5rem;
+                            text-align: center;
+                            font-size: clamp(0.7rem, 2vw, 0.9rem);
+                            font-weight: ${isMarked ? 'bold' : 'normal'};
+                            color: ${isMarked ? 'white' : '#333'};
+                            transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
+                        "
+                        ${!isFree ? `onmouseover="if(!${isMarked}) this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(${isMarked ? '0.95' : '1'})'"` : ''}
+                    >
+                        ${item}${isMarked ? '<br>✓' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkForBingo() {
+            // Check rows
+            for (let row = 0; row < 5; row++) {
+                if (markedSquares[row * 5] && markedSquares[row * 5 + 1] && markedSquares[row * 5 + 2] && markedSquares[row * 5 + 3] && markedSquares[row * 5 + 4]) {
+                    showBingoWin();
+                    return;
+                }
+            }
+
+            // Check columns
+            for (let col = 0; col < 5; col++) {
+                if (markedSquares[col] && markedSquares[col + 5] && markedSquares[col + 10] && markedSquares[col + 15] && markedSquares[col + 20]) {
+                    showBingoWin();
+                    return;
+                }
+            }
+
+            // Check diagonal (top-left to bottom-right)
+            if (markedSquares[0] && markedSquares[6] && markedSquares[12] && markedSquares[18] && markedSquares[24]) {
+                showBingoWin();
+                return;
+            }
+
+            // Check diagonal (top-right to bottom-left)
+            if (markedSquares[4] && markedSquares[8] && markedSquares[12] && markedSquares[16] && markedSquares[20]) {
+                showBingoWin();
+                return;
+            }
+        }
+
+        function showBingoWin() {
+            document.getElementById('bingoWinMessage').style.display = 'block';
+            // Scroll to top to see the message
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         // Show toast notification
         function showToast(message, duration = 3000) {
