@@ -96,8 +96,9 @@
 
         // Spawn Sparx
         gameState.sparx = [];
-        spawnSparx(true);  // Clockwise
-        spawnSparx(false); // Counter-clockwise
+        // Sparx disabled for better mobile experience
+        // spawnSparx(true);  // Clockwise
+        // spawnSparx(false); // Counter-clockwise
 
         calculatePercentClaimed();
     }
@@ -421,13 +422,13 @@
             }
         }
 
-        // Spawn more Sparx over time
-        gameState.sparxTimer++;
-        if (gameState.sparxTimer > gameState.sparxInterval) {
-            gameState.sparxTimer = 0;
-            spawnSparx(Math.random() < 0.5);
-            spawnSparx(Math.random() < 0.5);
-        }
+        // Spawn more Sparx over time - DISABLED
+        // gameState.sparxTimer++;
+        // if (gameState.sparxTimer > gameState.sparxInterval) {
+        //     gameState.sparxTimer = 0;
+        //     spawnSparx(Math.random() < 0.5);
+        //     spawnSparx(Math.random() < 0.5);
+        // }
 
         // Move marker - only allow 4 directions (no diagonals)
         let dx = 0, dy = 0;
@@ -739,7 +740,6 @@
                         <li>💎 You start on the edge (blue) - arrows only move along the edge until you start drawing</li>
                         <li>🎨 When you complete a box back to the edge, the side WITHOUT the Qix gets claimed</li>
                         <li>☠️ <strong>The Qix:</strong> Don't let it touch your incomplete lines!</li>
-                        <li>⚠️ <strong>Sparx:</strong> Red enemies patrol the edges - avoid them!</li>
                         <li>🏆 Bonus: Every 1% above 75% = 1,000 bonus points!</li>
                     </ul>
                 </div>
