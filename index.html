@@ -1181,7 +1181,7 @@
                         textColor = 'white';
                     } else if (p2Marked) {
                         isMarked = true;
-                        bgColor = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';  // Red for Player 2
+                        bgColor = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';  // Red for Player 2
                         textColor = 'white';
                     } else {
                         isMarked = false;
@@ -1218,7 +1218,7 @@
                         "
                         ${!isFree ? `onmouseover="if(!${isMarked}) this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(${isMarked ? '0.95' : '1'})'"` : ''}
                     >
-                        ${item}${isMarked ? '<br>✓' : ''}
+                        ${item}
                     </div>
                 `;
             }).join('');
