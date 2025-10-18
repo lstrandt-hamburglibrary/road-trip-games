@@ -958,27 +958,20 @@
                     background: #000000;
                 "></canvas>
 
-                <div style="text-align: center; color: #666;">
-                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">🎮 Arrow Keys to move, Space to shoot</p>
-                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">🐛 Destroy all centipede segments!</p>
-                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">⚠️ Watch out for Spider, Flea, and Scorpion!</p>
-                    <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #00ccff; font-weight: bold;">💣 Hit bright blue explosive mushrooms to clear 3 spaces!</p>
-                </div>
-
                 <!-- Mobile Touch Controls - Standardized Layout -->
-                <div id="centipedeControls" style="display: flex; justify-content: center; gap: 1rem; align-items: flex-end; margin-top: 0.25rem; max-width: 100%;">
+                <div id="centipedeControls" style="display: flex; justify-content: space-between; width: 100%; max-width: 350px; align-items: flex-end; margin-top: 0.5rem;">
                     <button id="centipedeBtnFire" style="width: 80px; height: 80px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.1rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
-                    <div style="display: grid; grid-template-columns: repeat(3, 70px); grid-template-rows: repeat(3, 70px); gap: 5px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 4px;">
                         <div style="grid-column: 2;"></div>
-                        <button id="centipedeBtnUp" style="grid-column: 2; width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 1.8rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▲</button>
+                        <button id="centipedeBtnUp" style="grid-column: 2; width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▲</button>
                         <div></div>
 
-                        <button id="centipedeBtnLeft" style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 1.8rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">◀</button>
+                        <button id="centipedeBtnLeft" style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">◀</button>
                         <div></div>
-                        <button id="centipedeBtnRight" style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 1.8rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▶</button>
+                        <button id="centipedeBtnRight" style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▶</button>
 
                         <div></div>
-                        <button id="centipedeBtnDown" style="grid-column: 2; width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-size: 1.8rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▼</button>
+                        <button id="centipedeBtnDown" style="grid-column: 2; width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.5rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▼</button>
                         <div></div>
                     </div>
                 </div>
