@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.77.0';</script>
+    <script>window.APP_VERSION = '1.78.0';</script>
 
     <style>
         * {
@@ -283,6 +283,71 @@
                 transform: scale(1.05);
             }
         }
+
+        /* Bingo Stats Modal */
+        .stats-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            padding: 1rem;
+        }
+
+        .stats-modal.show {
+            display: flex;
+        }
+
+        .stats-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .stats-player-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .stats-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -404,6 +469,7 @@
                     <div style="margin-top: 2rem; text-align: center;">
                         <button onclick="generateNewBingoCard()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔄 New Card</button>
                         <button onclick="resetBingoCard()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-left: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↺ Clear Marks</button>
+                        <button onclick="showBingoStats()" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-left: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">📊 Stats</button>
                     </div>
 
                     <div id="bingoInstructions" style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">
@@ -415,6 +481,22 @@
                             <li>Click "New Card" to generate a different set of items</li>
                             <li>Click "Clear Marks" to unmark all squares on current card</li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bingo Stats Modal -->
+            <div id="bingoStatsModal" class="stats-modal">
+                <div class="stats-content">
+                    <div class="stats-header">
+                        <h2 style="color: #333; margin: 0;">📊 Bingo Statistics</h2>
+                        <button onclick="closeBingoStats()" style="background: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold;">✕ Close</button>
+                    </div>
+                    <div id="bingoStatsContent">
+                        <!-- Stats will be rendered here -->
+                    </div>
+                    <div style="margin-top: 1.5rem; text-align: center;">
+                        <button onclick="clearBingoStats()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 0.9rem;">Clear All Stats</button>
                     </div>
                 </div>
             </div>
@@ -1416,17 +1498,24 @@
         function showBingoWin(winner) {
             const winMsg = document.getElementById('bingoWinMessage');
             const winText = document.getElementById('bingoWinText');
+            let winnerName;
 
             if (winner === 1) {
-                winText.textContent = `🔵 ${player1Name || 'Player 1'} Wins!`;
+                winnerName = player1Name || 'Player 1';
+                winText.textContent = `🔵 ${winnerName} Wins!`;
                 winMsg.style.background = 'linear-gradient(135deg, #007bff 0%, #0056b3 100%)';
             } else if (winner === 2) {
-                winText.textContent = `🔴 ${player2Name || 'Player 2'} Wins!`;
+                winnerName = player2Name || 'Player 2';
+                winText.textContent = `🔴 ${winnerName} Wins!`;
                 winMsg.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100())';
             } else {
+                winnerName = 'Team';
                 winText.textContent = 'Team Bingo!';
                 winMsg.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100())';
             }
+
+            // Record the win in statistics
+            recordBingoWin(winnerName, 'bingo');
 
             winMsg.style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1465,6 +1554,103 @@
                         confetti.remove();
                     }, (animationDuration + delay) * 1000);
                 }, i * 15); // Stagger creation
+            }
+        }
+
+        // Bingo Statistics Functions
+        function getBingoStats() {
+            const stats = localStorage.getItem('bingoStats');
+            return stats ? JSON.parse(stats) : {};
+        }
+
+        function saveBingoStats(stats) {
+            localStorage.setItem('bingoStats', JSON.stringify(stats));
+        }
+
+        function recordBingoWin(playerName, winType = 'bingo') {
+            const stats = getBingoStats();
+
+            if (!stats[playerName]) {
+                stats[playerName] = {
+                    bingos: 0,
+                    blackouts: 0,
+                    totalWins: 0,
+                    lastWinDate: null
+                };
+            }
+
+            // Record the win
+            if (winType === 'bingo') {
+                stats[playerName].bingos++;
+            } else if (winType === 'blackout') {
+                stats[playerName].blackouts++;
+            }
+            stats[playerName].totalWins++;
+            stats[playerName].lastWinDate = new Date().toLocaleDateString();
+
+            saveBingoStats(stats);
+        }
+
+        function showBingoStats() {
+            const stats = getBingoStats();
+            const modal = document.getElementById('bingoStatsModal');
+            const content = document.getElementById('bingoStatsContent');
+
+            if (Object.keys(stats).length === 0) {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #666;">
+                        <p style="font-size: 1.2rem;">No statistics yet!</p>
+                        <p style="margin-top: 0.5rem;">Play some games to start tracking your wins.</p>
+                    </div>
+                `;
+            } else {
+                // Sort by total wins descending
+                const sortedPlayers = Object.entries(stats).sort((a, b) => b[1].totalWins - a[1].totalWins);
+
+                content.innerHTML = sortedPlayers.map(([playerName, playerStats], index) => {
+                    const isTeam = playerName === 'Team';
+                    const gradient = isTeam ?
+                        'linear-gradient(135deg, #28a745 0%, #20c997 100%)' :
+                        index % 2 === 0 ?
+                            'linear-gradient(135deg, #007bff 0%, #0056b3 100%)' :
+                            'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+
+                    return `
+                        <div class="stats-player-card" style="background: ${gradient};">
+                            <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem;">${index + 1}. ${playerName}</h3>
+                            <div class="stats-row">
+                                <span class="stats-label">🎯 Bingos:</span>
+                                <span class="stats-value">${playerStats.bingos}</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="stats-label">⭐ Blackouts:</span>
+                                <span class="stats-value">${playerStats.blackouts}</span>
+                            </div>
+                            <div class="stats-row" style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: 0.75rem; margin-top: 0.5rem;">
+                                <span class="stats-label">🏆 Total Wins:</span>
+                                <span class="stats-value">${playerStats.totalWins}</span>
+                            </div>
+                            ${playerStats.lastWinDate ? `
+                                <div style="text-align: center; margin-top: 1rem; opacity: 0.8; font-size: 0.85rem;">
+                                    Last win: ${playerStats.lastWinDate}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeBingoStats() {
+            document.getElementById('bingoStatsModal').classList.remove('show');
+        }
+
+        function clearBingoStats() {
+            if (confirm('Are you sure you want to clear all bingo statistics? This cannot be undone.')) {
+                localStorage.removeItem('bingoStats');
+                showBingoStats(); // Refresh the display
             }
         }
 
