@@ -943,11 +943,11 @@
         const content = document.getElementById('centipedeContent');
 
         content.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 1rem;">
-                    <button onclick="exitCentipedeToMenu()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">← Back</button>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 0.5rem;">
+                    <button onclick="exitCentipedeToMenu()" style="width: 50px; height: 50px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">←</button>
                     <h2 style="margin: 0;">🐛 Centipede</h2>
-                    <div style="width: 120px;"></div>
+                    <div style="width: 50px;"></div>
                 </div>
 
                 <canvas id="centipedeCanvas" width="${GAME_WIDTH}" height="${GAME_HEIGHT}" style="
@@ -959,14 +959,14 @@
                 "></canvas>
 
                 <div style="text-align: center; color: #666;">
-                    <p style="margin: 0.5rem 0;">🎮 Arrow Keys to move, Space to shoot</p>
-                    <p style="margin: 0.5rem 0;">🐛 Destroy all centipede segments!</p>
-                    <p style="margin: 0.5rem 0;">⚠️ Watch out for Spider, Flea, and Scorpion!</p>
-                    <p style="margin: 0.5rem 0; color: #00ccff; font-weight: bold;">💣 Hit bright blue explosive mushrooms to clear 3 spaces!</p>
+                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">🎮 Arrow Keys to move, Space to shoot</p>
+                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">🐛 Destroy all centipede segments!</p>
+                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">⚠️ Watch out for Spider, Flea, and Scorpion!</p>
+                    <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #00ccff; font-weight: bold;">💣 Hit bright blue explosive mushrooms to clear 3 spaces!</p>
                 </div>
 
                 <!-- Mobile Touch Controls - Standardized Layout -->
-                <div id="centipedeControls" style="display: flex; justify-content: space-between; width: 100%; max-width: 500px; align-items: flex-end; margin-top: 1rem; padding: 0 1rem;">
+                <div id="centipedeControls" style="display: flex; justify-content: space-between; width: 100%; max-width: 500px; align-items: flex-end; margin-top: 0.25rem; padding: 0 1rem;">
                     <button id="centipedeBtnFire" style="width: 90px; height: 90px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 1.2rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">FIRE</button>
                     <div style="display: grid; grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(3, 80px); gap: 8px;">
                         <div style="grid-column: 2;"></div>
