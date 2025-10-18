@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.80.0';</script>
+    <script>window.APP_VERSION = '1.81.0';</script>
 
     <style>
         * {
@@ -467,9 +467,15 @@
                     <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.1rem; background: #667eea; padding: 0.1rem; border-radius: 6px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
 
                     <div style="margin-top: 2rem; text-align: center;">
-                        <button onclick="generateNewBingoCard()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔄 New Card</button>
+                        <button onclick="showThemeSelector()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🎨 Choose Theme</button>
+                        <button onclick="generateNewBingoCard()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-left: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔄 New Card</button>
                         <button onclick="resetBingoCard()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-left: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">↺ Clear Marks</button>
                         <button onclick="showBingoStats()" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-left: 1rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">📊 Stats</button>
+                    </div>
+
+                    <!-- Current Theme Indicator -->
+                    <div id="currentThemeIndicator" style="text-align: center; margin-top: 1rem; color: #666; font-size: 0.9rem;">
+                        Current theme: <span id="currentThemeName" style="font-weight: bold; color: #667eea;"></span>
                     </div>
 
                     <div id="bingoInstructions" style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-top: 2rem;">
@@ -499,6 +505,20 @@
                     </div>
                     <div style="margin-top: 1.5rem; text-align: center;">
                         <button onclick="clearBingoStats()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 0.9rem;">Clear All Stats</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Selector Modal -->
+            <div id="themeSelectorModal" class="stats-modal">
+                <div class="stats-content">
+                    <div class="stats-header">
+                        <h2 style="color: #333; margin: 0;">🎨 Choose Bingo Theme</h2>
+                        <button onclick="closeThemeSelector()" style="background: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold;">✕ Close</button>
+                    </div>
+                    <p style="text-align: center; color: #666; margin-bottom: 1.5rem;">Select a theme for your bingo card:</p>
+                    <div id="themeSelectorContent" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <!-- Theme cards will be rendered here -->
                     </div>
                 </div>
             </div>
@@ -1301,8 +1321,15 @@
                 generateNewBingoCard();
             }
 
+            // Load saved theme preference
+            const savedTheme = localStorage.getItem('bingoTheme');
+            if (savedTheme && BINGO_THEMES[savedTheme]) {
+                currentTheme = savedTheme;
+            }
+
             updatePlayerSelector();
             renderBingoCard();
+            updateThemeIndicator();
         }
 
         function startTeamMode() {
@@ -1334,7 +1361,14 @@
                 generateNewBingoCard();
             }
 
+            // Load saved theme preference
+            const savedTheme = localStorage.getItem('bingoTheme');
+            if (savedTheme && BINGO_THEMES[savedTheme]) {
+                currentTheme = savedTheme;
+            }
+
             renderBingoCard();
+            updateThemeIndicator();
         }
 
         function selectPlayer(playerNum) {
@@ -1771,6 +1805,61 @@
             if (confirm('Are you sure you want to clear all bingo statistics? This cannot be undone.')) {
                 localStorage.removeItem('bingoStats');
                 showBingoStats(); // Refresh the display
+            }
+        }
+
+        // Theme Selector Functions
+        function showThemeSelector() {
+            const modal = document.getElementById('themeSelectorModal');
+            const content = document.getElementById('themeSelectorContent');
+
+            // Render theme cards
+            content.innerHTML = Object.entries(BINGO_THEMES).map(([key, theme]) => {
+                const isSelected = key === currentTheme;
+                const borderStyle = isSelected ? 'border: 3px solid #28a745;' : 'border: 2px solid #e9ecef;';
+                const selectedBadge = isSelected ? '<div style="position: absolute; top: 10px; right: 10px; background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: bold;">ACTIVE</div>' : '';
+
+                return `
+                    <div onclick="selectTheme('${key}')" style="
+                        position: relative;
+                        background: white;
+                        ${borderStyle}
+                        border-radius: 15px;
+                        padding: 1.5rem;
+                        text-align: center;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)';">
+                        ${selectedBadge}
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">${theme.icon}</div>
+                        <h3 style="color: #333; margin-bottom: 0.5rem;">${theme.name}</h3>
+                        <p style="color: #666; font-size: 0.9rem;">${theme.items.length} items</p>
+                    </div>
+                `;
+            }).join('');
+
+            modal.classList.add('show');
+        }
+
+        function closeThemeSelector() {
+            document.getElementById('themeSelectorModal').classList.remove('show');
+        }
+
+        function selectTheme(themeKey) {
+            currentTheme = themeKey;
+            localStorage.setItem('bingoTheme', themeKey);
+            updateThemeIndicator();
+            closeThemeSelector();
+            // Optionally generate a new card immediately
+            generateNewBingoCard();
+        }
+
+        function updateThemeIndicator() {
+            const indicator = document.getElementById('currentThemeName');
+            if (indicator) {
+                const theme = BINGO_THEMES[currentTheme];
+                indicator.textContent = `${theme.icon} ${theme.name} (${theme.items.length} items)`;
             }
         }
 
