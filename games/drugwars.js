@@ -507,9 +507,9 @@
                     <td style="padding: 0.25rem;">${drug}:</td>
                     <td style="padding: 0.25rem; ${priceStyle}">$${price.toLocaleString()}</td>
                     <td style="padding: 0.25rem;">${owned > 0 ? `(own ${owned})` : ''}</td>
-                    <td style="padding: 0.5rem;">
-                        <button onclick="window.drugWarsBuy('${drug}')" style="background: #2ecc71; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; margin-right: 0.25rem; border-radius: 3px;">Buy</button>
-                        <button onclick="window.drugWarsSell('${drug}')" style="background: #e74c3c; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; border-radius: 3px;">Sell</button>
+                    <td style="padding: 0.25rem;">
+                        <button onclick="window.drugWarsBuy('${drug}')" style="background: #2ecc71; color: white; border: none; padding: 0.3rem 0.6rem; cursor: pointer; margin-right: 0.25rem; border-radius: 3px; font-size: 0.9rem;">Buy</button>
+                        <button onclick="window.drugWarsSell('${drug}')" style="background: #e74c3c; color: white; border: none; padding: 0.3rem 0.6rem; cursor: pointer; border-radius: 3px; font-size: 0.9rem;">Sell</button>
                     </td>
                 `;
             }
@@ -521,20 +521,19 @@
         locationsDiv.innerHTML = '';
 
         LOCATIONS.forEach((loc, i) => {
-            if (i > 0) locationsDiv.appendChild(document.createTextNode(' | '));
+            if (i > 0) locationsDiv.appendChild(document.createTextNode(' '));
+
+            const btn = document.createElement('button');
+            btn.textContent = loc;
+            btn.onclick = () => { travel(loc); };
 
             if (loc === gameState.location) {
-                const span = document.createElement('strong');
-                span.textContent = loc;
-                span.style.color = '#3498db';
-                locationsDiv.appendChild(span);
+                btn.style.cssText = 'background: #3498db; color: white; border: 1px solid #2980b9; padding: 0.3rem 0.6rem; cursor: pointer; border-radius: 3px; font-size: 0.9rem; font-weight: bold;';
             } else {
-                const link = document.createElement('a');
-                link.href = '#';
-                link.textContent = loc;
-                link.onclick = () => { travel(loc); return false; };
-                locationsDiv.appendChild(link);
+                btn.style.cssText = 'background: #ecf0f1; color: #2c3e50; border: 1px solid #bdc3c7; padding: 0.3rem 0.6rem; cursor: pointer; border-radius: 3px; font-size: 0.9rem;';
             }
+
+            locationsDiv.appendChild(btn);
         });
 
         // Show game over screen if needed
