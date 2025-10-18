@@ -37,13 +37,19 @@
 
 ---
 
-## Future Game Ideas
+## Completed Features ✅
 
-- [ ] Oregon Trail
+- [x] Oregon Trail
   - Classic survival game adapted for road trips
-  - Manage resources (food, fuel, health)
+  - Manage resources (food, ammo, health, supplies)
   - Random events and challenges
   - Make decisions that affect journey
+  - Complete with diseases, hunting, river crossings
+
+- [x] Themed bingo expansions
+  - Travel bingo implemented
+
+## Future Game Ideas
 
 - [ ] Dungeon Crawler
   - Simple roguelike/dungeon exploration
@@ -54,4 +60,3 @@
 ## Future Features
 
 - [ ] GPS Facts implementation
-- [ ] Themed bingo expansions
