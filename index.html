@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.79.0';</script>
+    <script>window.APP_VERSION = '1.80.0';</script>
 
     <style>
         * {
@@ -1103,6 +1103,7 @@
         }
 
         // Travel Bingo functionality
+        // Classic/Mixed Theme (Original)
         const BINGO_ITEMS = [
             '🐄 Cow', '🗼 Water Tower', '🌉 Bridge', '📻 Billboard', '⛽ Gas Station',
             '🏍️ Motorcycle', '🚛 Semi Truck', '🛑 Stop Sign', '🚔 Police Car', '🟡 Yellow Car',
@@ -1115,6 +1116,83 @@
             '🚧 Construction Cone', '🏴 Flagpole', '🌵 Cactus', '🚑 Ambulance', '🐄🚸 Cattle Crossing', '↩️ Detour Sign',
             '🎈 Hot Air Balloon', '⚡ Lightning', '🌈 Rainbow'
         ];
+
+        // City Road Trip Theme
+        const BINGO_ITEMS_CITY = [
+            '🚦 Traffic Light', '🏙️ Skyscraper', '🚇 Subway Station', '🏪 Convenience Store', '🚌 City Bus',
+            '🚕 Taxi', '🏢 Office Building', '🏬 Shopping Mall', '🚔 Police Car', '🚑 Ambulance',
+            '🚒 Fire Truck', '🅿️ Parking Garage', '🏨 Hotel', '🍕 Pizza Place', '☕ Coffee Shop',
+            '🏦 Bank', '📮 Mailbox', '🚧 Construction Zone', '🏥 Hospital', '🚲 Bike Lane',
+            '🛴 Scooter', '🌳 City Park', '⛲ Fountain', '🎭 Theater', '🏛️ Museum',
+            '🚏 Bus Stop', '📡 Cell Tower', '🏪 7-Eleven', '🍔 Fast Food', '🚐 Delivery Van',
+            '🚓 Police Station', '🏣 Post Office', '📚 Library', '🎪 Event Tent', '🌉 Bridge',
+            '🛣️ Highway Exit', '🚥 Pedestrian Signal', '🏗️ Construction Crane', '🗼 Tower/Monument', '🎡 City Attraction',
+            '🚍 School Bus', '🚙 Uber/Lyft', '🏟️ Stadium', '🌆 City Skyline', '🛒 Shopping Cart',
+            '🚨 Emergency Lights', '📱 Phone Store', '🎬 Movie Theater', '🌁 Fog/Smog', '🌃 Night Lights'
+        ];
+
+        // Rural Road Trip Theme
+        const BINGO_ITEMS_RURAL = [
+            '🐄 Cow', '🐎 Horse', '🐑 Sheep', '🐓 Chicken', '🐖 Pig',
+            '🌾 Wheat Field', '🌽 Corn Field', '🚜 Tractor', '🏚️ Barn', '🌾 Silo',
+            '🪦 Cemetery', '⛪ Country Church', '🏞️ Lake/Pond', '🌳 Tree Grove', '🦌 Deer Crossing Sign',
+            '🌻 Sunflowers', '🍎 Fruit Stand', '🐦 Birds on Wire', '🌬️ Windmill', '⛰️ Mountains',
+            '🚧 Gravel Road', '📮 Rural Mailbox', '🌲 Forest', '🦅 Flock of Birds', '🐄🚸 Cattle Crossing',
+            '🌄 Rolling Hills', '🦃 Wild Turkey', '🦊 Fox Crossing', '🌾 Hay Bales', '🚰 Water Tower',
+            '🏡 Farmhouse', '🪵 Split Rail Fence', '🌿 Pasture', '🦆 Duck Pond', '🐕 Farm Dog',
+            '🚛 Farm Truck', '🌱 Garden', '🐝 Beehives', '🦌 Deer', '🏞️ Creek/Stream',
+            '🪴 Flower Garden', '🌳 Orchard', '🚪 Red Barn Door', '🔔 Farm Bell', '🌾 Wheat Silo',
+            '🪁 Open Field', '🌤️ Clear Sky', '🌅 Sunrise/Sunset', '🦉 Barn Owl', '🐿️ Wildlife'
+        ];
+
+        // Highway Road Trip Theme
+        const BINGO_ITEMS_HIGHWAY = [
+            '🚛 Semi Truck', '⛽ Gas Station', '🛣️ Exit Sign', '🅿️ Rest Stop', '⚖️ Weigh Station',
+            '📻 Billboard', '🚔 State Trooper', '🚌 Tour Bus', '🏍️ Motorcycle', '🚐 RV/Camper',
+            '🚙 Minivan', '🟡 Yellow Car', '🔴 Red Car', '🏎️ Sports Car', '🚗 Convertible',
+            '🌉 Bridge/Overpass', '🚧 Construction Zone', '↩️ Detour Sign', '⚠️ Speed Limit Sign', '🛑 Stop Sign',
+            '🏨 Highway Motel', '🍔 Fast Food', '☕ Drive-Thru', '🚁 Helicopter', '📡 Cell Tower',
+            '🚚 Moving Truck', '🚙 Taxi', '🛻 Pickup Truck', '🚜 Slow Vehicle', '🏁 Mile Marker',
+            '🚏 Park & Ride', '⛽ Truck Stop', '🍩 Donut Shop', '🏪 Travel Center', '🚿 Shower Sign',
+            '📶 Signal Tower', '🌉 Toll Booth', '💨 Passing Zone', '🛤️ Railroad Crossing', '🚧 Orange Cone',
+            '📏 Lane Marker', '🚥 Traffic Light', '🏞️ Scenic Overlook', '🗺️ State Line Sign', '🎯 Next Exit Sign',
+            '🚓 Highway Patrol', '🚕 Rideshare', '🚗 Out-of-State Plate', '⛰️ Mountain View', '🌅 Horizon'
+        ];
+
+        // Seasonal Road Trip Theme
+        const BINGO_ITEMS_SEASONAL = [
+            '🌸 Spring Flowers', '🌼 Daisies', '🌷 Tulips', '🦋 Butterfly', '🐝 Bees',
+            '🌤️ Sunshine', '🏖️ Beach', '🌊 Water', '🦢 Swan', '🌺 Blooming Trees',
+            '🍂 Fall Leaves', '🎃 Pumpkin Patch', '🌰 Acorns', '🦃 Turkey Decor', '🍁 Maple Tree',
+            '❄️ Snow', '⛄ Snowman', '🎄 Christmas Tree', '🦌 Reindeer Decor', '⛷️ Ski Resort',
+            '🌈 Rainbow', '⚡ Lightning', '🌩️ Storm Clouds', '🌅 Sunrise/Sunset', '🌙 Full Moon',
+            '⭐ Stars Visible', '☁️ Fluffy Clouds', '🌬️ Windy Day', '🌫️ Fog', '🌧️ Rain',
+            '☀️ Bright Sun', '🌨️ Snow Flurries', '🍀 Clover Field', '🌻 Sunflower Field', '🎆 Fireworks',
+            '🎈 Party Decorations', '🎃 Halloween Decor', '🎄 Holiday Lights', '🌸 Cherry Blossoms', '🍂 Autumn Colors',
+            '🏔️ Snow-Capped Mountains', '🌊 Ocean Waves', '🏝️ Palm Trees', '🍃 Green Leaves', '🌾 Golden Fields',
+            '🦆 Migrating Birds', '🐻 Wildlife Crossing', '🌺 Tropical Flowers', '🌵 Desert Plants', '🏜️ Sand Dunes'
+        ];
+
+        // All themes combined (default option)
+        const BINGO_ITEMS_ALL = [
+            ...BINGO_ITEMS,
+            ...BINGO_ITEMS_CITY,
+            ...BINGO_ITEMS_RURAL,
+            ...BINGO_ITEMS_HIGHWAY,
+            ...BINGO_ITEMS_SEASONAL
+        ];
+
+        // Theme collection object
+        const BINGO_THEMES = {
+            'all': { name: 'All Themes', items: BINGO_ITEMS_ALL, icon: '🌟' },
+            'classic': { name: 'Classic Mix', items: BINGO_ITEMS, icon: '🎯' },
+            'city': { name: 'City Trip', items: BINGO_ITEMS_CITY, icon: '🏙️' },
+            'rural': { name: 'Rural Trip', items: BINGO_ITEMS_RURAL, icon: '🌾' },
+            'highway': { name: 'Highway Trip', items: BINGO_ITEMS_HIGHWAY, icon: '🛣️' },
+            'seasonal': { name: 'Seasonal', items: BINGO_ITEMS_SEASONAL, icon: '🌸' }
+        };
+
+        let currentTheme = 'all'; // Track current selected theme (default to all themes)
 
         let bingoCard = [];
         let markedSquares = [];  // For team mode: boolean array
@@ -1287,8 +1365,10 @@
         }
 
         function generateNewBingoCard() {
+            // Get items from current theme
+            const themeItems = BINGO_THEMES[currentTheme].items;
             // Shuffle and pick 24 random items (center will be FREE)
-            const shuffled = [...BINGO_ITEMS].sort(() => Math.random() - 0.5);
+            const shuffled = [...themeItems].sort(() => Math.random() - 0.5);
             bingoCard = shuffled.slice(0, 24);
             // Insert FREE space in the middle (index 12)
             bingoCard.splice(12, 0, '⭐ FREE');
