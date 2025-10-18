@@ -694,36 +694,38 @@
                 <canvas id="qixCanvas" width="800" height="600" style="border: 4px solid #333; border-radius: 10px; background: #000; max-width: 100%; height: auto; display: block; margin: 0 auto;"></canvas>
 
                 <!-- Mobile Controls -->
-                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap;">
-                    <div style="display: grid; grid-template-columns: repeat(3, 80px); gap: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; justify-content: space-between; align-items: flex-end; margin-top: 1rem; max-width: 100%;">
+                    <!-- Left side: Fast and Slow buttons stacked -->
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button id="qixFastBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #00ccff 0%, #0099cc 100%); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 0.9rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3); line-height: 1.2;">
+                            ⚡<br>FAST
+                        </button>
+                        <button id="qixSlowBtn" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff6600 0%, #cc5200 100%); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 0.9rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3); line-height: 1.2;">
+                            🐢<br>SLOW
+                        </button>
+                    </div>
+
+                    <!-- Right side: Directional controls -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 70px); grid-template-rows: repeat(3, 70px); gap: 5px;">
                         <div></div>
-                        <button id="qixUpBtn" style="background: #667eea; color: white; border: none; padding: 1rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation;">
+                        <button id="qixUpBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
                             ⬆️
                         </button>
                         <div></div>
 
-                        <button id="qixLeftBtn" style="background: #667eea; color: white; border: none; padding: 1rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation;">
+                        <button id="qixLeftBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
                             ⬅️
                         </button>
                         <div></div>
-                        <button id="qixRightBtn" style="background: #667eea; color: white; border: none; padding: 1rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation;">
+                        <button id="qixRightBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
                             ➡️
                         </button>
 
                         <div></div>
-                        <button id="qixDownBtn" style="background: #667eea; color: white; border: none; padding: 1rem; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation;">
+                        <button id="qixDownBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: bold; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
                             ⬇️
                         </button>
                         <div></div>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        <button id="qixFastBtn" style="background: #00ccff; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold; touch-action: manipulation;">
-                            ⚡ FAST (1x)
-                        </button>
-                        <button id="qixSlowBtn" style="background: #ff6600; color: white; border: none; padding: 1rem 2rem; border-radius: 12px; cursor: pointer; font-size: 1.2rem; font-weight: bold; touch-action: manipulation;">
-                            🐢 SLOW (2x)
-                        </button>
                     </div>
                 </div>
 
