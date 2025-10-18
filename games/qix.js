@@ -733,11 +733,11 @@
                     <h4 style="color: #333; margin-bottom: 1rem;">How to Play:</h4>
                     <ul style="color: #666; text-align: left; line-height: 1.8;">
                         <li>🎯 <strong>Objective:</strong> Claim 75% of the playfield to complete each level</li>
-                        <li>📐 <strong>Drawing:</strong> Press F (Fast) or S (Slow) to start drawing lines</li>
+                        <li>📐 <strong>IMPORTANT:</strong> Press ⚡ FAST or 🐢 SLOW button to start drawing, then use arrows to move into black area!</li>
                         <li>⚡ <strong>Fast Draw (blue):</strong> Quick but worth 1x points</li>
                         <li>🐢 <strong>Slow Draw (orange):</strong> Slower but worth 2x points!</li>
-                        <li>💎 Move your diamond marker and draw lines to close off areas</li>
-                        <li>🎨 When you complete a box, the side WITHOUT the Qix gets claimed</li>
+                        <li>💎 You start on the edge (blue) - arrows only move along the edge until you start drawing</li>
+                        <li>🎨 When you complete a box back to the edge, the side WITHOUT the Qix gets claimed</li>
                         <li>☠️ <strong>The Qix:</strong> Don't let it touch your incomplete lines!</li>
                         <li>⚠️ <strong>Sparx:</strong> Red enemies patrol the edges - avoid them!</li>
                         <li>🏆 Bonus: Every 1% above 75% = 1,000 bonus points!</li>
