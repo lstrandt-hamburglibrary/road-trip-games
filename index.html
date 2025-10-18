@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.67.0';</script>
+    <script>window.APP_VERSION = '1.75.2';</script>
 
     <style>
         * {
@@ -334,8 +334,8 @@
                     <p id="bingoWinText" style="font-size: 1.5rem;">You got 5 in a row!</p>
                 </div>
 
-                <div style="max-width: 600px; margin: 0 auto;">
-                    <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem; background: #667eea; padding: 0.5rem; border-radius: 10px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
+                <div style="max-width: 100%; margin: 0 auto;">
+                    <div id="bingoGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.15rem; background: #667eea; padding: 0.25rem; border-radius: 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"></div>
 
                     <div style="margin-top: 2rem; text-align: center;">
                         <button onclick="generateNewBingoCard()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔄 New Card</button>
@@ -1202,9 +1202,9 @@
                                 cursor: ${isFree ? 'default' : 'pointer'};
                                 transition: all 0.2s;
                                 box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
-                                padding: 0.25rem;
+                                padding: 0.15rem;
                                 text-align: center;
-                                font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+                                font-size: clamp(0.5rem, 1.6vw, 0.75rem);
                                 color: ${textColor};
                                 transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
                                 position: relative;
@@ -1235,9 +1235,9 @@
                                 cursor: ${isFree ? 'default' : 'pointer'};
                                 transition: all 0.2s;
                                 box-shadow: ${isMarked ? '0 4px 8px rgba(0, 0, 0, 0.4)' : '0 2px 4px rgba(0,0,0,0.1)'};
-                                padding: 0.25rem;
+                                padding: 0.15rem;
                                 text-align: center;
-                                font-size: clamp(0.55rem, 1.8vw, 0.8rem);
+                                font-size: clamp(0.5rem, 1.6vw, 0.75rem);
                                 font-weight: ${isMarked ? 'bold' : 'normal'};
                                 color: ${textColor};
                                 transform: ${isMarked ? 'scale(0.95)' : 'scale(1)'};
