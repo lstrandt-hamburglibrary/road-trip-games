@@ -6,7 +6,6 @@
     const STARTING_CASH = 2000;
     const STARTING_DEBT = 5500;
     const STARTING_SPACES = 100;
-    const TOTAL_DAYS = 30;
     const INTEREST_RATE = 0.10; // 10% daily interest on debt
 
     // Locations
@@ -45,6 +44,7 @@
         debt: STARTING_DEBT,
         bankBalance: 0,
         day: 1,
+        totalDays: 30,
         location: 'Bronx',
         inventory: {},
         usedSpaces: 0,
@@ -58,18 +58,24 @@
     };
 
     // Initialize game
-    function initGame() {
-        resetGame();
+    function initGame(totalDays) {
+        resetGame(totalDays);
         updateDisplay();
         generatePrices();
     }
 
-    function resetGame() {
+    function resetGame(totalDays) {
+        // Preserve totalDays if not provided (for restart)
+        if (!totalDays) {
+            totalDays = gameState.totalDays || 30;
+        }
+
         gameState = {
             cash: STARTING_CASH,
             debt: STARTING_DEBT,
             bankBalance: 0,
             day: 1,
+            totalDays: totalDays,
             location: 'Bronx',
             inventory: {},
             usedSpaces: 0,
@@ -79,7 +85,7 @@
             health: 100,
             gameOver: false,
             currentEvent: null,
-            message: 'Welcome to Drug Wars! You owe the loan shark $5,500. You have 30 days to pay it off and make a profit. Good luck!'
+            message: `Welcome to Drug Wars! You owe the loan shark $5,500. You have ${totalDays} days to pay it off and make a profit. Good luck!`
         };
     }
 
@@ -169,7 +175,7 @@
         generatePrices();
 
         // Check if game over
-        if (gameState.day > TOTAL_DAYS) {
+        if (gameState.day > gameState.totalDays) {
             endGame();
         }
 
@@ -446,7 +452,7 @@
         gameState.gameOver = true;
         const netWorth = gameState.cash + gameState.bankBalance - gameState.debt;
 
-        let message = `GAME OVER!\n\nDay ${gameState.day}/${TOTAL_DAYS}\n\n`;
+        let message = `GAME OVER!\n\nDay ${gameState.day}/${gameState.totalDays}\n\n`;
         message += `Cash: $${gameState.cash.toLocaleString()}\n`;
         message += `Bank: $${gameState.bankBalance.toLocaleString()}\n`;
         message += `Debt: -$${gameState.debt.toLocaleString()}\n`;
@@ -477,6 +483,7 @@
         document.getElementById('drugwarsDebt').textContent = gameState.debt.toLocaleString();
         document.getElementById('drugwarsBank').textContent = gameState.bankBalance.toLocaleString();
         document.getElementById('drugwarsDay').textContent = gameState.day;
+        document.getElementById('drugwarsTotalDays').textContent = gameState.totalDays;
         document.getElementById('drugwarsLocation').textContent = gameState.location;
         document.getElementById('drugwarsSpace').textContent = `${gameState.usedSpaces}/${gameState.maxSpaces}`;
         document.getElementById('drugwarsGuns').textContent = gameState.guns;
@@ -556,9 +563,16 @@
 
     // Export functions to window
     window.launchDrugWars = function() {
+        // Hide games menu and show day selection modal
+        document.getElementById('gamesMenu').style.display = 'none';
+        document.getElementById('drugwarsDaySelectModal').style.display = 'flex';
+    };
+
+    window.drugWarsStartGame = function(totalDays) {
+        document.getElementById('drugwarsDaySelectModal').style.display = 'none';
         document.getElementById('gamesMenu').style.display = 'none';
         document.getElementById('drugwarsGame').style.display = 'block';
-        initGame();
+        initGame(totalDays);
     };
 
     window.exitDrugWars = function() {
