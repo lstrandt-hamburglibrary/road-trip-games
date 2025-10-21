@@ -270,7 +270,7 @@
                     gameState.score += brick.points;
 
                     // Set cooldown to prevent multiple brick hits
-                    gameState.ball.brickCollisionCooldown = 8;
+                    gameState.ball.brickCollisionCooldown = 15;
 
                     // Determine bounce direction and push ball away from brick
                     const ballCenterX = gameState.ball.x;
@@ -284,20 +284,20 @@
                     if (diffX > diffY) {
                         // Hit from side
                         gameState.ball.dx *= -1;
-                        // Push ball outside the brick
+                        // Push ball outside the brick to prevent multi-brick collision
                         if (ballCenterX < brickCenterX) {
-                            gameState.ball.x = brick.x - BALL_RADIUS - 1;
+                            gameState.ball.x = brick.x - BALL_RADIUS - 3;
                         } else {
-                            gameState.ball.x = brick.x + brick.width + BALL_RADIUS + 1;
+                            gameState.ball.x = brick.x + brick.width + BALL_RADIUS + 3;
                         }
                     } else {
                         // Hit from top/bottom
                         gameState.ball.dy *= -1;
-                        // Push ball outside the brick
+                        // Push ball outside the brick to prevent multi-brick collision
                         if (ballCenterY < brickCenterY) {
-                            gameState.ball.y = brick.y - BALL_RADIUS - 1;
+                            gameState.ball.y = brick.y - BALL_RADIUS - 3;
                         } else {
-                            gameState.ball.y = brick.y + brick.height + BALL_RADIUS + 1;
+                            gameState.ball.y = brick.y + brick.height + BALL_RADIUS + 3;
                         }
                     }
 
