@@ -215,7 +215,7 @@
                     const percentage = Math.round(confiscationRate * 100);
                     gameState.message = `🚨 BUSTED! Officer Hardass confiscated ${percentage}% of your drugs!`;
                 } else if (gameState.cash > 0) {
-                    const fine = Math.floor(gameState.cash * 0.5);
+                    const fine = Math.floor(gameState.cash * 0.2);
                     gameState.cash -= fine;
                     gameState.message = `💸 Officer Hardass fined you $${fine.toLocaleString()}!`;
                 }
