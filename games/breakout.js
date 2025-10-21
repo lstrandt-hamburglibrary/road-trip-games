@@ -33,22 +33,32 @@
 
     // Level configurations
     const LEVELS = [
-        { rows: 8, ballSpeed: 4, name: 'Level 1' },
-        { rows: 8, ballSpeed: 4.3, name: 'Level 2' },
-        { rows: 8, ballSpeed: 4.6, name: 'Level 3' },
-        { rows: 8, ballSpeed: 4.9, name: 'Level 4' },
-        { rows: 8, ballSpeed: 5.2, name: 'Level 5' },
-        { rows: 8, ballSpeed: 5.5, name: 'Level 6' },
-        { rows: 8, ballSpeed: 5.8, name: 'Level 7' }
+        { rows: 8, ballSpeed: 5, name: 'Level 1' },
+        { rows: 8, ballSpeed: 5.4, name: 'Level 2' },
+        { rows: 8, ballSpeed: 5.8, name: 'Level 3' },
+        { rows: 8, ballSpeed: 6.2, name: 'Level 4' },
+        { rows: 8, ballSpeed: 6.6, name: 'Level 5' },
+        { rows: 8, ballSpeed: 7, name: 'Level 6' },
+        { rows: 8, ballSpeed: 7.4, name: 'Level 7' }
+    ];
+
+    // Power-up types
+    const POWERUPS = [
+        { name: 'multiball', color: '#9b59b6', emoji: '⚡', text: 'Multi-Ball!' },
+        { name: 'doublepoints', color: '#f1c40f', emoji: '💰', text: '2x Points!' },
+        { name: 'widepaddle', color: '#3498db', emoji: '📏', text: 'Wide Paddle!' },
+        { name: 'extralife', color: '#e74c3c', emoji: '❤️', text: 'Extra Life!' }
     ];
 
     // Game state
     let gameState = {
         canvas: null,
         ctx: null,
-        paddle: { x: 0, y: 0, width: PADDLE_WIDTH, height: PADDLE_HEIGHT, dx: 0 },
-        ball: { x: 0, y: 0, dx: 0, dy: 0, radius: BALL_RADIUS, launched: false, lastX: 0, lastY: 0, brickCooldown: 0 },
+        paddle: { x: 0, y: 0, width: PADDLE_WIDTH, height: PADDLE_HEIGHT, dx: 0, normalWidth: PADDLE_WIDTH, wideUntil: 0 },
+        ball: { x: 0, y: 0, dx: 0, dy: 0, radius: BALL_RADIUS, launched: false, skipFrames: 0 },
+        balls: [], // Additional balls for multi-ball
         bricks: [],
+        powerups: [], // Falling power-ups
         score: 0,
         lives: STARTING_LIVES,
         level: 1,
@@ -58,7 +68,8 @@
         keys: { left: false, right: false },
         mouseX: 0,
         useMouseControl: false,
-        animationId: null
+        animationId: null,
+        doublePointsUntil: 0
     };
 
     // Initialize game
@@ -95,9 +106,7 @@
         gameState.ball.dx = 0;
         gameState.ball.dy = 0;
         gameState.ball.launched = false;
-        gameState.ball.lastX = gameState.ball.x;
-        gameState.ball.lastY = gameState.ball.y;
-        gameState.ball.brickCooldown = 0;
+        gameState.ball.skipFrames = 0;
 
         // Create bricks
         createBricks();
@@ -120,9 +129,18 @@
                     height: BRICK_HEIGHT,
                     color: brickInfo.color,
                     points: brickInfo.points,
-                    visible: true
+                    visible: true,
+                    powerup: null
                 });
             }
+        }
+
+        // Add one random power-up brick per level
+        if (gameState.bricks.length > 0) {
+            const randomIndex = Math.floor(Math.random() * gameState.bricks.length);
+            const randomPowerup = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
+            gameState.bricks[randomIndex].powerup = randomPowerup;
+            gameState.bricks[randomIndex].color = randomPowerup.color;
         }
     }
 
@@ -203,23 +221,29 @@
         // Ball follows paddle if not launched
         if (!gameState.ball.launched) {
             gameState.ball.x = gameState.paddle.x + PADDLE_WIDTH / 2;
-            gameState.ball.lastX = gameState.ball.x;
-            gameState.ball.lastY = gameState.ball.y;
             return;
         }
 
-        // Store last position before moving
-        gameState.ball.lastX = gameState.ball.x;
-        gameState.ball.lastY = gameState.ball.y;
-
-        // Decrement brick collision cooldown
-        if (gameState.ball.brickCooldown > 0) {
-            gameState.ball.brickCooldown--;
+        // Decrement skip frames
+        if (gameState.ball.skipFrames > 0) {
+            gameState.ball.skipFrames--;
         }
 
-        // Update ball position
-        gameState.ball.x += gameState.ball.dx;
-        gameState.ball.y += gameState.ball.dy;
+        // Sub-step movement - move ball in small increments to prevent tunneling
+        const steps = 5; // Divide movement into 5 sub-steps
+        const stepDx = gameState.ball.dx / steps;
+        const stepDy = gameState.ball.dy / steps;
+
+        for (let i = 0; i < steps; i++) {
+            gameState.ball.x += stepDx;
+            gameState.ball.y += stepDy;
+
+            // Check for brick collision after each sub-step (only if not in skip frames)
+            if (gameState.ball.skipFrames === 0 && checkBrickCollision()) {
+                gameState.ball.skipFrames = 3; // Skip next 3 frames after hitting a brick
+                break; // Stop moving if we hit a brick
+            }
+        }
 
         // Wall collision (left and right)
         if (gameState.ball.x - BALL_RADIUS < 0 || gameState.ball.x + BALL_RADIUS > CANVAS_WIDTH) {
@@ -256,88 +280,216 @@
 
         // Ball falls below paddle
         if (gameState.ball.y - BALL_RADIUS > CANVAS_HEIGHT) {
-            gameState.lives--;
-            if (gameState.lives > 0) {
-                resetBall();
+            if (gameState.balls.length > 0) {
+                // Multi-ball active - just remove this ball, promote one from balls array
+                gameState.ball = gameState.balls.pop();
             } else {
-                gameOver();
+                // No extra balls - lose a life
+                gameState.lives--;
+                if (gameState.lives > 0) {
+                    resetBall();
+                } else {
+                    gameOver();
+                }
             }
         }
 
-        // Brick collision - only check if cooldown expired
-        if (gameState.ball.brickCooldown === 0) {
-            let closestBrick = null;
-            let closestDistance = Infinity;
+        // Update extra balls (multi-ball)
+        for (let i = gameState.balls.length - 1; i >= 0; i--) {
+            const ball = gameState.balls[i];
 
-            for (let brick of gameState.bricks) {
-                if (!brick.visible) continue;
+            // Decrement skip frames
+            if (ball.skipFrames > 0) {
+                ball.skipFrames--;
+            }
 
-                // Check if ball overlaps this brick
-                if (gameState.ball.x + BALL_RADIUS > brick.x &&
-                    gameState.ball.x - BALL_RADIUS < brick.x + brick.width &&
-                    gameState.ball.y + BALL_RADIUS > brick.y &&
-                    gameState.ball.y - BALL_RADIUS < brick.y + brick.height) {
+            // Sub-step movement
+            const steps = 5;
+            const stepDx = ball.dx / steps;
+            const stepDy = ball.dy / steps;
 
-                    // Calculate distance from last position to brick
-                    const brickCenterX = brick.x + brick.width / 2;
-                    const brickCenterY = brick.y + brick.height / 2;
-                    const distance = Math.sqrt(
-                        Math.pow(gameState.ball.lastX - brickCenterX, 2) +
-                        Math.pow(gameState.ball.lastY - brickCenterY, 2)
-                    );
+            for (let j = 0; j < steps; j++) {
+                ball.x += stepDx;
+                ball.y += stepDy;
 
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestBrick = brick;
-                    }
+                if (ball.skipFrames === 0 && checkBrickCollisionForBall(ball)) {
+                    ball.skipFrames = 3;
+                    break;
                 }
             }
 
-            // Only destroy the closest brick if one was found
-            if (closestBrick) {
-                closestBrick.visible = false;
-                gameState.score += closestBrick.points;
-
-                // Set cooldown - ball cannot hit another brick for 10 frames
-                gameState.ball.brickCooldown = 10;
-
-                // Determine bounce direction
-                const ballCenterX = gameState.ball.x;
-                const ballCenterY = gameState.ball.y;
-                const brickCenterX = closestBrick.x + closestBrick.width / 2;
-                const brickCenterY = closestBrick.y + closestBrick.height / 2;
-
-                const diffX = Math.abs(ballCenterX - brickCenterX);
-                const diffY = Math.abs(ballCenterY - brickCenterY);
-
-                if (diffX > diffY) {
-                    // Hit from side
-                    gameState.ball.dx *= -1;
-                    // Push ball outside the brick
-                    if (ballCenterX < brickCenterX) {
-                        gameState.ball.x = closestBrick.x - BALL_RADIUS - 1;
-                    } else {
-                        gameState.ball.x = closestBrick.x + closestBrick.width + BALL_RADIUS + 1;
-                    }
-                } else {
-                    // Hit from top/bottom
-                    gameState.ball.dy *= -1;
-                    // Push ball outside the brick
-                    if (ballCenterY < brickCenterY) {
-                        gameState.ball.y = closestBrick.y - BALL_RADIUS - 1;
-                    } else {
-                        gameState.ball.y = closestBrick.y + closestBrick.height + BALL_RADIUS + 1;
-                    }
-                }
-
-                // Check if level complete
-                if (gameState.bricks.every(b => !b.visible)) {
-                    levelComplete();
-                }
+            // Wall collision
+            if (ball.x - BALL_RADIUS < 0 || ball.x + BALL_RADIUS > CANVAS_WIDTH) {
+                ball.dx *= -1;
+                if (ball.x - BALL_RADIUS < 0) ball.x = BALL_RADIUS;
+                if (ball.x + BALL_RADIUS > CANVAS_WIDTH) ball.x = CANVAS_WIDTH - BALL_RADIUS;
             }
+            if (ball.y - BALL_RADIUS < 0) {
+                ball.dy *= -1;
+                ball.y = BALL_RADIUS;
+            }
+
+            // Paddle collision
+            if (ball.y + BALL_RADIUS > gameState.paddle.y &&
+                ball.y - BALL_RADIUS < gameState.paddle.y + gameState.paddle.height &&
+                ball.x > gameState.paddle.x &&
+                ball.x < gameState.paddle.x + gameState.paddle.width) {
+
+                ball.dy = -Math.abs(ball.dy);
+                const hitPos = (ball.x - gameState.paddle.x) / gameState.paddle.width;
+                const angle = (hitPos - 0.5) * 120;
+                const speed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2);
+                ball.dx = speed * Math.sin(angle * Math.PI / 180);
+                ball.y = gameState.paddle.y - BALL_RADIUS;
+            }
+
+            // Remove ball if it falls below paddle
+            if (ball.y - BALL_RADIUS > CANVAS_HEIGHT) {
+                gameState.balls.splice(i, 1);
+            }
+        }
+
+        // Update falling power-ups
+        for (let i = gameState.powerups.length - 1; i >= 0; i--) {
+            const powerup = gameState.powerups[i];
+            powerup.y += 2; // Fall speed
+
+            // Check if paddle caught it
+            if (powerup.y + 10 > gameState.paddle.y &&
+                powerup.y < gameState.paddle.y + gameState.paddle.height &&
+                powerup.x + 20 > gameState.paddle.x &&
+                powerup.x < gameState.paddle.x + gameState.paddle.width) {
+
+                applyPowerup(powerup.type);
+                gameState.powerups.splice(i, 1);
+            }
+            // Remove if fell off screen
+            else if (powerup.y > CANVAS_HEIGHT) {
+                gameState.powerups.splice(i, 1);
+            }
+        }
+
+        // Update timed power-ups
+        const now = Date.now();
+        if (gameState.doublePointsUntil > 0 && now > gameState.doublePointsUntil) {
+            gameState.doublePointsUntil = 0;
+        }
+        if (gameState.paddle.wideUntil > 0 && now > gameState.paddle.wideUntil) {
+            gameState.paddle.wideUntil = 0;
+            gameState.paddle.width = gameState.paddle.normalWidth;
         }
 
         updateDisplay();
+    }
+
+    // Check for brick collision and handle it - returns true if brick was hit
+    function checkBrickCollision() {
+        return checkBrickCollisionForBall(gameState.ball);
+    }
+
+    // Check brick collision for any ball object
+    function checkBrickCollisionForBall(ball) {
+        // First pass - find if we're colliding with ANY brick
+        let hitBrick = null;
+
+        for (let brick of gameState.bricks) {
+            if (!brick.visible) continue;
+
+            // Check if ball overlaps this brick
+            if (ball.x + BALL_RADIUS > brick.x &&
+                ball.x - BALL_RADIUS < brick.x + brick.width &&
+                ball.y + BALL_RADIUS > brick.y &&
+                ball.y - BALL_RADIUS < brick.y + brick.height) {
+
+                hitBrick = brick;
+                break; // Found ONE brick, stop looking
+            }
+        }
+
+        // If we hit a brick, handle ONLY that one brick
+        if (hitBrick) {
+            // Destroy the brick
+            hitBrick.visible = false;
+
+            // Apply score multiplier if double points active
+            const points = gameState.doublePointsUntil > 0 ? hitBrick.points * 2 : hitBrick.points;
+            gameState.score += points;
+
+            // Drop power-up if this brick had one
+            if (hitBrick.powerup) {
+                gameState.powerups.push({
+                    x: hitBrick.x + hitBrick.width / 2 - 10,
+                    y: hitBrick.y,
+                    type: hitBrick.powerup
+                });
+            }
+
+            // Determine bounce direction
+            const ballCenterX = ball.x;
+            const ballCenterY = ball.y;
+            const brickCenterX = hitBrick.x + hitBrick.width / 2;
+            const brickCenterY = hitBrick.y + hitBrick.height / 2;
+
+            const diffX = Math.abs(ballCenterX - brickCenterX);
+            const diffY = Math.abs(ballCenterY - brickCenterY);
+
+            if (diffX > diffY) {
+                // Hit from side
+                ball.dx *= -1;
+                // Push ball completely outside the brick
+                if (ballCenterX < brickCenterX) {
+                    ball.x = hitBrick.x - BALL_RADIUS - 2;
+                } else {
+                    ball.x = hitBrick.x + hitBrick.width + BALL_RADIUS + 2;
+                }
+            } else {
+                // Hit from top/bottom
+                ball.dy *= -1;
+                // Push ball completely outside the brick
+                if (ballCenterY < brickCenterY) {
+                    ball.y = hitBrick.y - BALL_RADIUS - 2;
+                } else {
+                    ball.y = hitBrick.y + hitBrick.height + BALL_RADIUS + 2;
+                }
+            }
+
+            // Check if level complete
+            if (gameState.bricks.every(b => !b.visible)) {
+                levelComplete();
+            }
+
+            return true; // Brick was hit, stop all movement this frame
+        }
+
+        return false; // No brick hit
+    }
+
+    // Apply power-up effect
+    function applyPowerup(powerup) {
+        showMessage(powerup.text, 2000);
+
+        if (powerup.name === 'multiball') {
+            // Spawn a second ball
+            const levelConfig = LEVELS[gameState.level - 1];
+            const speed = levelConfig.ballSpeed;
+            const angle = (Math.random() * 120 - 60) * Math.PI / 180;
+
+            gameState.balls.push({
+                x: gameState.ball.x,
+                y: gameState.ball.y,
+                dx: speed * Math.sin(angle),
+                dy: -speed * Math.cos(angle),
+                radius: BALL_RADIUS,
+                skipFrames: 0
+            });
+        } else if (powerup.name === 'doublepoints') {
+            gameState.doublePointsUntil = Date.now() + 10000; // 10 seconds
+        } else if (powerup.name === 'widepaddle') {
+            gameState.paddle.width = PADDLE_WIDTH * 1.5;
+            gameState.paddle.wideUntil = Date.now() + 10000; // 10 seconds
+        } else if (powerup.name === 'extralife') {
+            gameState.lives++;
+        }
     }
 
     function resetBall() {
@@ -346,9 +498,9 @@
         gameState.ball.dx = 0;
         gameState.ball.dy = 0;
         gameState.ball.launched = false;
-        gameState.ball.lastX = gameState.ball.x;
-        gameState.ball.lastY = gameState.ball.y;
-        gameState.ball.brickCooldown = 0;
+        gameState.ball.skipFrames = 0;
+        gameState.balls = []; // Clear multi-balls
+        gameState.powerups = []; // Clear falling powerups
     }
 
     function levelComplete() {
@@ -410,16 +562,38 @@
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.lineWidth = 2;
             ctx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+
+            // Draw power-up emoji if this brick has one
+            if (brick.powerup) {
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(brick.powerup.emoji, brick.x + brick.width / 2, brick.y + brick.height / 2);
+            }
+        }
+
+        // Draw falling power-ups
+        for (let powerup of gameState.powerups) {
+            ctx.fillStyle = powerup.type.color;
+            ctx.fillRect(powerup.x, powerup.y, 20, 20);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(powerup.x, powerup.y, 20, 20);
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#fff';
+            ctx.fillText(powerup.type.emoji, powerup.x + 10, powerup.y + 10);
         }
 
         // Draw paddle
         ctx.fillStyle = '#3498db';
-        ctx.fillRect(gameState.paddle.x, gameState.paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        ctx.fillRect(gameState.paddle.x, gameState.paddle.y, gameState.paddle.width, PADDLE_HEIGHT);
         ctx.strokeStyle = '#2980b9';
         ctx.lineWidth = 2;
-        ctx.strokeRect(gameState.paddle.x, gameState.paddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        ctx.strokeRect(gameState.paddle.x, gameState.paddle.y, gameState.paddle.width, PADDLE_HEIGHT);
 
-        // Draw ball
+        // Draw main ball
         ctx.fillStyle = '#ecf0f1';
         ctx.beginPath();
         ctx.arc(gameState.ball.x, gameState.ball.y, BALL_RADIUS, 0, Math.PI * 2);
@@ -427,6 +601,17 @@
         ctx.strokeStyle = '#bdc3c7';
         ctx.lineWidth = 2;
         ctx.stroke();
+
+        // Draw extra balls (multi-ball)
+        for (let ball of gameState.balls) {
+            ctx.fillStyle = '#ecf0f1';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#bdc3c7';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
 
         // Draw launch hint
         if (!gameState.ball.launched && !gameState.gameOver) {
