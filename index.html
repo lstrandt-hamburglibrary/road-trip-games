@@ -689,8 +689,13 @@
                         <p>Classic 1984 drug dealing economic strategy game!</p>
                     </div>
 
-                    <div class="feature-card" onclick="launchOregonTrail()" style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%);">
-                        <h3>🚂 The Oregon Trail</h3>
+                    <div class="feature-card" onclick="launchBreakout()" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                        <h3>🧱 Breakout</h3>
+                        <p>Classic 1976 brick breaking arcade game!</p>
+                    </div>
+
+                    <div class="feature-card" style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); opacity: 0.7; cursor: not-allowed;">
+                        <h3>🚂 The Oregon Trail <span style="background: #feca57; color: #2c3e50; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 0.5rem;">COMING SOON</span></h3>
                         <p>Classic 1971 survival journey - 2,000 miles to Oregon! (Landscape mode)</p>
                     </div>
                 </div>
@@ -990,6 +995,51 @@
                             <button id="drugwarsNumberInputCancel" style="flex: 1; background: #95a5a6; color: white; border: none; padding: 1rem; border-radius: 5px; cursor: pointer; font-size: 1rem;">Cancel</button>
                             <button id="drugwarsNumberInputOK" style="flex: 1; background: #3498db; color: white; border: none; padding: 1rem; border-radius: 5px; cursor: pointer; font-size: 1rem;">OK</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breakout Game Section (hidden by default) -->
+            <div id="breakoutGame" style="display: none;">
+                <div style="margin-bottom: 1rem;">
+                    <button onclick="exitBreakout()" style="background: #666; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer;">← Back to Menu</button>
+                    <button onclick="breakoutPause()" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; margin-left: 0.5rem;">⏸️ Pause (P)</button>
+                </div>
+
+                <!-- Status Bar -->
+                <div style="background: #f0f0f0; padding: 0.75rem; margin-bottom: 1rem; font-family: monospace; font-size: 1rem; text-align: center;">
+                    <strong>Score: <span id="breakoutScore" style="color: #2ecc71;">0</span></strong> |
+                    <strong>Lives: <span id="breakoutLives" style="color: #e74c3c;">3</span></strong> |
+                    <strong>Level: <span id="breakoutLevel" style="color: #3498db;">1</span></strong>
+                </div>
+
+                <!-- Message Area -->
+                <div id="breakoutMessage" style="background: #fffacd; padding: 0.75rem; margin-bottom: 1rem; display: none; border-left: 4px solid #f39c12; text-align: center; font-weight: bold;"></div>
+
+                <!-- Game Canvas -->
+                <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+                    <canvas id="breakoutCanvas" width="800" height="600" style="border: 3px solid #2c3e50; background: #1a1a1a; max-width: 100%; height: auto;"></canvas>
+                </div>
+
+                <!-- Instructions -->
+                <div style="background: white; padding: 1rem; border: 1px solid #ddd; font-size: 0.9rem;">
+                    <strong>Controls:</strong>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                        <li><strong>Arrow Keys</strong> or <strong>Mouse</strong> - Move paddle</li>
+                        <li><strong>Space</strong> or <strong>Click</strong> - Launch ball</li>
+                        <li><strong>P</strong> - Pause/Resume game</li>
+                    </ul>
+                    <strong>Goal:</strong> Break all bricks to advance to the next level. You have 3 lives!
+                </div>
+
+                <!-- Game Over Screen -->
+                <div id="breakoutGameOverScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 1000;">
+                    <div style="background: white; padding: 3rem; border-radius: 15px; max-width: 500px; text-align: center;">
+                        <h2 id="breakoutGameOverTitle" style="margin-top: 0; color: #2c3e50;">GAME OVER</h2>
+                        <p id="breakoutGameOverMessage" style="font-size: 1.2rem; margin: 1rem 0;">Better luck next time!</p>
+                        <p style="font-size: 2rem; margin: 1.5rem 0; color: #2ecc71;">Final Score: <strong id="breakoutFinalScore">0</strong></p>
+                        <button onclick="breakoutRestart()" style="background: #27ae60; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold; margin-right: 1rem;">🔄 Play Again</button>
+                        <button onclick="exitBreakout()" style="background: #95a5a6; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">🏠 Menu</button>
                     </div>
                 </div>
             </div>
@@ -2099,6 +2149,7 @@
     <script src="games/qix.js?v=1.69.0"></script>
     <script src="games/klax.js?v=1.70.0"></script>
     <script src="games/drugwars.js?v=1.84.3"></script>
+    <script src="games/breakout.js?v=1.0.0"></script>
     <script src="games/oregontrail.js?v=1.85.0"></script>
     <script src="games/pharaoh.js?v=1.61.0"></script>
 

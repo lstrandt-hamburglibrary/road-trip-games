@@ -26,9 +26,9 @@
         'Acid': { min: 1000, max: 4500, eventMin: 6000, eventMax: 15000 },
         'Ecstasy': { min: 1500, max: 5000, eventMin: 7000, eventMax: 18000 },
         'Hash': { min: 400, max: 1200, eventMin: 200, eventMax: 600 },
-        'Mushrooms': { min: 500, max: 1500, eventMin: 2000, eventMax: 5000 },
+        'Mushrooms': { min: 500, max: 1500, eventMin: 100, eventMax: 400 },
         'Weed': { min: 300, max: 900, eventMin: 50, eventMax: 250 },
-        'Speed': { min: 90, max: 250, eventMin: 300, eventMax: 800 }
+        'Speed': { min: 90, max: 250, eventMin: 20, eventMax: 70 }
     };
 
     // Special events that affect prices
@@ -118,9 +118,9 @@
         for (const [drug, range] of Object.entries(DRUGS)) {
             // Check if this drug has a special event
             if (gameState.currentEvent && gameState.currentEvent.drug === drug) {
-                // Use event prices
-                const min = gameState.currentEvent.spike ? range.eventMin : range.eventMin;
-                const max = gameState.currentEvent.spike ? range.eventMax : range.eventMax;
+                // Use event prices (always available during events)
+                const min = range.eventMin;
+                const max = range.eventMax;
                 newPrices[drug] = Math.floor(Math.random() * (max - min + 1) + min);
             } else {
                 // Normal price variation
