@@ -9,7 +9,7 @@
     const PADDLE_HEIGHT = 15;
     const PADDLE_SPEED = 8;
     const BALL_RADIUS = 8;
-    const BALL_SPEED = 4;
+    const BALL_SPEED = 2;
     const BRICK_ROWS = 8;
     const BRICK_COLS = 14;
     const BRICK_WIDTH = 50;
@@ -33,13 +33,13 @@
 
     // Level configurations
     const LEVELS = [
-        { rows: 8, ballSpeed: 3.5, name: 'Level 1' },
-        { rows: 8, ballSpeed: 3.75, name: 'Level 2' },
-        { rows: 8, ballSpeed: 4, name: 'Level 3' },
-        { rows: 8, ballSpeed: 4.25, name: 'Level 4' },
-        { rows: 8, ballSpeed: 4.5, name: 'Level 5' },
-        { rows: 8, ballSpeed: 4.75, name: 'Level 6' },
-        { rows: 8, ballSpeed: 5, name: 'Level 7' }
+        { rows: 8, ballSpeed: 2, name: 'Level 1' },
+        { rows: 8, ballSpeed: 2.25, name: 'Level 2' },
+        { rows: 8, ballSpeed: 2.5, name: 'Level 3' },
+        { rows: 8, ballSpeed: 2.75, name: 'Level 4' },
+        { rows: 8, ballSpeed: 3, name: 'Level 5' },
+        { rows: 8, ballSpeed: 3.25, name: 'Level 6' },
+        { rows: 8, ballSpeed: 3.5, name: 'Level 7' }
     ];
 
     // Game state
