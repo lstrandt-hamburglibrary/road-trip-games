@@ -9,7 +9,7 @@
     const PADDLE_HEIGHT = 15;
     const PADDLE_SPEED = 8;
     const BALL_RADIUS = 8;
-    const BALL_SPEED = 2;
+    const BALL_SPEED = 4;
     const BRICK_ROWS = 8;
     const BRICK_COLS = 14;
     const BRICK_WIDTH = 50;
@@ -33,13 +33,13 @@
 
     // Level configurations
     const LEVELS = [
-        { rows: 8, ballSpeed: 2, name: 'Level 1' },
-        { rows: 8, ballSpeed: 2.25, name: 'Level 2' },
-        { rows: 8, ballSpeed: 2.5, name: 'Level 3' },
-        { rows: 8, ballSpeed: 2.75, name: 'Level 4' },
-        { rows: 8, ballSpeed: 3, name: 'Level 5' },
-        { rows: 8, ballSpeed: 3.25, name: 'Level 6' },
-        { rows: 8, ballSpeed: 3.5, name: 'Level 7' }
+        { rows: 8, ballSpeed: 4, name: 'Level 1' },
+        { rows: 8, ballSpeed: 4.3, name: 'Level 2' },
+        { rows: 8, ballSpeed: 4.6, name: 'Level 3' },
+        { rows: 8, ballSpeed: 4.9, name: 'Level 4' },
+        { rows: 8, ballSpeed: 5.2, name: 'Level 5' },
+        { rows: 8, ballSpeed: 5.5, name: 'Level 6' },
+        { rows: 8, ballSpeed: 5.8, name: 'Level 7' }
     ];
 
     // Game state
@@ -47,7 +47,7 @@
         canvas: null,
         ctx: null,
         paddle: { x: 0, y: 0, width: PADDLE_WIDTH, height: PADDLE_HEIGHT, dx: 0 },
-        ball: { x: 0, y: 0, dx: 0, dy: 0, radius: BALL_RADIUS, launched: false, lastX: 0, lastY: 0 },
+        ball: { x: 0, y: 0, dx: 0, dy: 0, radius: BALL_RADIUS, launched: false, lastX: 0, lastY: 0, brickCooldown: 0 },
         bricks: [],
         score: 0,
         lives: STARTING_LIVES,
@@ -97,6 +97,7 @@
         gameState.ball.launched = false;
         gameState.ball.lastX = gameState.ball.x;
         gameState.ball.lastY = gameState.ball.y;
+        gameState.ball.brickCooldown = 0;
 
         // Create bricks
         createBricks();
@@ -211,6 +212,11 @@
         gameState.ball.lastX = gameState.ball.x;
         gameState.ball.lastY = gameState.ball.y;
 
+        // Decrement brick collision cooldown
+        if (gameState.ball.brickCooldown > 0) {
+            gameState.ball.brickCooldown--;
+        }
+
         // Update ball position
         gameState.ball.x += gameState.ball.dx;
         gameState.ball.y += gameState.ball.dy;
@@ -258,71 +264,76 @@
             }
         }
 
-        // Brick collision - find CLOSEST brick hit along ball's path
-        let closestBrick = null;
-        let closestDistance = Infinity;
+        // Brick collision - only check if cooldown expired
+        if (gameState.ball.brickCooldown === 0) {
+            let closestBrick = null;
+            let closestDistance = Infinity;
 
-        for (let brick of gameState.bricks) {
-            if (!brick.visible) continue;
+            for (let brick of gameState.bricks) {
+                if (!brick.visible) continue;
 
-            // Check if ball overlaps this brick
-            if (gameState.ball.x + BALL_RADIUS > brick.x &&
-                gameState.ball.x - BALL_RADIUS < brick.x + brick.width &&
-                gameState.ball.y + BALL_RADIUS > brick.y &&
-                gameState.ball.y - BALL_RADIUS < brick.y + brick.height) {
+                // Check if ball overlaps this brick
+                if (gameState.ball.x + BALL_RADIUS > brick.x &&
+                    gameState.ball.x - BALL_RADIUS < brick.x + brick.width &&
+                    gameState.ball.y + BALL_RADIUS > brick.y &&
+                    gameState.ball.y - BALL_RADIUS < brick.y + brick.height) {
 
-                // Calculate distance from last position to brick
-                const brickCenterX = brick.x + brick.width / 2;
-                const brickCenterY = brick.y + brick.height / 2;
-                const distance = Math.sqrt(
-                    Math.pow(gameState.ball.lastX - brickCenterX, 2) +
-                    Math.pow(gameState.ball.lastY - brickCenterY, 2)
-                );
+                    // Calculate distance from last position to brick
+                    const brickCenterX = brick.x + brick.width / 2;
+                    const brickCenterY = brick.y + brick.height / 2;
+                    const distance = Math.sqrt(
+                        Math.pow(gameState.ball.lastX - brickCenterX, 2) +
+                        Math.pow(gameState.ball.lastY - brickCenterY, 2)
+                    );
 
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestBrick = brick;
-                }
-            }
-        }
-
-        // Only destroy the closest brick if one was found
-        if (closestBrick) {
-            closestBrick.visible = false;
-            gameState.score += closestBrick.points;
-
-            // Determine bounce direction
-            const ballCenterX = gameState.ball.x;
-            const ballCenterY = gameState.ball.y;
-            const brickCenterX = closestBrick.x + closestBrick.width / 2;
-            const brickCenterY = closestBrick.y + closestBrick.height / 2;
-
-            const diffX = Math.abs(ballCenterX - brickCenterX);
-            const diffY = Math.abs(ballCenterY - brickCenterY);
-
-            if (diffX > diffY) {
-                // Hit from side
-                gameState.ball.dx *= -1;
-                // Push ball outside the brick
-                if (ballCenterX < brickCenterX) {
-                    gameState.ball.x = closestBrick.x - BALL_RADIUS - 1;
-                } else {
-                    gameState.ball.x = closestBrick.x + closestBrick.width + BALL_RADIUS + 1;
-                }
-            } else {
-                // Hit from top/bottom
-                gameState.ball.dy *= -1;
-                // Push ball outside the brick
-                if (ballCenterY < brickCenterY) {
-                    gameState.ball.y = closestBrick.y - BALL_RADIUS - 1;
-                } else {
-                    gameState.ball.y = closestBrick.y + closestBrick.height + BALL_RADIUS + 1;
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestBrick = brick;
+                    }
                 }
             }
 
-            // Check if level complete
-            if (gameState.bricks.every(b => !b.visible)) {
-                levelComplete();
+            // Only destroy the closest brick if one was found
+            if (closestBrick) {
+                closestBrick.visible = false;
+                gameState.score += closestBrick.points;
+
+                // Set cooldown - ball cannot hit another brick for 10 frames
+                gameState.ball.brickCooldown = 10;
+
+                // Determine bounce direction
+                const ballCenterX = gameState.ball.x;
+                const ballCenterY = gameState.ball.y;
+                const brickCenterX = closestBrick.x + closestBrick.width / 2;
+                const brickCenterY = closestBrick.y + closestBrick.height / 2;
+
+                const diffX = Math.abs(ballCenterX - brickCenterX);
+                const diffY = Math.abs(ballCenterY - brickCenterY);
+
+                if (diffX > diffY) {
+                    // Hit from side
+                    gameState.ball.dx *= -1;
+                    // Push ball outside the brick
+                    if (ballCenterX < brickCenterX) {
+                        gameState.ball.x = closestBrick.x - BALL_RADIUS - 1;
+                    } else {
+                        gameState.ball.x = closestBrick.x + closestBrick.width + BALL_RADIUS + 1;
+                    }
+                } else {
+                    // Hit from top/bottom
+                    gameState.ball.dy *= -1;
+                    // Push ball outside the brick
+                    if (ballCenterY < brickCenterY) {
+                        gameState.ball.y = closestBrick.y - BALL_RADIUS - 1;
+                    } else {
+                        gameState.ball.y = closestBrick.y + closestBrick.height + BALL_RADIUS + 1;
+                    }
+                }
+
+                // Check if level complete
+                if (gameState.bricks.every(b => !b.visible)) {
+                    levelComplete();
+                }
             }
         }
 
@@ -337,6 +348,7 @@
         gameState.ball.launched = false;
         gameState.ball.lastX = gameState.ball.x;
         gameState.ball.lastY = gameState.ball.y;
+        gameState.ball.brickCooldown = 0;
     }
 
     function levelComplete() {
