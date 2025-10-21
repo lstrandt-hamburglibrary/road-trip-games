@@ -130,8 +130,8 @@
         if (gameState.gameOver) return;
         if (location === gameState.location) return;
 
-        // Random police encounter (15% chance)
-        if (Math.random() < 0.15 && gameState.usedSpaces > 0) {
+        // Random police encounter (8% chance)
+        if (Math.random() < 0.08 && gameState.usedSpaces > 0) {
             handlePoliceEncounter();
             return;
         }
@@ -193,15 +193,27 @@
 
         document.getElementById('drugwarsPoliceRun').addEventListener('click', () => {
             modal.style.display = 'none';
-            // 50% chance to escape
-            if (Math.random() < 0.5) {
+            // 75% chance to escape
+            if (Math.random() < 0.75) {
                 gameState.message = '✅ You escaped from Officer Hardass!';
             } else {
                 // Caught - lose some inventory or cash
                 if (gameState.usedSpaces > 0) {
-                    gameState.inventory = {};
-                    gameState.usedSpaces = 0;
-                    gameState.message = '🚨 BUSTED! Officer Hardass confiscated ALL your drugs!';
+                    const confiscationRate = 0.2 + Math.random() * 0.2; // 20-40%
+                    let totalConfiscated = 0;
+
+                    for (const [drug, amount] of Object.entries(gameState.inventory)) {
+                        const confiscated = Math.floor(amount * confiscationRate);
+                        gameState.inventory[drug] -= confiscated;
+                        if (gameState.inventory[drug] <= 0) {
+                            delete gameState.inventory[drug];
+                        }
+                        totalConfiscated += confiscated;
+                    }
+
+                    gameState.usedSpaces -= totalConfiscated;
+                    const percentage = Math.round(confiscationRate * 100);
+                    gameState.message = `🚨 BUSTED! Officer Hardass confiscated ${percentage}% of your drugs!`;
                 } else if (gameState.cash > 0) {
                     const fine = Math.floor(gameState.cash * 0.5);
                     gameState.cash -= fine;
