@@ -22,7 +22,11 @@
     const DRUGS = {
         'Cocaine': { min: 15000, max: 30000, eventMin: 40000, eventMax: 110000 },
         'Heroin': { min: 5000, max: 14000, eventMin: 20000, eventMax: 45000 },
+        'PCP': { min: 3000, max: 8000, eventMin: 12000, eventMax: 25000 },
         'Acid': { min: 1000, max: 4500, eventMin: 6000, eventMax: 15000 },
+        'Ecstasy': { min: 1500, max: 5000, eventMin: 7000, eventMax: 18000 },
+        'Hash': { min: 400, max: 1200, eventMin: 200, eventMax: 600 },
+        'Mushrooms': { min: 500, max: 1500, eventMin: 2000, eventMax: 5000 },
         'Weed': { min: 300, max: 900, eventMin: 50, eventMax: 250 },
         'Speed': { min: 90, max: 250, eventMin: 300, eventMax: 800 },
         'Ludes': { min: 10, max: 60, eventMin: 5, eventMax: 30 }
@@ -32,7 +36,11 @@
     const SPECIAL_EVENTS = [
         { drug: 'Cocaine', text: 'The cops made a huge Cocaine bust! Prices are outrageous!', spike: true },
         { drug: 'Heroin', text: 'Addicts are going crazy for Heroin!', spike: true },
+        { drug: 'PCP', text: 'Local PCP lab was raided! Supply is scarce!', spike: true },
         { drug: 'Acid', text: 'A major Acid lab was discovered! Prices skyrocketing!', spike: true },
+        { drug: 'Ecstasy', text: 'Rave tonight! Everyone wants Ecstasy!', spike: true },
+        { drug: 'Hash', text: 'Moroccan shipment arrived! Hash is everywhere and cheap!', spike: false },
+        { drug: 'Mushrooms', text: 'It\'s mushroom season! Shrooms are abundant and cheap!', spike: false },
         { drug: 'Weed', text: 'Columbian freighter dusted the Coast Guard! Weed prices have bottomed out!', spike: false },
         { drug: 'Speed', text: 'Rival dealers are selling cheap Speed!', spike: false },
         { drug: 'Ludes', text: 'The market is flooded with cheap Ludes!', spike: false }
