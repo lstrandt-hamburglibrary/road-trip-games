@@ -47,7 +47,7 @@
         canvas: null,
         ctx: null,
         paddle: { x: 0, y: 0, width: PADDLE_WIDTH, height: PADDLE_HEIGHT, dx: 0 },
-        ball: { x: 0, y: 0, dx: 0, dy: 0, radius: BALL_RADIUS, launched: false },
+        ball: { x: 0, y: 0, dx: 0, dy: 0, radius: BALL_RADIUS, launched: false, brickCollisionCooldown: 0 },
         bricks: [],
         score: 0,
         lives: STARTING_LIVES,
@@ -95,6 +95,7 @@
         gameState.ball.dx = 0;
         gameState.ball.dy = 0;
         gameState.ball.launched = false;
+        gameState.ball.brickCollisionCooldown = 0;
 
         // Create bricks
         createBricks();
@@ -203,6 +204,11 @@
             return;
         }
 
+        // Decrement brick collision cooldown
+        if (gameState.ball.brickCollisionCooldown > 0) {
+            gameState.ball.brickCollisionCooldown--;
+        }
+
         // Update ball position
         gameState.ball.x += gameState.ball.dx;
         gameState.ball.y += gameState.ball.dy;
@@ -250,53 +256,58 @@
             }
         }
 
-        // Brick collision
-        for (let brick of gameState.bricks) {
-            if (!brick.visible) continue;
+        // Brick collision (only if cooldown is finished)
+        if (gameState.ball.brickCollisionCooldown === 0) {
+            for (let brick of gameState.bricks) {
+                if (!brick.visible) continue;
 
-            if (gameState.ball.x + BALL_RADIUS > brick.x &&
-                gameState.ball.x - BALL_RADIUS < brick.x + brick.width &&
-                gameState.ball.y + BALL_RADIUS > brick.y &&
-                gameState.ball.y - BALL_RADIUS < brick.y + brick.height) {
+                if (gameState.ball.x + BALL_RADIUS > brick.x &&
+                    gameState.ball.x - BALL_RADIUS < brick.x + brick.width &&
+                    gameState.ball.y + BALL_RADIUS > brick.y &&
+                    gameState.ball.y - BALL_RADIUS < brick.y + brick.height) {
 
-                brick.visible = false;
-                gameState.score += brick.points;
+                    brick.visible = false;
+                    gameState.score += brick.points;
 
-                // Determine bounce direction and push ball away from brick
-                const ballCenterX = gameState.ball.x;
-                const ballCenterY = gameState.ball.y;
-                const brickCenterX = brick.x + brick.width / 2;
-                const brickCenterY = brick.y + brick.height / 2;
+                    // Set cooldown to prevent multiple brick hits
+                    gameState.ball.brickCollisionCooldown = 8;
 
-                const diffX = Math.abs(ballCenterX - brickCenterX);
-                const diffY = Math.abs(ballCenterY - brickCenterY);
+                    // Determine bounce direction and push ball away from brick
+                    const ballCenterX = gameState.ball.x;
+                    const ballCenterY = gameState.ball.y;
+                    const brickCenterX = brick.x + brick.width / 2;
+                    const brickCenterY = brick.y + brick.height / 2;
 
-                if (diffX > diffY) {
-                    // Hit from side
-                    gameState.ball.dx *= -1;
-                    // Push ball outside the brick
-                    if (ballCenterX < brickCenterX) {
-                        gameState.ball.x = brick.x - BALL_RADIUS - 1;
+                    const diffX = Math.abs(ballCenterX - brickCenterX);
+                    const diffY = Math.abs(ballCenterY - brickCenterY);
+
+                    if (diffX > diffY) {
+                        // Hit from side
+                        gameState.ball.dx *= -1;
+                        // Push ball outside the brick
+                        if (ballCenterX < brickCenterX) {
+                            gameState.ball.x = brick.x - BALL_RADIUS - 1;
+                        } else {
+                            gameState.ball.x = brick.x + brick.width + BALL_RADIUS + 1;
+                        }
                     } else {
-                        gameState.ball.x = brick.x + brick.width + BALL_RADIUS + 1;
+                        // Hit from top/bottom
+                        gameState.ball.dy *= -1;
+                        // Push ball outside the brick
+                        if (ballCenterY < brickCenterY) {
+                            gameState.ball.y = brick.y - BALL_RADIUS - 1;
+                        } else {
+                            gameState.ball.y = brick.y + brick.height + BALL_RADIUS + 1;
+                        }
                     }
-                } else {
-                    // Hit from top/bottom
-                    gameState.ball.dy *= -1;
-                    // Push ball outside the brick
-                    if (ballCenterY < brickCenterY) {
-                        gameState.ball.y = brick.y - BALL_RADIUS - 1;
-                    } else {
-                        gameState.ball.y = brick.y + brick.height + BALL_RADIUS + 1;
+
+                    // Check if level complete
+                    if (gameState.bricks.every(b => !b.visible)) {
+                        levelComplete();
                     }
-                }
 
-                // Check if level complete
-                if (gameState.bricks.every(b => !b.visible)) {
-                    levelComplete();
+                    break; // Only one brick collision per frame
                 }
-
-                break; // Only one brick collision per frame
             }
         }
 
@@ -309,6 +320,7 @@
         gameState.ball.dx = 0;
         gameState.ball.dy = 0;
         gameState.ball.launched = false;
+        gameState.ball.brickCollisionCooldown = 0;
     }
 
     function levelComplete() {
