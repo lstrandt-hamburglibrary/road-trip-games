@@ -33,13 +33,13 @@
 
     // Level configurations
     const LEVELS = [
-        { rows: 8, ballSpeed: 4, name: 'Level 1' },
-        { rows: 8, ballSpeed: 4.5, name: 'Level 2' },
-        { rows: 8, ballSpeed: 5, name: 'Level 3' },
-        { rows: 8, ballSpeed: 5.5, name: 'Level 4' },
-        { rows: 8, ballSpeed: 6, name: 'Level 5' },
-        { rows: 8, ballSpeed: 6.5, name: 'Level 6' },
-        { rows: 8, ballSpeed: 7, name: 'Level 7' }
+        { rows: 8, ballSpeed: 3.5, name: 'Level 1' },
+        { rows: 8, ballSpeed: 3.75, name: 'Level 2' },
+        { rows: 8, ballSpeed: 4, name: 'Level 3' },
+        { rows: 8, ballSpeed: 4.25, name: 'Level 4' },
+        { rows: 8, ballSpeed: 4.5, name: 'Level 5' },
+        { rows: 8, ballSpeed: 4.75, name: 'Level 6' },
+        { rows: 8, ballSpeed: 5, name: 'Level 7' }
     ];
 
     // Game state
@@ -262,7 +262,7 @@
                 brick.visible = false;
                 gameState.score += brick.points;
 
-                // Determine bounce direction
+                // Determine bounce direction and push ball away from brick
                 const ballCenterX = gameState.ball.x;
                 const ballCenterY = gameState.ball.y;
                 const brickCenterX = brick.x + brick.width / 2;
@@ -274,9 +274,21 @@
                 if (diffX > diffY) {
                     // Hit from side
                     gameState.ball.dx *= -1;
+                    // Push ball outside the brick
+                    if (ballCenterX < brickCenterX) {
+                        gameState.ball.x = brick.x - BALL_RADIUS - 1;
+                    } else {
+                        gameState.ball.x = brick.x + brick.width + BALL_RADIUS + 1;
+                    }
                 } else {
                     // Hit from top/bottom
                     gameState.ball.dy *= -1;
+                    // Push ball outside the brick
+                    if (ballCenterY < brickCenterY) {
+                        gameState.ball.y = brick.y - BALL_RADIUS - 1;
+                    } else {
+                        gameState.ball.y = brick.y + brick.height + BALL_RADIUS + 1;
+                    }
                 }
 
                 // Check if level complete
