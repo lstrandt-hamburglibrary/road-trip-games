@@ -6,7 +6,7 @@
     const STARTING_CASH = 2000;
     const STARTING_DEBT = 5500;
     const STARTING_SPACES = 100;
-    const INTEREST_RATE = 0.10; // 10% daily interest on debt
+    const INTEREST_RATE = 0.03; // 3% daily interest on debt
 
     // Locations
     const LOCATIONS = [
@@ -28,8 +28,7 @@
         'Hash': { min: 400, max: 1200, eventMin: 200, eventMax: 600 },
         'Mushrooms': { min: 500, max: 1500, eventMin: 2000, eventMax: 5000 },
         'Weed': { min: 300, max: 900, eventMin: 50, eventMax: 250 },
-        'Speed': { min: 90, max: 250, eventMin: 300, eventMax: 800 },
-        'Ludes': { min: 10, max: 60, eventMin: 5, eventMax: 30 }
+        'Speed': { min: 90, max: 250, eventMin: 300, eventMax: 800 }
     };
 
     // Special events that affect prices
@@ -42,8 +41,7 @@
         { drug: 'Hash', text: 'Moroccan shipment arrived! Hash is everywhere and cheap!', spike: false },
         { drug: 'Mushrooms', text: 'It\'s mushroom season! Shrooms are abundant and cheap!', spike: false },
         { drug: 'Weed', text: 'Columbian freighter dusted the Coast Guard! Weed prices have bottomed out!', spike: false },
-        { drug: 'Speed', text: 'Rival dealers are selling cheap Speed!', spike: false },
-        { drug: 'Ludes', text: 'The market is flooded with cheap Ludes!', spike: false }
+        { drug: 'Speed', text: 'Rival dealers are selling cheap Speed!', spike: false }
     ];
 
     // Game state
@@ -392,7 +390,7 @@
             if (amount > 0) {
                 gameState.cash += amount;
                 gameState.debt += amount;
-                showMessage(`Borrowed $${amount.toLocaleString()} (10% daily interest!)`);
+                showMessage(`Borrowed $${amount.toLocaleString()} (3% daily interest!)`);
                 updateDisplay();
             }
         }
