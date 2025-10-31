@@ -109,7 +109,8 @@
         } else {
             // Only clear message if it's not a police/important message
             if (!gameState.message.includes('BUSTED') && !gameState.message.includes('Officer Hardass') &&
-                !gameState.message.includes('ARRESTED') && !gameState.message.includes('escaped')) {
+                !gameState.message.includes('ARRESTED') && !gameState.message.includes('escaped') &&
+                !gameState.message.includes('mugged')) {
                 gameState.message = '';
             }
         }
