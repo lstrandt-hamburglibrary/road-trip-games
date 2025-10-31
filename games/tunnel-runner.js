@@ -5,7 +5,9 @@
     let rocket;
     let tunnelSegments = [];
     let score = 0;
+    let coins = 0;
     let highScore = parseInt(localStorage.getItem('tunnelRunnerHighScore') || '0');
+    let highCoins = parseInt(localStorage.getItem('tunnelRunnerHighCoins') || '0');
     let animationId;
 
     const GAME_WIDTH = 800;
@@ -16,10 +18,12 @@
     const MIN_TUNNEL_WIDTH = 120;
     const MAX_TUNNEL_WIDTH = 240;
     const SEGMENT_WIDTH = 20;
-    const OBSTACLE_CHANCE = 0.05; // 5% chance per segment
+    const OBSTACLE_CHANCE = 0.08; // 8% chance per segment
+    const COIN_CHANCE = 0.15; // 15% chance per segment
     const SPLIT_CHANCE = 0.008; // 0.8% chance to start a tunnel split
     const MIN_PATH_WIDTH = 100; // Minimum width for each path during a split
     const PATH_DEVIATION = 30; // How much paths deviate from center during split
+    const COIN_SIZE = 20;
 
     // Smooth motion parameters
     let targetTopHeight = GAME_HEIGHT / 2 - BASE_TUNNEL_WIDTH / 2;
@@ -50,7 +54,7 @@
     }
 
     // Create a tunnel segment
-    function createTunnelSegment(x, topHeight, bottomHeight, tunnelWidth, colorIndex, obstacles = [], splitInfo = null) {
+    function createTunnelSegment(x, topHeight, bottomHeight, tunnelWidth, colorIndex, obstacles = [], coins = [], splitInfo = null) {
         return {
             x: x,
             topHeight: topHeight,
@@ -58,6 +62,7 @@
             tunnelWidth: tunnelWidth,
             colorIndex: colorIndex,
             obstacles: obstacles,
+            coins: coins,
             splitInfo: splitInfo // { state: 'splitting'|'split'|'merging', progress: 0-1, dividerY: number }
         };
     }
@@ -81,21 +86,48 @@
             tunnelWidth >= 160 &&
             Math.random() < OBSTACLE_CHANCE) {
 
-            // Random obstacle type
-            const type = Math.random() < 0.5 ? 'stalactite' : 'stalagmite';
-            const obstacleLength = 30 + Math.random() * 40; // 30-70 pixels
+            // Random obstacle type with more variety
+            const rand = Math.random();
+            let obstacleType;
+            let obstacleLength;
 
-            if (type === 'stalactite') {
+            if (rand < 0.25) {
+                // Stalactite from top
+                obstacleType = 'stalactite';
+                obstacleLength = 30 + Math.random() * 50; // 30-80 pixels
                 obstacles.push({
                     type: 'stalactite',
                     y: topHeight,
                     length: obstacleLength
                 });
-            } else {
+            } else if (rand < 0.5) {
+                // Stalagmite from bottom
+                obstacleType = 'stalagmite';
+                obstacleLength = 30 + Math.random() * 50;
                 obstacles.push({
                     type: 'stalagmite',
                     y: bottomHeight,
                     length: obstacleLength
+                });
+            } else if (rand < 0.7) {
+                // Both top and bottom (narrow passage)
+                obstacles.push({
+                    type: 'stalactite',
+                    y: topHeight,
+                    length: 25 + Math.random() * 30
+                });
+                obstacles.push({
+                    type: 'stalagmite',
+                    y: bottomHeight,
+                    length: 25 + Math.random() * 30
+                });
+            } else {
+                // Floating crystal obstacle in middle
+                const centerY = topHeight + tunnelWidth / 2;
+                obstacles.push({
+                    type: 'crystal',
+                    y: centerY,
+                    size: 30 + Math.random() * 20
                 });
             }
 
@@ -107,11 +139,33 @@
         return obstacles;
     }
 
+    // Create coins for a segment
+    function createCoins(topHeight, bottomHeight, tunnelWidth, canSpawn) {
+        const coins = [];
+
+        // Spawn coins more frequently than obstacles
+        if (canSpawn && Math.random() < COIN_CHANCE) {
+            const numCoins = Math.floor(1 + Math.random() * 3); // 1-3 coins
+
+            for (let i = 0; i < numCoins; i++) {
+                // Random position in the open tunnel space
+                const y = topHeight + COIN_SIZE + Math.random() * (tunnelWidth - COIN_SIZE * 2);
+                coins.push({
+                    y: y,
+                    collected: false
+                });
+            }
+        }
+
+        return coins;
+    }
+
     // Initialize game
     function initGame() {
         rocket = createRocket();
         tunnelSegments = [];
         score = 0;
+        coins = 0;
         noiseOffset = 0;
 
         // Reset smooth motion targets
@@ -135,8 +189,9 @@
             const currentBottomHeight = currentTopHeight + currentTunnelWidth;
 
             const obstacles = i > 10 ? createObstacles(currentTopHeight, currentBottomHeight, currentTunnelWidth, true) : [];
+            const segmentCoins = i > 10 ? createCoins(currentTopHeight, currentBottomHeight, currentTunnelWidth, true) : [];
 
-            tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight, currentTunnelWidth, currentColorIndex, obstacles));
+            tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight, currentTunnelWidth, currentColorIndex, obstacles, segmentCoins));
         }
 
         gameState = 'playing';
@@ -293,9 +348,10 @@
                 }
             }
 
-            // Create obstacles (but not during splits)
+            // Create obstacles and coins (but not during splits)
             const canSpawnObstacle = splitState === null;
             const obstacles = createObstacles(newTopHeight, newBottomHeight, newTunnelWidth, canSpawnObstacle);
+            const segmentCoins = createCoins(newTopHeight, newBottomHeight, newTunnelWidth, canSpawnObstacle);
 
             tunnelSegments.push(createTunnelSegment(
                 lastSegment.x + SEGMENT_WIDTH,
@@ -304,6 +360,7 @@
                 newTunnelWidth,
                 currentColorIndex,
                 obstacles,
+                segmentCoins,
                 splitInfo
             ));
 
@@ -321,7 +378,7 @@
                 gameOver();
             }
 
-            // Check obstacles (stalactites and stalagmites)
+            // Check obstacles (stalactites, stalagmites, and crystals)
             for (let obstacle of rocketSegment.obstacles) {
                 if (obstacle.type === 'stalactite') {
                     // Stalactite hangs from top
@@ -332,6 +389,29 @@
                     // Stalagmite rises from bottom
                     if (rocket.y + ROCKET_SIZE > obstacle.y - obstacle.length) {
                         gameOver();
+                    }
+                } else if (obstacle.type === 'crystal') {
+                    // Floating crystal obstacle
+                    const distance = Math.sqrt(
+                        Math.pow(rocket.x + ROCKET_SIZE / 2 - (rocketSegment.x + SEGMENT_WIDTH / 2), 2) +
+                        Math.pow(rocket.y + ROCKET_SIZE / 2 - obstacle.y, 2)
+                    );
+                    if (distance < obstacle.size / 2 + ROCKET_SIZE / 2) {
+                        gameOver();
+                    }
+                }
+            }
+
+            // Check coin collection
+            for (let coin of rocketSegment.coins) {
+                if (!coin.collected) {
+                    const distance = Math.sqrt(
+                        Math.pow(rocket.x + ROCKET_SIZE / 2 - (rocketSegment.x + SEGMENT_WIDTH / 2), 2) +
+                        Math.pow(rocket.y + ROCKET_SIZE / 2 - coin.y, 2)
+                    );
+                    if (distance < COIN_SIZE + ROCKET_SIZE / 2) {
+                        coin.collected = true;
+                        coins++;
                     }
                 }
             }
@@ -576,6 +656,53 @@
                     ctx.strokeStyle = '#bb8fce';
                     ctx.lineWidth = 2;
                     ctx.stroke();
+                } else if (obstacle.type === 'crystal') {
+                    // Draw floating crystal obstacle (diamond shape)
+                    const centerX = segment.x + SEGMENT_WIDTH / 2;
+                    const centerY = obstacle.y;
+                    const size = obstacle.size;
+
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY - size / 2);
+                    ctx.lineTo(centerX + size / 2, centerY);
+                    ctx.lineTo(centerX, centerY + size / 2);
+                    ctx.lineTo(centerX - size / 2, centerY);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Add highlight
+                    ctx.strokeStyle = '#ff7979';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Draw coins
+        for (let segment of tunnelSegments) {
+            for (let coin of segment.coins) {
+                if (!coin.collected) {
+                    const centerX = segment.x + SEGMENT_WIDTH / 2;
+                    const centerY = coin.y;
+
+                    // Draw coin
+                    ctx.fillStyle = '#f1c40f';
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, COIN_SIZE / 2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Add coin border
+                    ctx.strokeStyle = '#f39c12';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Add inner circle for detail
+                    ctx.strokeStyle = '#f39c12';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, COIN_SIZE / 3, 0, Math.PI * 2);
+                    ctx.stroke();
                 }
             }
         }
@@ -627,6 +754,14 @@
         ctx.textAlign = 'left';
         ctx.fillText(`Score: ${score}`, 20, 40);
         ctx.fillText(`High: ${highScore}`, 20, 70);
+
+        // Draw coin count
+        ctx.fillStyle = '#f1c40f';
+        ctx.fillText(`💰 ${coins}`, 20, 100);
+
+        ctx.fillStyle = '#888';
+        ctx.font = '16px Arial';
+        ctx.fillText(`Best: ${highCoins}`, 20, 120);
     }
 
     // Draw menu
@@ -663,24 +798,31 @@
         ctx.fillStyle = 'white';
         ctx.font = 'bold 48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('GAME OVER', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 60);
+        ctx.fillText('GAME OVER', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 80);
 
         ctx.font = '32px Arial';
-        ctx.fillText(`Score: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        ctx.fillText(`Score: ${score}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 30);
 
-        if (score > highScore) {
+        ctx.fillStyle = '#f1c40f';
+        ctx.font = '28px Arial';
+        ctx.fillText(`💰 Coins: ${coins}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);
+
+        if (score > highScore || coins > highCoins) {
             ctx.fillStyle = '#feca57';
-            ctx.font = 'bold 28px Arial';
-            ctx.fillText('🎉 NEW HIGH SCORE! 🎉', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+            ctx.font = 'bold 24px Arial';
+            let messages = [];
+            if (score > highScore) messages.push('NEW HIGH SCORE');
+            if (coins > highCoins) messages.push('MOST COINS');
+            ctx.fillText(`🎉 ${messages.join(' & ')}! 🎉', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
         } else {
             ctx.fillStyle = 'white';
-            ctx.font = '24px Arial';
-            ctx.fillText(`High Score: ${highScore}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+            ctx.font = '20px Arial';
+            ctx.fillText(`High: ${highScore} | Best Coins: ${highCoins}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
         }
 
         ctx.font = 'bold 28px Arial';
         ctx.fillStyle = '#feca57';
-        ctx.fillText('TAP TO PLAY AGAIN', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 120);
+        ctx.fillText('TAP TO PLAY AGAIN', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 110);
     }
 
     // Game over
@@ -690,6 +832,11 @@
         if (score > highScore) {
             highScore = score;
             localStorage.setItem('tunnelRunnerHighScore', highScore.toString());
+        }
+
+        if (coins > highCoins) {
+            highCoins = coins;
+            localStorage.setItem('tunnelRunnerHighCoins', highCoins.toString());
         }
 
         cancelAnimationFrame(animationId);
