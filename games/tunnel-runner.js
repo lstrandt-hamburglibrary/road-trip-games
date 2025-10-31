@@ -379,54 +379,108 @@
     function drawTunnel() {
         const color = TUNNEL_COLORS[currentColorIndex];
 
-        // Draw top wall as smooth path
+        // Draw top wall as smooth curved path
         ctx.fillStyle = color.wall;
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        for (let i = 0; i < tunnelSegments.length; i++) {
-            const segment = tunnelSegments[i];
-            ctx.lineTo(segment.x, segment.topHeight);
+
+        if (tunnelSegments.length > 0) {
+            ctx.lineTo(tunnelSegments[0].x, tunnelSegments[0].topHeight);
+
+            for (let i = 1; i < tunnelSegments.length - 1; i++) {
+                const current = tunnelSegments[i];
+                const next = tunnelSegments[i + 1];
+                const controlX = current.x;
+                const controlY = current.topHeight;
+                const endX = (current.x + next.x) / 2;
+                const endY = (current.topHeight + next.topHeight) / 2;
+                ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+            }
+
+            if (tunnelSegments.length > 1) {
+                const last = tunnelSegments[tunnelSegments.length - 1];
+                ctx.lineTo(last.x, last.topHeight);
+            }
         }
+
         ctx.lineTo(GAME_WIDTH, 0);
         ctx.closePath();
         ctx.fill();
 
-        // Draw top edge line
+        // Draw top edge line with curves
         ctx.strokeStyle = color.edge;
         ctx.lineWidth = 3;
         ctx.beginPath();
-        for (let i = 0; i < tunnelSegments.length; i++) {
-            const segment = tunnelSegments[i];
-            if (i === 0) {
-                ctx.moveTo(segment.x, segment.topHeight);
-            } else {
-                ctx.lineTo(segment.x, segment.topHeight);
+
+        if (tunnelSegments.length > 0) {
+            ctx.moveTo(tunnelSegments[0].x, tunnelSegments[0].topHeight);
+
+            for (let i = 1; i < tunnelSegments.length - 1; i++) {
+                const current = tunnelSegments[i];
+                const next = tunnelSegments[i + 1];
+                const controlX = current.x;
+                const controlY = current.topHeight;
+                const endX = (current.x + next.x) / 2;
+                const endY = (current.topHeight + next.topHeight) / 2;
+                ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+            }
+
+            if (tunnelSegments.length > 1) {
+                const last = tunnelSegments[tunnelSegments.length - 1];
+                ctx.lineTo(last.x, last.topHeight);
             }
         }
         ctx.stroke();
 
-        // Draw bottom wall as smooth path
+        // Draw bottom wall as smooth curved path
         ctx.fillStyle = color.wall;
         ctx.beginPath();
         ctx.moveTo(0, GAME_HEIGHT);
-        for (let i = 0; i < tunnelSegments.length; i++) {
-            const segment = tunnelSegments[i];
-            ctx.lineTo(segment.x, segment.bottomHeight);
+
+        if (tunnelSegments.length > 0) {
+            ctx.lineTo(tunnelSegments[0].x, tunnelSegments[0].bottomHeight);
+
+            for (let i = 1; i < tunnelSegments.length - 1; i++) {
+                const current = tunnelSegments[i];
+                const next = tunnelSegments[i + 1];
+                const controlX = current.x;
+                const controlY = current.bottomHeight;
+                const endX = (current.x + next.x) / 2;
+                const endY = (current.bottomHeight + next.bottomHeight) / 2;
+                ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+            }
+
+            if (tunnelSegments.length > 1) {
+                const last = tunnelSegments[tunnelSegments.length - 1];
+                ctx.lineTo(last.x, last.bottomHeight);
+            }
         }
+
         ctx.lineTo(GAME_WIDTH, GAME_HEIGHT);
         ctx.closePath();
         ctx.fill();
 
-        // Draw bottom edge line
+        // Draw bottom edge line with curves
         ctx.strokeStyle = color.edge;
         ctx.lineWidth = 3;
         ctx.beginPath();
-        for (let i = 0; i < tunnelSegments.length; i++) {
-            const segment = tunnelSegments[i];
-            if (i === 0) {
-                ctx.moveTo(segment.x, segment.bottomHeight);
-            } else {
-                ctx.lineTo(segment.x, segment.bottomHeight);
+
+        if (tunnelSegments.length > 0) {
+            ctx.moveTo(tunnelSegments[0].x, tunnelSegments[0].bottomHeight);
+
+            for (let i = 1; i < tunnelSegments.length - 1; i++) {
+                const current = tunnelSegments[i];
+                const next = tunnelSegments[i + 1];
+                const controlX = current.x;
+                const controlY = current.bottomHeight;
+                const endX = (current.x + next.x) / 2;
+                const endY = (current.bottomHeight + next.bottomHeight) / 2;
+                ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+            }
+
+            if (tunnelSegments.length > 1) {
+                const last = tunnelSegments[tunnelSegments.length - 1];
+                ctx.lineTo(last.x, last.bottomHeight);
             }
         }
         ctx.stroke();
