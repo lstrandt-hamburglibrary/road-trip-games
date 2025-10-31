@@ -15,11 +15,11 @@
     const ROCKET_SIZE = 30;
     const SCROLL_SPEED = 3;
     const BASE_TUNNEL_WIDTH = 200;
-    const MIN_TUNNEL_WIDTH = 120;
+    const MIN_TUNNEL_WIDTH = 160; // Increased from 120 to prevent too-narrow tunnels
     const MAX_TUNNEL_WIDTH = 240;
     const SEGMENT_WIDTH = 20;
     const OBSTACLE_CHANCE = 0.08; // 8% chance per segment
-    const COIN_CHANCE = 0.15; // 15% chance per segment
+    const COIN_CHANCE = 0.075; // 7.5% chance per segment (half of 15%)
     const SPLIT_CHANCE = 0.008; // 0.8% chance to start a tunnel split
     const MIN_PATH_WIDTH = 100; // Minimum width for each path during a split
     const PATH_DEVIATION = 30; // How much paths deviate from center during split
@@ -631,11 +631,13 @@
                 ctx.fillStyle = '#9b59b6';
 
                 if (obstacle.type === 'stalactite') {
-                    // Draw stalactite (triangle pointing down)
+                    // Draw stalactite - base attached to ceiling, point hanging down
                     ctx.beginPath();
-                    ctx.moveTo(segment.x + SEGMENT_WIDTH / 2, obstacle.y);
-                    ctx.lineTo(segment.x, obstacle.y + obstacle.length);
-                    ctx.lineTo(segment.x + SEGMENT_WIDTH, obstacle.y + obstacle.length);
+                    // Wide base at ceiling
+                    ctx.moveTo(segment.x, obstacle.y);
+                    ctx.lineTo(segment.x + SEGMENT_WIDTH, obstacle.y);
+                    // Point at bottom
+                    ctx.lineTo(segment.x + SEGMENT_WIDTH / 2, obstacle.y + obstacle.length);
                     ctx.closePath();
                     ctx.fill();
 
@@ -644,11 +646,13 @@
                     ctx.lineWidth = 2;
                     ctx.stroke();
                 } else if (obstacle.type === 'stalagmite') {
-                    // Draw stalagmite (triangle pointing up)
+                    // Draw stalagmite - base attached to floor, point rising up
                     ctx.beginPath();
-                    ctx.moveTo(segment.x + SEGMENT_WIDTH / 2, obstacle.y);
-                    ctx.lineTo(segment.x, obstacle.y - obstacle.length);
-                    ctx.lineTo(segment.x + SEGMENT_WIDTH, obstacle.y - obstacle.length);
+                    // Wide base at floor
+                    ctx.moveTo(segment.x, obstacle.y);
+                    ctx.lineTo(segment.x + SEGMENT_WIDTH, obstacle.y);
+                    // Point at top
+                    ctx.lineTo(segment.x + SEGMENT_WIDTH / 2, obstacle.y - obstacle.length);
                     ctx.closePath();
                     ctx.fill();
 
