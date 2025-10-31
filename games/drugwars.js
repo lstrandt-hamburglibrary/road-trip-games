@@ -262,9 +262,41 @@
         });
     }
 
-    function showGunOffer() {
+    // Custom confirmation dialog with Yes/No buttons
+    function getConfirmation(promptText) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('drugwarsConfirmModal');
+            const promptEl = document.getElementById('drugwarsConfirmPrompt');
+            const yesBtn = document.getElementById('drugwarsConfirmYes');
+            const noBtn = document.getElementById('drugwarsConfirmNo');
+
+            promptEl.textContent = promptText;
+            modal.style.display = 'flex';
+
+            // Clean up old listeners
+            const newYesBtn = yesBtn.cloneNode(true);
+            const newNoBtn = noBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+
+            const handleYes = () => {
+                modal.style.display = 'none';
+                resolve(true);
+            };
+
+            const handleNo = () => {
+                modal.style.display = 'none';
+                resolve(false);
+            };
+
+            document.getElementById('drugwarsConfirmYes').addEventListener('click', handleYes);
+            document.getElementById('drugwarsConfirmNo').addEventListener('click', handleNo);
+        });
+    }
+
+    async function showGunOffer() {
         const gunPrice = Math.floor(300 + Math.random() * 700);
-        const accept = confirm(`Will you buy a gun for $${gunPrice}?`);
+        const accept = await getConfirmation(`Will you buy a gun for $${gunPrice.toLocaleString()}?`);
         if (accept && gameState.cash >= gunPrice) {
             gameState.cash -= gunPrice;
             gameState.guns++;
@@ -272,10 +304,10 @@
         }
     }
 
-    function showCoatOffer() {
+    async function showCoatOffer() {
         const coatPrice = Math.floor(200 + Math.random() * 300);
         const extraSpace = 50;
-        const accept = confirm(`Will you buy a bigger trenchcoat for $${coatPrice}? (+${extraSpace} spaces)`);
+        const accept = await getConfirmation(`Will you buy a bigger trenchcoat for $${coatPrice.toLocaleString()}? (+${extraSpace} spaces)`);
         if (accept && gameState.cash >= coatPrice) {
             gameState.cash -= coatPrice;
             gameState.maxSpaces += extraSpace;
