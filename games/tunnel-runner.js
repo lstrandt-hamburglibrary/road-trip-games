@@ -1,4 +1,4 @@
-// Tunnel Runner Game - Side-scrolling rocket game
+// Tunnel Runner Game - Side-scrolling rocket game with smooth tunnel generation
 (function() {
     let gameCanvas, ctx;
     let gameState = 'menu'; // menu, playing, gameOver
@@ -17,9 +17,15 @@
     const MAX_TUNNEL_WIDTH = 240;
     const SEGMENT_WIDTH = 20;
     const OBSTACLE_CHANCE = 0.05; // 5% chance per segment
-    const SPLIT_CHANCE = 0.01; // 1% chance to start a tunnel split
+    const SPLIT_CHANCE = 0.008; // 0.8% chance to start a tunnel split
     const MIN_PATH_WIDTH = 100; // Minimum width for each path during a split
     const PATH_DEVIATION = 30; // How much paths deviate from center during split
+
+    // Smooth motion parameters
+    let targetTopHeight = GAME_HEIGHT / 2 - BASE_TUNNEL_WIDTH / 2;
+    let targetTunnelWidth = BASE_TUNNEL_WIDTH;
+    let smoothingFactor = 0.15; // Lower = smoother (0-1)
+    let noiseOffset = 0; // For continuous noise-like movement
 
     // Color palette for tunnel variations
     const TUNNEL_COLORS = [
@@ -54,6 +60,11 @@
             obstacles: obstacles,
             splitInfo: splitInfo // { state: 'splitting'|'split'|'merging', progress: 0-1, dividerY: number }
         };
+    }
+
+    // Simple noise function for smooth variation
+    function smoothNoise(x, amplitude) {
+        return Math.sin(x * 0.1) * amplitude + Math.sin(x * 0.23) * (amplitude * 0.5);
     }
 
     // Create random obstacles for a segment
@@ -101,26 +112,29 @@
         rocket = createRocket();
         tunnelSegments = [];
         score = 0;
+        noiseOffset = 0;
 
-        // Create initial tunnel segments
-        let currentTunnelWidth = BASE_TUNNEL_WIDTH;
-        let currentTopHeight = GAME_HEIGHT / 2 - currentTunnelWidth / 2;
-        let currentBottomHeight = GAME_HEIGHT / 2 + currentTunnelWidth / 2;
+        // Reset smooth motion targets
+        targetTopHeight = GAME_HEIGHT / 2 - BASE_TUNNEL_WIDTH / 2;
+        targetTunnelWidth = BASE_TUNNEL_WIDTH;
+
+        // Create initial tunnel segments with smooth interpolation
+        let currentTopHeight = targetTopHeight;
+        let currentTunnelWidth = targetTunnelWidth;
         let currentColorIndex = 0;
-        let segmentsSinceColorChange = 0;
 
         for (let i = 0; i < Math.ceil(GAME_WIDTH / SEGMENT_WIDTH) + 5; i++) {
-            // Add some random variation to tunnel height
-            const variation = (Math.random() - 0.5) * 10;
+            // Smooth noise-based variation
+            const heightNoise = smoothNoise(noiseOffset + i, 3);
+            targetTopHeight = GAME_HEIGHT / 2 - currentTunnelWidth / 2 + heightNoise;
 
-            // Gradually vary tunnel width - more dramatic changes
-            const widthVariation = (Math.random() - 0.5) * 8;
-            currentTunnelWidth = Math.max(MIN_TUNNEL_WIDTH, Math.min(MAX_TUNNEL_WIDTH, currentTunnelWidth + widthVariation));
+            // Interpolate smoothly toward target
+            currentTopHeight += (targetTopHeight - currentTopHeight) * smoothingFactor;
+            currentTopHeight = Math.max(50, Math.min(GAME_HEIGHT - currentTunnelWidth - 50, currentTopHeight));
 
-            currentTopHeight = Math.max(50, Math.min(GAME_HEIGHT - currentTunnelWidth - 50, currentTopHeight + variation));
-            currentBottomHeight = currentTopHeight + currentTunnelWidth;
+            const currentBottomHeight = currentTopHeight + currentTunnelWidth;
 
-            const obstacles = i > 10 ? createObstacles(currentTopHeight, currentBottomHeight, currentTunnelWidth, true) : []; // No obstacles at start
+            const obstacles = i > 10 ? createObstacles(currentTopHeight, currentBottomHeight, currentTunnelWidth, true) : [];
 
             tunnelSegments.push(createTunnelSegment(i * SEGMENT_WIDTH, currentTopHeight, currentBottomHeight, currentTunnelWidth, currentColorIndex, obstacles));
         }
@@ -137,9 +151,11 @@
     let splitState = null; // null, 'splitting', 'split', 'merging'
     let splitSegmentsRemaining = 0;
     let splitDividerY = 0;
-    const SPLIT_DURATION = 20; // segments to split
-    const FULL_SPLIT_DURATION = 40; // segments fully split
-    const MERGE_DURATION = 20; // segments to merge
+    let splitTopTarget = 0;
+    let splitBottomTarget = 0;
+    const SPLIT_DURATION = 30; // segments to split
+    const FULL_SPLIT_DURATION = 50; // segments fully split
+    const MERGE_DURATION = 30; // segments to merge
 
     // Track obstacle spacing
     let segmentsSinceLastObstacle = 0;
@@ -168,13 +184,23 @@
 
             // Add new segment at the end
             const lastSegment = tunnelSegments[tunnelSegments.length - 1];
-            const variation = (Math.random() - 0.5) * 15;
+            noiseOffset += 0.5; // Increment for continuous noise
 
-            // Gradually vary tunnel width - more dramatic changes
-            const widthVariation = (Math.random() - 0.5) * 8;
-            let newTunnelWidth = Math.max(MIN_TUNNEL_WIDTH, Math.min(MAX_TUNNEL_WIDTH, lastSegment.tunnelWidth + widthVariation));
+            // Smooth width variation
+            const widthNoise = smoothNoise(noiseOffset * 0.5, 4);
+            targetTunnelWidth += widthNoise;
+            targetTunnelWidth = Math.max(MIN_TUNNEL_WIDTH, Math.min(MAX_TUNNEL_WIDTH, targetTunnelWidth));
 
-            let newTopHeight = Math.max(50, Math.min(GAME_HEIGHT - newTunnelWidth - 50, lastSegment.topHeight + variation));
+            // Smooth interpolation towards target
+            let newTunnelWidth = lastSegment.tunnelWidth + (targetTunnelWidth - lastSegment.tunnelWidth) * smoothingFactor;
+
+            // Smooth height variation using noise
+            const heightNoise = smoothNoise(noiseOffset, 5);
+            targetTopHeight = GAME_HEIGHT / 2 - newTunnelWidth / 2 + heightNoise;
+
+            // Interpolate smoothly
+            let newTopHeight = lastSegment.topHeight + (targetTopHeight - lastSegment.topHeight) * smoothingFactor;
+            newTopHeight = Math.max(50, Math.min(GAME_HEIGHT - newTunnelWidth - 50, newTopHeight));
             let newBottomHeight = newTopHeight + newTunnelWidth;
 
             // Change color every 50-100 segments
@@ -184,7 +210,7 @@
                 segmentsSinceColorChange = 0;
             }
 
-            // Handle tunnel splits
+            // Handle tunnel splits with smooth transitions
             let splitInfo = null;
 
             if (splitState === null && Math.random() < SPLIT_CHANCE && score > 50) {
@@ -192,29 +218,29 @@
                 splitState = 'splitting';
                 splitSegmentsRemaining = SPLIT_DURATION;
                 splitDividerY = newTopHeight + newTunnelWidth / 2;
+
+                // Set split targets
+                const dividerThickness = 15;
+                const requiredWidth = (MIN_PATH_WIDTH * 2) + dividerThickness + (PATH_DEVIATION * 2);
+                const expansionNeeded = Math.max(0, requiredWidth - newTunnelWidth);
+
+                splitTopTarget = newTopHeight - (expansionNeeded / 2) - PATH_DEVIATION;
+                splitBottomTarget = newBottomHeight + (expansionNeeded / 2) + PATH_DEVIATION;
             }
 
             if (splitState === 'splitting') {
                 const progress = 1 - (splitSegmentsRemaining / SPLIT_DURATION);
 
-                // Calculate required total width: two 100px paths + 15px divider + 2*30px deviation = 275px
-                const dividerThickness = 15;
-                const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness + (PATH_DEVIATION * 2);
-
-                // Expand tunnel to meet required width AND shift paths apart
-                const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
-                const deviationOffset = PATH_DEVIATION * progress;
-
-                // Random angular divergence - top path varies 5-20px, bottom drops MUCH more (10-50px)
-                const topAngleVariation = (Math.random() - 0.5) * 30; // -15 to +15px (winding)
-                const bottomAngleVariation = 10 + Math.random() * 40; // 10-50px downward (steep drop)
-
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
+                // Smoothly interpolate to split targets
+                newTopHeight = lastSegment.topHeight + (splitTopTarget - lastSegment.topHeight) * 0.1;
+                newBottomHeight = lastSegment.bottomHeight + (splitBottomTarget - lastSegment.bottomHeight) * 0.1;
+                newTopHeight = Math.max(30, newTopHeight);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
-                // Position divider with offset
-                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2) + deviationOffset;
+                // Position divider smoothly
+                const dividerThickness = 15;
+                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2) + (PATH_DEVIATION * progress);
                 splitInfo = { state: 'splitting', progress: progress, dividerY: splitDividerY };
 
                 splitSegmentsRemaining--;
@@ -223,48 +249,42 @@
                     splitSegmentsRemaining = FULL_SPLIT_DURATION;
                 }
             } else if (splitState === 'split') {
-                // Maintain expanded and deviated tunnel with varied angular divergence
+                // Maintain split with small smooth variations
                 const dividerThickness = 15;
-                const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness + (PATH_DEVIATION * 2);
-                const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth);
-                const deviationOffset = PATH_DEVIATION;
+                const smallVariation = smoothNoise(noiseOffset * 2, 2);
 
-                // Random variation - top winds around, bottom continues dropping dramatically
-                const topAngleVariation = (Math.random() - 0.5) * 30; // -15 to +15px (winding)
-                const bottomAngleVariation = 10 + Math.random() * 40; // 10-50px downward (steep)
-
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
+                newTopHeight = lastSegment.topHeight + smallVariation * 0.3;
+                newBottomHeight = lastSegment.bottomHeight + smallVariation * 0.3;
+                newTopHeight = Math.max(30, newTopHeight);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
-                // Keep divider positioned with full deviation
-                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2) + deviationOffset;
+                // Keep divider positioned
+                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2) + PATH_DEVIATION;
                 splitInfo = { state: 'split', progress: 1, dividerY: splitDividerY };
 
                 splitSegmentsRemaining--;
                 if (splitSegmentsRemaining <= 0) {
                     splitState = 'merging';
                     splitSegmentsRemaining = MERGE_DURATION;
+
+                    // Set merge target (back to normal tunnel)
+                    targetTopHeight = GAME_HEIGHT / 2 - BASE_TUNNEL_WIDTH / 2;
+                    targetTunnelWidth = BASE_TUNNEL_WIDTH;
                 }
             } else if (splitState === 'merging') {
                 const progress = splitSegmentsRemaining / MERGE_DURATION;
 
-                // Gradually contract tunnel and bring paths back together
-                const dividerThickness = 15;
-                const requiredTotalWidth = (MIN_PATH_WIDTH * 2) + dividerThickness + (PATH_DEVIATION * 2);
-                const expansionNeeded = Math.max(0, requiredTotalWidth - newTunnelWidth) * progress;
-                const deviationOffset = PATH_DEVIATION * progress;
-
-                // Reduce variation as paths merge back
-                const topAngleVariation = ((Math.random() - 0.5) * 30) * progress; // Scaled by progress
-                const bottomAngleVariation = (10 + Math.random() * 40) * progress; // Scaled by progress
-
-                newTopHeight = Math.max(30, newTopHeight - (expansionNeeded / 2) - deviationOffset - topAngleVariation);
-                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight + (expansionNeeded / 2) + deviationOffset + bottomAngleVariation);
+                // Smoothly merge back to normal tunnel
+                newTopHeight = lastSegment.topHeight + (targetTopHeight - lastSegment.topHeight) * 0.08;
+                newBottomHeight = newTopHeight + lastSegment.tunnelWidth + (targetTunnelWidth - lastSegment.tunnelWidth) * 0.08;
+                newTopHeight = Math.max(30, newTopHeight);
+                newBottomHeight = Math.min(GAME_HEIGHT - 30, newBottomHeight);
                 newTunnelWidth = newBottomHeight - newTopHeight;
 
-                // Bring divider back to center
-                splitDividerY = newTopHeight + MIN_PATH_WIDTH + (dividerThickness / 2) + deviationOffset;
+                // Bring divider back to center smoothly
+                const dividerThickness = 15;
+                splitDividerY = newTopHeight + (newTunnelWidth / 2);
                 splitInfo = { state: 'merging', progress: progress, dividerY: splitDividerY };
 
                 splitSegmentsRemaining--;
@@ -355,58 +375,124 @@
         }
     }
 
-    // Draw tunnel
+    // Draw tunnel with smooth curves
     function drawTunnel() {
+        const color = TUNNEL_COLORS[currentColorIndex];
+
+        // Draw top wall as smooth path
+        ctx.fillStyle = color.wall;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        for (let i = 0; i < tunnelSegments.length; i++) {
+            const segment = tunnelSegments[i];
+            ctx.lineTo(segment.x, segment.topHeight);
+        }
+        ctx.lineTo(GAME_WIDTH, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw top edge line
+        ctx.strokeStyle = color.edge;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let i = 0; i < tunnelSegments.length; i++) {
+            const segment = tunnelSegments[i];
+            if (i === 0) {
+                ctx.moveTo(segment.x, segment.topHeight);
+            } else {
+                ctx.lineTo(segment.x, segment.topHeight);
+            }
+        }
+        ctx.stroke();
+
+        // Draw bottom wall as smooth path
+        ctx.fillStyle = color.wall;
+        ctx.beginPath();
+        ctx.moveTo(0, GAME_HEIGHT);
+        for (let i = 0; i < tunnelSegments.length; i++) {
+            const segment = tunnelSegments[i];
+            ctx.lineTo(segment.x, segment.bottomHeight);
+        }
+        ctx.lineTo(GAME_WIDTH, GAME_HEIGHT);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw bottom edge line
+        ctx.strokeStyle = color.edge;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let i = 0; i < tunnelSegments.length; i++) {
+            const segment = tunnelSegments[i];
+            if (i === 0) {
+                ctx.moveTo(segment.x, segment.bottomHeight);
+            } else {
+                ctx.lineTo(segment.x, segment.bottomHeight);
+            }
+        }
+        ctx.stroke();
+
+        // Draw split dividers as smooth paths
         for (let segment of tunnelSegments) {
-            // Get color for this segment
-            const color = TUNNEL_COLORS[segment.colorIndex];
-
-            // Draw top wall
-            ctx.fillStyle = color.wall;
-            ctx.fillRect(segment.x, 0, SEGMENT_WIDTH + 1, segment.topHeight);
-
-            // Draw bottom wall
-            ctx.fillRect(segment.x, segment.bottomHeight, SEGMENT_WIDTH + 1, GAME_HEIGHT - segment.bottomHeight);
-
-            // Draw wall edges for visual effect
-            ctx.strokeStyle = color.edge;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(segment.x, segment.topHeight);
-            ctx.lineTo(segment.x + SEGMENT_WIDTH, segment.topHeight);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(segment.x, segment.bottomHeight);
-            ctx.lineTo(segment.x + SEGMENT_WIDTH, segment.bottomHeight);
-            ctx.stroke();
-
-            // Draw tunnel split divider
             if (segment.splitInfo && segment.splitInfo.progress > 0) {
                 const dividerThickness = 15;
                 const dividerHalfThickness = dividerThickness / 2;
                 const dividerTop = segment.splitInfo.dividerY - (dividerHalfThickness * segment.splitInfo.progress);
                 const dividerBottom = segment.splitInfo.dividerY + (dividerHalfThickness * segment.splitInfo.progress);
 
-                // Draw the divider
+                // Draw the divider segment
                 ctx.fillStyle = color.wall;
                 ctx.fillRect(segment.x, dividerTop, SEGMENT_WIDTH + 1, dividerBottom - dividerTop);
-
-                // Draw divider edges
-                ctx.strokeStyle = color.edge;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(segment.x, dividerTop);
-                ctx.lineTo(segment.x + SEGMENT_WIDTH, dividerTop);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(segment.x, dividerBottom);
-                ctx.lineTo(segment.x + SEGMENT_WIDTH, dividerBottom);
-                ctx.stroke();
             }
+        }
 
-            // Draw obstacles
+        // Draw divider edges
+        let inSplit = false;
+        ctx.strokeStyle = color.edge;
+        ctx.lineWidth = 3;
+
+        // Top edge of divider
+        ctx.beginPath();
+        for (let segment of tunnelSegments) {
+            if (segment.splitInfo && segment.splitInfo.progress > 0) {
+                const dividerThickness = 15;
+                const dividerHalfThickness = dividerThickness / 2;
+                const dividerTop = segment.splitInfo.dividerY - (dividerHalfThickness * segment.splitInfo.progress);
+
+                if (!inSplit) {
+                    ctx.moveTo(segment.x, dividerTop);
+                    inSplit = true;
+                } else {
+                    ctx.lineTo(segment.x, dividerTop);
+                }
+            } else if (inSplit) {
+                inSplit = false;
+            }
+        }
+        ctx.stroke();
+
+        // Bottom edge of divider
+        inSplit = false;
+        ctx.beginPath();
+        for (let segment of tunnelSegments) {
+            if (segment.splitInfo && segment.splitInfo.progress > 0) {
+                const dividerThickness = 15;
+                const dividerHalfThickness = dividerThickness / 2;
+                const dividerBottom = segment.splitInfo.dividerY + (dividerHalfThickness * segment.splitInfo.progress);
+
+                if (!inSplit) {
+                    ctx.moveTo(segment.x, dividerBottom);
+                    inSplit = true;
+                } else {
+                    ctx.lineTo(segment.x, dividerBottom);
+                }
+            } else if (inSplit) {
+                inSplit = false;
+            }
+        }
+        ctx.stroke();
+
+        // Draw obstacles
+        for (let segment of tunnelSegments) {
             for (let obstacle of segment.obstacles) {
                 ctx.fillStyle = '#9b59b6';
 
