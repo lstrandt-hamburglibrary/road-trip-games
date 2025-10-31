@@ -410,7 +410,7 @@
 
         if (action === 'p') {
             const maxPay = Math.min(gameState.cash, gameState.debt);
-            const amount = await getNumberInput(`Pay how much? (You have $${gameState.cash.toLocaleString()})`, maxPay);
+            const amount = await getNumberInput(`Pay how much? (You owe $${gameState.debt.toLocaleString()}, have $${gameState.cash.toLocaleString()})`, maxPay);
             if (amount > 0 && amount <= gameState.cash && amount <= gameState.debt) {
                 gameState.cash -= amount;
                 gameState.debt -= amount;
