@@ -813,7 +813,7 @@
             let messages = [];
             if (score > highScore) messages.push('NEW HIGH SCORE');
             if (coins > highCoins) messages.push('MOST COINS');
-            ctx.fillText(`🎉 ${messages.join(' & ')}! 🎉', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
+            ctx.fillText(`🎉 ${messages.join(' & ')}! 🎉`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 50);
         } else {
             ctx.fillStyle = 'white';
             ctx.font = '20px Arial';
