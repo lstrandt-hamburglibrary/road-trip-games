@@ -1384,13 +1384,39 @@
     "flower": "Dogwood",
     "motto": "To Be Rather Than to Seem",
     "facts": [
-      "The Wright Brothers made the first powered flight at Kitty Hawk (1903)",
-      "Birthplace of Pepsi Cola in New Bern (1898)",
-      "The Biltmore Estate in Asheville is America's largest home",
-      "Research Triangle is one of the largest research parks in the world",
-      "First state university to open its doors (UNC, 1795)"
+      "The Wright Brothers made the first powered flight at Kitty Hawk on December 17, 1903",
+      "Pepsi Cola was invented by Caleb Bradham in New Bern in 1898",
+      "The Biltmore Estate in Asheville is America's largest privately-owned home with 250 rooms",
+      "Research Triangle Park is one of the largest research parks in the world",
+      "University of North Carolina (1795) was the first state university to open its doors",
+      "Krispy Kreme doughnuts were invented in Winston-Salem in 1937",
+      "Mount Mitchell is the highest point east of the Mississippi River at 6,684 feet",
+      "The first English child born in America was Virginia Dare on Roanoke Island (1587)",
+      "North Carolina produces more sweet potatoes than any other state",
+      "The pirate Blackbeard was killed off the coast of North Carolina in 1718",
+      "Cheerwine, a cherry-flavored soft drink, has been made in Salisbury since 1917",
+      "The Lost Colony of Roanoke mysteriously disappeared in the 1580s",
+      "It's illegal to play bingo while drunk in North Carolina (yes, really)",
+      "The Blue Ridge Parkway is America's longest linear park at 469 miles",
+      "North Carolina has more than 300 miles of coastline along the Outer Banks",
+      "The first miniature golf course was built in Fayetteville in 1916",
+      "Charlotte is the second largest banking center in the U.S. after New York",
+      "The Grandfather Mountain Mile High Swinging Bridge is the highest in America",
+      "Andy Griffith, Michael Jordan, and James K. Polk are from North Carolina",
+      "Cape Hatteras Lighthouse is the tallest brick lighthouse in North America at 210 feet"
     ],
-    "landmarks": ["Outer Banks", "Blue Ridge Parkway", "Biltmore Estate", "Wright Brothers Memorial", "Great Smoky Mountains"]
+    "landmarks": [
+      "Outer Banks - Coastal NC",
+      "Blue Ridge Parkway - Western NC",
+      "Biltmore Estate - Asheville",
+      "Wright Brothers National Memorial - Kill Devil Hills",
+      "Great Smoky Mountains National Park - Western NC border",
+      "Cape Hatteras Lighthouse - Buxton",
+      "Grandfather Mountain - Linville",
+      "Chimney Rock State Park - Chimney Rock",
+      "USS North Carolina Battleship - Wilmington",
+      "Research Triangle Park - Durham/Raleigh/Chapel Hill"
+    ]
   },
   "North Dakota": {
     "capital": "Bismarck",
@@ -1401,13 +1427,39 @@
     "flower": "Wild Prairie Rose",
     "motto": "Liberty and Union, Now and Forever",
     "facts": [
-      "Geographic center of North America is near Rugby",
-      "Theodore Roosevelt National Park preserves the Badlands",
-      "The state has more wildlife refuges than any other state",
-      "Leads the nation in honey production",
-      "Has the tallest human-made structure in the Western Hemisphere (KVLY TV mast, 2,063 feet)"
+      "The geographic center of North America is near Rugby, North Dakota",
+      "Theodore Roosevelt National Park preserves 70,000 acres of colorful Badlands",
+      "Has more National Wildlife Refuges than any other state (63 total)",
+      "Leads the nation in honey production - produces about 30 million pounds annually",
+      "The KVLY TV mast near Blanchard is 2,063 feet tall - tallest structure in Western Hemisphere",
+      "North Dakota's Enchanted Highway features the world's largest scrap metal sculptures",
+      "Beer and pretzels cannot legally be served together in bars (weird but true law)",
+      "The state has more golf courses per capita than any other state",
+      "North Dakota is the most rural state - only 10% of people live in cities",
+      "Lawrence Welk, the bandleader, was born in Strasburg",
+      "The state capital building in Bismarck is the tallest in the U.S. at 19 stories",
+      "International Peace Garden straddles the U.S.-Canada border",
+      "North Dakota became a state on the same day as South Dakota (November 2, 1889)",
+      "The state has a strategic petroleum reserve holding 727 million barrels of oil",
+      "Geese Pyramid in Regent is a 110-foot tall sculpture made of scrap metal",
+      "Fort Abraham Lincoln was where General Custer was stationed before Little Bighorn",
+      "North Dakota produces more sunflowers than any other state",
+      "The state name comes from the Dakota Sioux word meaning 'friend' or 'ally'",
+      "Fargo is the state's largest city but Bismarck is the capital",
+      "The coldest temperature ever recorded was -60°F in Tower on February 15, 1936"
     ],
-    "landmarks": ["Theodore Roosevelt National Park", "International Peace Garden", "Fort Abraham Lincoln", "Enchanted Highway"]
+    "landmarks": [
+      "Theodore Roosevelt National Park - Medora",
+      "International Peace Garden - Dunseith (US-Canada border)",
+      "Fort Abraham Lincoln State Park - Mandan",
+      "Enchanted Highway - Regent to Gladstone",
+      "KVLY TV Mast - Blanchard",
+      "Maah Daah Hey Trail - Badlands",
+      "Scandinavian Heritage Park - Minot",
+      "Knife River Indian Villages - Stanton",
+      "Lewis and Clark Interpretive Center - Washburn",
+      "North Dakota Heritage Center - Bismarck"
+    ]
   },
   "Ohio": {
     "capital": "Columbus",
@@ -1419,12 +1471,38 @@
     "motto": "With God, All Things Are Possible",
     "facts": [
       "Birthplace of aviation - the Wright Brothers were from Dayton",
-      "Eight U.S. Presidents were born in Ohio (more than any other state)",
-      "Rock and Roll Hall of Fame is in Cleveland",
-      "Cedar Point has some of the world's tallest and fastest roller coasters",
-      "The first professional baseball team was the Cincinnati Red Stockings (1869)"
+      "Eight U.S. Presidents were born in Ohio - more than any other state",
+      "The Rock and Roll Hall of Fame is in Cleveland where DJ Alan Freed coined the term 'rock and roll'",
+      "Cedar Point in Sandusky has 17 roller coasters and calls itself the 'Roller Coaster Capital'",
+      "The first professional baseball team was the Cincinnati Red Stockings in 1869",
+      "Thomas Edison was born in Milan, Ohio in 1847",
+      "The Pro Football Hall of Fame is in Canton, birthplace of the NFL",
+      "Columbus is the largest city in Ohio and the 14th largest in the U.S.",
+      "Ohio produces more Swiss cheese than Switzerland - 50% of U.S. Swiss cheese",
+      "The first traffic light was installed in Cleveland in 1914",
+      "Cincinnati chili is served over spaghetti and is a local delicacy",
+      "Operators of underground coal mines must provide 'an adequate supply of toilet paper' (real law)",
+      "The state flag is the only non-rectangular U.S. state flag (it's a pennant shape)",
+      "Seven U.S. Presidents called Ohio home: Grant, Hayes, Garfield, Harrison, McKinley, Taft, and Harding",
+      "Ohio State University is the third-largest university in the U.S. by enrollment",
+      "The Cuyahoga River in Cleveland famously caught fire in 1969, leading to the Clean Water Act",
+      "The first ambulance service began in Cincinnati in 1865",
+      "Ohio is the leading producer of greenhouse and nursery plants",
+      "The hot dog was invented in Ohio (or so Ohioans claim)",
+      "Life Savers candy was invented in Cleveland in 1912"
     ],
-    "landmarks": ["Rock and Roll Hall of Fame", "Cedar Point", "Hocking Hills", "Pro Football Hall of Fame", "Cuyahoga Valley"]
+    "landmarks": [
+      "Rock and Roll Hall of Fame - Cleveland",
+      "Cedar Point - Sandusky",
+      "Hocking Hills State Park - Logan",
+      "Pro Football Hall of Fame - Canton",
+      "Cuyahoga Valley National Park - Between Cleveland and Akron",
+      "National Museum of the U.S. Air Force - Dayton",
+      "Cincinnati Zoo & Botanical Garden - Cincinnati",
+      "Ohio Statehouse - Columbus",
+      "Kings Island - Mason",
+      "Marblehead Lighthouse - Marblehead"
+    ]
   },
   "Oklahoma": {
     "capital": "Oklahoma City",
@@ -1435,13 +1513,39 @@
     "flower": "Oklahoma Rose",
     "motto": "Labor Conquers All Things",
     "facts": [
-      "Has more man-made lakes than any other state (over 200)",
-      "Oklahoma City is the horse show capital of the world",
-      "The shopping cart was invented in Oklahoma City (1936)",
-      "Route 66 runs through more miles of Oklahoma than any other state",
-      "Native American population is second highest in the nation"
+      "Has more man-made lakes than any other state - over 200 reservoirs",
+      "Oklahoma City hosts the largest livestock show and rodeo in the world",
+      "The shopping cart was invented in Oklahoma City by Sylvan Goldman in 1936",
+      "Route 66 runs through more miles of Oklahoma (400+) than any other state",
+      "Has the second highest Native American population in the nation (only Alaska has more)",
+      "The parking meter was invented in Oklahoma City in 1935",
+      "Oklahoma was the last state to allow tattooing - it was illegal until 2006",
+      "The state has the world's largest collection of Indian baskets at the Gilcrease Museum",
+      "Will Rogers, the humorist and actor, was from Oologah, Oklahoma",
+      "'Oklahoma!' the musical, is the state's official song",
+      "Turner Falls is Oklahoma's tallest waterfall at 77 feet",
+      "The geographic center of Oklahoma is 8 miles north of Oklahoma City",
+      "Oklahoma has the most tornadoes per square mile of any state",
+      "Cimarron County is the only county in the U.S. that borders four states",
+      "The name 'Oklahoma' comes from Choctaw words meaning 'red people'",
+      "Boise City was accidentally bombed by the U.S. Air Force during WWII training",
+      "The state has 11 ecoregions - more diversity than almost any other state",
+      "The first Girl Scout Cookie was sold in Muskogee in 1917",
+      "Oklahoma City's Capitol building is the only one with an operating oil well underneath it",
+      "Woody Guthrie, folk singer, was born in Okemah"
     ],
-    "landmarks": ["Route 66 Museum", "Wichita Mountains", "National Cowboy Museum", "Turner Falls", "Chickasaw National Recreation Area"]
+    "landmarks": [
+      "Route 66 Museum - Clinton",
+      "Wichita Mountains Wildlife Refuge - Southwest Oklahoma",
+      "National Cowboy & Western Heritage Museum - Oklahoma City",
+      "Turner Falls - Davis",
+      "Chickasaw National Recreation Area - Sulphur",
+      "Tallgrass Prairie Preserve - Pawhuska",
+      "Philbrook Museum - Tulsa",
+      "Oklahoma City National Memorial - Oklahoma City",
+      "Gilcrease Museum - Tulsa",
+      "Alabaster Caverns - Freedom"
+    ]
   },
   "Oregon": {
     "capital": "Salem",
