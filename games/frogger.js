@@ -107,7 +107,7 @@
             const direction = index % 2 === 0 ? 1 : -1; // Alternate directions
             const vehicleType = VEHICLE_TYPES[index % VEHICLE_TYPES.length];
             const speed = vehicleType.speed * (1 + gameState.level * 0.05) * direction; // Reduced from 0.1 to 0.05
-            const gap = 3.5 + Math.random() * 1.5;
+            const gap = 5 + Math.random() * 2; // Increased from 3.5-5 to 5-7
 
             // Create vehicles across wider area to ensure smooth wrapping
             const numVehicles = Math.ceil(COLS * 1.5 / gap);
@@ -133,7 +133,7 @@
             const logType = LOG_TYPES[index % LOG_TYPES.length];
             const isTurtle = index % 2 === 1;
             const speed = logType.speed * (1 + gameState.level * 0.04) * direction; // Reduced from 0.08 to 0.04
-            const gap = 4.5 + Math.random() * 1.5;
+            const gap = 6 + Math.random() * 2; // Increased from 4.5-6 to 6-8
 
             // Create obstacles across wider area to ensure smooth wrapping
             const numObstacles = Math.ceil(COLS * 1.8 / gap);
