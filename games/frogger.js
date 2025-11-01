@@ -3,10 +3,10 @@
     'use strict';
 
     // Game constants
-    const CANVAS_WIDTH = 560;
-    const CANVAS_HEIGHT = 728;
-    const TILE_SIZE = 56;
-    const COLS = 10;
+    const CANVAS_WIDTH = 650;
+    const CANVAS_HEIGHT = 520;
+    const TILE_SIZE = 40;
+    const COLS = 13;
     const ROWS = 13;
 
     // Lane configuration
@@ -17,7 +17,7 @@
     const START_ROW = 12;
 
     // Home positions (lily pads)
-    const HOME_POSITIONS = [1, 3, 5, 7, 9]; // Column positions
+    const HOME_POSITIONS = [1, 3, 5, 7, 9, 11]; // Column positions
 
     // Vehicle types and speeds (base speeds - much slower)
     const VEHICLE_TYPES = [
@@ -39,7 +39,7 @@
     let gameState = {
         canvas: null,
         ctx: null,
-        frog: { row: START_ROW, col: 5, moving: false, moveProgress: 0 },
+        frog: { row: START_ROW, col: 6, moving: false, moveProgress: 0 },
         lives: 3,
         score: 0,
         level: 1,
@@ -47,7 +47,7 @@
         timeMax: 60,
         gameOver: false,
         won: false,
-        homesOccupied: [false, false, false, false, false],
+        homesOccupied: [false, false, false, false, false, false],
         frogsHome: 0,
         vehicles: [],
         waterObstacles: [],
@@ -79,14 +79,14 @@
         gameState.level = 1;
         gameState.gameOver = false;
         gameState.won = false;
-        gameState.homesOccupied = [false, false, false, false, false];
+        gameState.homesOccupied = [false, false, false, false, false, false];
         gameState.frogsHome = 0;
         resetLevel();
     }
 
     function resetLevel() {
         gameState.timeLeft = gameState.timeMax;
-        gameState.frog = { row: START_ROW, col: 5, moving: false, moveProgress: 0 };
+        gameState.frog = { row: START_ROW, col: 6, moving: false, moveProgress: 0 };
         gameState.moveQueued = null;
         createVehicles();
         createWaterObstacles();
@@ -94,7 +94,7 @@
     }
 
     function resetFrog() {
-        gameState.frog = { row: START_ROW, col: 5, moving: false, moveProgress: 0 };
+        gameState.frog = { row: START_ROW, col: 6, moving: false, moveProgress: 0 };
         gameState.moveQueued = null;
         gameState.timeLeft = gameState.timeMax;
     }
@@ -519,7 +519,7 @@
         gameState.score += Math.floor(gameState.timeLeft * 20);
 
         // Check if all homes occupied
-        if (gameState.frogsHome >= 5) {
+        if (gameState.frogsHome >= 6) {
             levelComplete();
         } else {
             resetFrog();
@@ -531,7 +531,7 @@
         gameState.score += 1000;
         gameState.level++;
         gameState.frogsHome = 0;
-        gameState.homesOccupied = [false, false, false, false, false];
+        gameState.homesOccupied = [false, false, false, false, false, false];
 
         // Reduce time at higher levels
         if (gameState.level > 3) {
