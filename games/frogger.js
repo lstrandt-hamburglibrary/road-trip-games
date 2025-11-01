@@ -364,11 +364,11 @@
         for (let vehicle of gameState.vehicles) {
             vehicle.col += vehicle.speed * 0.05;
 
-            // Wrap around
-            if (vehicle.direction > 0 && vehicle.col > COLS + 2) {
-                vehicle.col = -vehicle.type.width - 2;
-            } else if (vehicle.direction < 0 && vehicle.col < -vehicle.type.width - 2) {
-                vehicle.col = COLS + 2;
+            // Wrap around with larger boundaries for wider screen
+            if (vehicle.direction > 0 && vehicle.col > COLS + 3) {
+                vehicle.col = -vehicle.type.width - 3;
+            } else if (vehicle.direction < 0 && vehicle.col < -vehicle.type.width - 3) {
+                vehicle.col = COLS + 3;
             }
         }
 
@@ -376,11 +376,11 @@
         for (let obstacle of gameState.waterObstacles) {
             obstacle.col += obstacle.speed * 0.05;
 
-            // Wrap around
-            if (obstacle.direction > 0 && obstacle.col > COLS + 2) {
-                obstacle.col = -obstacle.width - 2;
-            } else if (obstacle.direction < 0 && obstacle.col < -obstacle.width - 2) {
-                obstacle.col = COLS + 2;
+            // Wrap around with larger boundaries for wider screen
+            if (obstacle.direction > 0 && obstacle.col > COLS + 4) {
+                obstacle.col = -obstacle.width - 4;
+            } else if (obstacle.direction < 0 && obstacle.col < -obstacle.width - 4) {
+                obstacle.col = COLS + 4;
             }
 
             // Update turtle diving
