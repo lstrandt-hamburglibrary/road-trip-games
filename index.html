@@ -2344,10 +2344,14 @@
                     if (roadmap) roadmap.style.display = 'none';
                     if (iSpyGame) {
                         iSpyGame.style.display = 'block';
+                        console.log('iSpyGame display set to block');
                     } else {
                         console.error('iSpyGame element not found!');
                         return;
                     }
+
+                    // Scroll to top to ensure game is visible
+                    window.scrollTo(0, 0);
 
                     currentScene = 0;
                     score = 0;
@@ -2376,6 +2380,7 @@
                         return;
                     }
 
+                    console.log('Setting content for scene:', scene.name);
                     contentEl.innerHTML = `
                     <div style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); padding: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
                         <div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
