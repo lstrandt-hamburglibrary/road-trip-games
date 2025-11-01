@@ -2453,23 +2453,113 @@
                 // Clear canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Background emojis for each scene
-                const backgroundSets = {
-                    'Park Scene': ['🌳', '🌲', '🌿', '🍃', '🌱', '🌾', '☘️', '🍀', '🌸', '🌼', '🌺', '🌻', '🌷', '☁️', '🌤️'],
-                    'Beach Scene': ['🌊', '🏖️', '⛱️', '🏄‍♂️', '🌅', '☀️', '⛵', '🌴', '🥥', '💧', '🌀', '☁️'],
-                    'City Scene': ['🏢', '🏬', '🏛️', '🏦', '🏙️', '🏗️', '🌆', '☁️', '🚗', '🚙', '🛣️', '🚧', '⛽'],
-                    'Farm Scene': ['🌾', '🚜', '🏡', '🐄', '🌻', '🌽', '🥕', '🍅', '🌿', '🌱', '☘️', '⛅', '☁️']
-                };
-
-                const bgEmojis = backgroundSets[scene.name] || [];
-
-                // Draw dense background pattern with varied sizes
-                for (let i = 0; i < 70; i++) {
-                    const x = Math.random() * canvas.width;
-                    const y = Math.random() * canvas.height;
-                    const size = 20 + Math.random() * 40; // Varied sizes
-                    ctx.font = `${size}px Arial`;
-                    ctx.fillText(bgEmojis[Math.floor(Math.random() * bgEmojis.length)], x, y);
+                // Draw scene-specific background
+                if (scene.name === 'Park Scene') {
+                    // Sky
+                    ctx.fillStyle = '#87CEEB';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height * 0.6);
+                    // Grass
+                    ctx.fillStyle = '#90EE90';
+                    ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+                    // Sun
+                    ctx.font = '80px Arial';
+                    ctx.fillText('☀️', canvas.width - 120, 80);
+                    // Clouds
+                    ctx.font = '60px Arial';
+                    ctx.fillText('☁️', 100, 80);
+                    ctx.fillText('☁️', canvas.width - 300, 120);
+                    // Trees
+                    ctx.font = '70px Arial';
+                    for (let i = 0; i < 8; i++) {
+                        ctx.fillText('🌳', i * 110 + (i % 2) * 30, canvas.height * 0.65 + Math.random() * 20);
+                    }
+                    // Flowers in grass
+                    ctx.font = '35px Arial';
+                    for (let i = 0; i < 25; i++) {
+                        const flowers = ['🌸', '🌼', '🌺', '🌻', '🌷'];
+                        ctx.fillText(flowers[Math.floor(Math.random() * flowers.length)],
+                            Math.random() * canvas.width,
+                            canvas.height * 0.65 + Math.random() * 150);
+                    }
+                } else if (scene.name === 'Beach Scene') {
+                    // Sky
+                    ctx.fillStyle = '#87CEEB';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height * 0.5);
+                    // Ocean
+                    ctx.fillStyle = '#4682B4';
+                    ctx.fillRect(0, canvas.height * 0.5, canvas.width, canvas.height * 0.25);
+                    // Sand
+                    ctx.fillStyle = '#F4E4C1';
+                    ctx.fillRect(0, canvas.height * 0.75, canvas.width, canvas.height * 0.25);
+                    // Sun
+                    ctx.font = '80px Arial';
+                    ctx.fillText('☀️', canvas.width - 120, 80);
+                    // Waves
+                    ctx.font = '45px Arial';
+                    for (let i = 0; i < 15; i++) {
+                        ctx.fillText('🌊', i * 60 + Math.random() * 20, canvas.height * 0.55 + Math.random() * 100);
+                    }
+                    // Palm trees
+                    ctx.font = '70px Arial';
+                    ctx.fillText('🌴', 50, canvas.height * 0.8);
+                    ctx.fillText('🌴', canvas.width - 120, canvas.height * 0.78);
+                    // Beach items
+                    ctx.font = '50px Arial';
+                    ctx.fillText('⛱️', 200, canvas.height * 0.85);
+                    ctx.fillText('⛱️', canvas.width - 300, canvas.height * 0.83);
+                } else if (scene.name === 'City Scene') {
+                    // Sky
+                    ctx.fillStyle = '#B0C4DE';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height * 0.6);
+                    // Street
+                    ctx.fillStyle = '#696969';
+                    ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+                    // Buildings
+                    ctx.font = '90px Arial';
+                    for (let i = 0; i < 7; i++) {
+                        ctx.fillText('🏢', i * 120 + Math.random() * 20, canvas.height * 0.55 + Math.random() * 30);
+                    }
+                    // Clouds
+                    ctx.font = '50px Arial';
+                    ctx.fillText('☁️', 150, 80);
+                    ctx.fillText('☁️', canvas.width - 200, 100);
+                    // Street lights and signs
+                    ctx.font = '60px Arial';
+                    ctx.fillText('🚦', 100, canvas.height * 0.7);
+                    ctx.fillText('🚦', canvas.width - 150, canvas.height * 0.68);
+                    // Parked vehicles
+                    ctx.font = '45px Arial';
+                    for (let i = 0; i < 6; i++) {
+                        const vehicles = ['🚗', '🚙', '🚕'];
+                        ctx.fillText(vehicles[Math.floor(Math.random() * vehicles.length)],
+                            i * 130 + 50, canvas.height * 0.82 + Math.random() * 20);
+                    }
+                } else if (scene.name === 'Farm Scene') {
+                    // Sky
+                    ctx.fillStyle = '#87CEEB';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height * 0.55);
+                    // Fields
+                    ctx.fillStyle = '#DAA520';
+                    ctx.fillRect(0, canvas.height * 0.55, canvas.width, canvas.height * 0.45);
+                    // Sun
+                    ctx.font = '80px Arial';
+                    ctx.fillText('☀️', canvas.width - 120, 80);
+                    // Barn
+                    ctx.font = '90px Arial';
+                    ctx.fillText('🏡', 50, canvas.height * 0.6);
+                    // Clouds
+                    ctx.font = '50px Arial';
+                    ctx.fillText('☁️', 200, 80);
+                    ctx.fillText('☁️', canvas.width - 300, 100);
+                    // Wheat fields
+                    ctx.font = '50px Arial';
+                    for (let i = 0; i < 30; i++) {
+                        ctx.fillText('🌾', Math.random() * canvas.width,
+                            canvas.height * 0.6 + Math.random() * 180);
+                    }
+                    // Tractor
+                    ctx.font = '60px Arial';
+                    ctx.fillText('🚜', canvas.width - 200, canvas.height * 0.75);
                 }
 
                 // Draw objects (smaller and harder to spot)
