@@ -526,6 +526,9 @@
                             color: ${color};
                             cursor: ${gameState.gameOver ? 'default' : 'pointer'};
                             user-select: none;
+                            -webkit-user-select: none;
+                            -webkit-touch-callout: none;
+                            touch-action: manipulation;
                         "
                     >${content}</div>
                 `;
@@ -555,6 +558,7 @@
 
     // Touch event handlers for long-press flagging
     window.handleTouchStart = function(event, row, col) {
+        event.preventDefault(); // Prevent context menu / copy menu
         touchHandled = false;
 
         // Start long-press timer (500ms)

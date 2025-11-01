@@ -1025,11 +1025,20 @@
                 <div style="background: white; padding: 1rem; border: 1px solid #ddd; font-size: 0.9rem;">
                     <strong>Controls:</strong>
                     <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
-                        <li><strong>Arrow Keys</strong> or <strong>Mouse</strong> - Move paddle</li>
-                        <li><strong>Space</strong> or <strong>Click</strong> - Launch ball</li>
+                        <li><strong>Arrow Keys</strong>, <strong>Mouse</strong>, or <strong>Touch Buttons</strong> - Move paddle</li>
+                        <li><strong>Space</strong>, <strong>Click</strong>, or <strong>Launch Button</strong> - Launch ball</li>
                         <li><strong>P</strong> - Pause/Resume game</li>
                     </ul>
                     <strong>Goal:</strong> Break all bricks to advance to the next level. You have 3 lives!
+                </div>
+
+                <!-- Mobile Touch Controls - Standardized Layout -->
+                <div id="breakoutControls" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; padding: 0 1rem;">
+                    <button id="breakoutBtnLaunch" style="width: 90px; height: 90px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; border: none; border-radius: 50%; font-size: 0.9rem; cursor: pointer; touch-action: manipulation; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">LAUNCH</button>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="breakoutBtnLeft" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">◀</button>
+                        <button id="breakoutBtnRight" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; font-size: 2rem; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">▶</button>
+                    </div>
                 </div>
 
                 <!-- Game Over Screen -->

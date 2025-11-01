@@ -182,6 +182,70 @@
         });
     }
 
+    // Setup mobile touch controls
+    function setupMobileControls() {
+        const btnLeft = document.getElementById('breakoutBtnLeft');
+        const btnRight = document.getElementById('breakoutBtnRight');
+        const btnLaunch = document.getElementById('breakoutBtnLaunch');
+
+        if (btnLeft) {
+            btnLeft.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                gameState.keys.left = true;
+                gameState.useMouseControl = false;
+            });
+            btnLeft.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                gameState.keys.left = false;
+            });
+            btnLeft.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                gameState.keys.left = true;
+                gameState.useMouseControl = false;
+            });
+            btnLeft.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                gameState.keys.left = false;
+            });
+        }
+
+        if (btnRight) {
+            btnRight.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                gameState.keys.right = true;
+                gameState.useMouseControl = false;
+            });
+            btnRight.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                gameState.keys.right = false;
+            });
+            btnRight.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                gameState.keys.right = true;
+                gameState.useMouseControl = false;
+            });
+            btnRight.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                gameState.keys.right = false;
+            });
+        }
+
+        if (btnLaunch) {
+            btnLaunch.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!gameState.ball.launched && !gameState.gameOver) {
+                    launchBall();
+                }
+            });
+            btnLaunch.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!gameState.ball.launched && !gameState.gameOver) {
+                    launchBall();
+                }
+            });
+        }
+    }
+
     function launchBall() {
         const levelConfig = LEVELS[gameState.level - 1];
         const speed = levelConfig.ballSpeed;
@@ -651,6 +715,7 @@
         document.getElementById('gamesMenu').style.display = 'none';
         document.getElementById('breakoutGame').style.display = 'block';
         initGame();
+        setupMobileControls();
     };
 
     window.exitBreakout = function() {
