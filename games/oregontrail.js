@@ -837,6 +837,10 @@
     };
 
     window.oregonContinue = function() {
+        // Clear "Your journey begins!" message on first travel
+        if (gameState.milesTraveled === 0 && gameState.eventLog.includes('Your journey begins!')) {
+            gameState.eventLog = [];
+        }
         travel();
     };
 
