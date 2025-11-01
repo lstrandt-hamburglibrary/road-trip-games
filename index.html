@@ -2333,19 +2333,28 @@
 
             window.launchISpy = function() {
                 console.log('Launching I Spy game');
-                const welcome = document.querySelector('.welcome');
-                const featureGrid = document.querySelector('.feature-grid');
-                const roadmap = document.querySelector('.roadmap');
-                const iSpyGame = document.getElementById('iSpyGame');
+                try {
+                    const welcome = document.querySelector('.welcome');
+                    const featureGrid = document.querySelector('.feature-grid');
+                    const roadmap = document.querySelector('.roadmap');
+                    const iSpyGame = document.getElementById('iSpyGame');
 
-                if (welcome) welcome.style.display = 'none';
-                if (featureGrid) featureGrid.style.display = 'none';
-                if (roadmap) roadmap.style.display = 'none';
-                if (iSpyGame) iSpyGame.style.display = 'block';
+                    if (welcome) welcome.style.display = 'none';
+                    if (featureGrid) featureGrid.style.display = 'none';
+                    if (roadmap) roadmap.style.display = 'none';
+                    if (iSpyGame) {
+                        iSpyGame.style.display = 'block';
+                    } else {
+                        console.error('iSpyGame element not found!');
+                        return;
+                    }
 
-                currentScene = 0;
-                score = 0;
-                startScene();
+                    currentScene = 0;
+                    score = 0;
+                    startScene();
+                } catch (error) {
+                    console.error('Error launching I Spy:', error);
+                }
             };
 
             window.exitISpy = function() {
@@ -2356,10 +2365,18 @@
             };
 
             function startScene() {
-                foundObjects = [];
-                const scene = scenes[currentScene];
+                console.log('Starting scene:', currentScene);
+                try {
+                    foundObjects = [];
+                    const scene = scenes[currentScene];
+                    const contentEl = document.getElementById('iSpyContent');
 
-                document.getElementById('iSpyContent').innerHTML = `
+                    if (!contentEl) {
+                        console.error('iSpyContent element not found!');
+                        return;
+                    }
+
+                    contentEl.innerHTML = `
                     <div style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); padding: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
                         <div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                             <h3 style="margin-top: 0; color: #a6c1ee; text-align: center; font-size: 1.8rem;">
@@ -2407,8 +2424,11 @@
                     </div>
                 `;
 
-                // Draw the scene
-                setTimeout(() => drawScene(), 100);
+                    // Draw the scene
+                    setTimeout(() => drawScene(), 100);
+                } catch (error) {
+                    console.error('Error in startScene:', error);
+                }
             }
 
             function drawScene() {
