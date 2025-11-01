@@ -395,13 +395,39 @@
     "flower": "Cherokee Rose",
     "motto": "Wisdom, Justice, and Moderation",
     "facts": [
-      "Largest state east of the Mississippi River",
-      "Coca-Cola was invented in Atlanta in 1886",
-      "Home to the world's busiest airport (Hartsfield-Jackson Atlanta)",
-      "Produces more peanuts and pecans than any other state",
-      "The Girl Scouts were founded in Savannah in 1912"
+      "Largest state east of the Mississippi River by land area",
+      "Coca-Cola was invented in Atlanta by John Pemberton in 1886",
+      "Home to the world's busiest airport - Hartsfield-Jackson Atlanta serves 107 million passengers annually",
+      "Produces more peanuts, pecans, and peaches than any other state",
+      "The Girl Scouts were founded in Savannah by Juliette Gordon Low in 1912",
+      "The 'Tree That Owns Itself' in Athens legally owns itself and the land around it",
+      "Mixing peanuts and Coca-Cola together is a beloved Georgia tradition",
+      "The varsity drive-in in Atlanta is the world's largest drive-in restaurant",
+      "Georgia has produced more American Idols than any other state",
+      "The first gold rush in America happened in Dahlonega, Georgia in 1828",
+      "Savannah was the first planned city in America with its famous squares",
+      "Georgia is home to the largest sculptured monument in the world - Stone Mountain",
+      "The Big Chicken in Marietta is a 56-foot tall KFC landmark visible from miles away",
+      "Vidalia onions can only be grown in a 20-county area and are protected by law",
+      "Georgia has 159 counties - more than any state except Texas",
+      "CNN, The Home Depot, UPS, Delta, and Chick-fil-A are all headquartered here",
+      "Ty Cobb, Jackie Robinson, and Hank Aaron all played baseball in Georgia",
+      "The state has its own language - Gullah Geechee spoken on the coast",
+      "Providence Canyon is called Georgia's 'Little Grand Canyon'",
+      "The Masters golf tournament is held annually in Augusta"
     ],
-    "landmarks": ["Stone Mountain", "Savannah Historic District", "Jekyll Island", "Okefenokee Swamp", "Atlanta Aquarium"]
+    "landmarks": [
+      "Stone Mountain - Stone Mountain",
+      "Savannah Historic District - Savannah",
+      "Jekyll Island - Jekyll Island",
+      "Okefenokee Swamp - Waycross",
+      "Georgia Aquarium - Atlanta",
+      "The Tree That Owns Itself - Athens",
+      "The Big Chicken - Marietta",
+      "Providence Canyon State Park - Lumpkin",
+      "World of Coca-Cola - Atlanta",
+      "Augusta National Golf Club - Augusta"
+    ]
   },
   "Hawaii": {
     "capital": "Honolulu",
@@ -412,13 +438,39 @@
     "flower": "Yellow Hibiscus",
     "motto": "The Life of the Land is Perpetuated in Righteousness",
     "facts": [
-      "Only state made entirely of islands (137 islands)",
-      "The only state that grows coffee commercially",
-      "Has its own time zone (Hawaiian Standard Time)",
+      "Only state made entirely of islands - 137 total islands spanning 1,500 miles",
+      "The only state that grows coffee commercially (Kona coffee)",
+      "Has its own time zone - Hawaiian Standard Time (no daylight saving time)",
       "Most isolated population center on Earth - 2,390 miles from California",
-      "Kilauea is the world's most active volcano"
+      "Kilauea is one of the world's most active volcanoes (erupted continuously 1983-2018)",
+      "Loco Moco (rice, hamburger, fried egg, gravy) was invented in Hilo in 1949",
+      "Hawaii has its own alphabet with only 13 letters (5 vowels, 8 consonants)",
+      "The state is moving 3-4 inches closer to Alaska every year due to tectonic plates",
+      "Mauna Kea is the world's tallest mountain from base to peak (33,500 feet from ocean floor)",
+      "Hawaii is the only state that was once an independent kingdom with its own monarchy",
+      "The state has no racial or ethnic majority - most diverse state in the U.S.",
+      "Barack Obama was born in Honolulu - first president born outside the continental U.S.",
+      "Humuhumunukunukuapua'a is the state fish (reef triggerfish)",
+      "There are no billboards allowed anywhere in Hawaii",
+      "Hawaii has its own endangered language - only 2,000 native speakers of Hawaiian remain",
+      "The islands are still being formed - Loihi seamount will surface in 10,000-100,000 years",
+      "Hawaii is the only state that bans plastic bags and has commercial-scale vanilla farming",
+      "Mount Waialeale on Kauai is the wettest spot on Earth (450 inches of rain annually)",
+      "The Hawaiian pizza was not invented in Hawaii - it was created in Canada",
+      "Iolani Palace is the only royal palace on American soil"
     ],
-    "landmarks": ["Pearl Harbor", "Volcanoes National Park", "Waikiki Beach", "Diamond Head", "Haleakalā"]
+    "landmarks": [
+      "Pearl Harbor National Memorial - Honolulu, Oahu",
+      "Hawaii Volcanoes National Park - Big Island",
+      "Waikiki Beach - Honolulu, Oahu",
+      "Diamond Head - Honolulu, Oahu",
+      "Haleakalā National Park - Maui",
+      "Iolani Palace - Honolulu, Oahu",
+      "Mauna Kea Summit - Big Island",
+      "Na Pali Coast - Kauai",
+      "Road to Hana - Maui",
+      "Polynesian Cultural Center - Laie, Oahu"
+    ]
   },
   "Idaho": {
     "capital": "Boise",
@@ -429,13 +481,39 @@
     "flower": "Syringa",
     "motto": "Let it be Perpetual",
     "facts": [
-      "Produces about one-third of all potatoes grown in the U.S.",
-      "Has more whitewater river miles than any other state",
-      "Craters of the Moon looks so much like the moon, astronauts trained there",
-      "Sun Valley was America's first destination ski resort (1936)",
-      "The deepest river gorge in North America is Hells Canyon"
+      "Produces about one-third of all potatoes grown in the U.S. - over 13 billion pounds annually",
+      "Has more whitewater river miles than any other state (3,100 miles)",
+      "Craters of the Moon looks so lunar that Apollo astronauts trained there in the 1960s",
+      "Sun Valley was America's first destination ski resort, opened in 1936",
+      "The deepest river gorge in North America is Hells Canyon - 7,993 feet deep",
+      "Every year on New Year's Eve, thousands watch the Idaho Potato Drop in Boise (a giant glowing potato)",
+      "It's illegal to ride a merry-go-round on Sundays (law from 1907, never repealed)",
+      "Shoshone Falls is taller than Niagara Falls (212 feet vs 167 feet)",
+      "Idaho has 72 named precious gem stones and is the only state where star garnets are found",
+      "The state name 'Idaho' is completely made up - it has no meaning in any language",
+      "Boise has the most Basque descendants outside of the Basque Country in Spain",
+      "Ernest Hemingway spent his final years in Ketchum and is buried there",
+      "Idaho has over 2,000 lakes and 107 mountain ranges",
+      "The Hiawatha bike trail goes through 10 tunnels and 7 sky-high trestles in the mountains",
+      "Boise is the largest city between Salt Lake City and Portland",
+      "The Snake River Plain contains some of the world's largest volcanic features",
+      "Idaho has only one official area code (208) for the entire state",
+      "The world's first nuclear power plant that produced electricity for a city is in Arco (1955)",
+      "Thousands of Sockeye salmon migrate 900 miles from the ocean to Redfish Lake",
+      "The Idaho State Capitol is the only capitol heated by geothermal water"
     ],
-    "landmarks": ["Craters of the Moon", "Sun Valley", "Shoshone Falls", "Sawtooth Mountains", "Hells Canyon"]
+    "landmarks": [
+      "Craters of the Moon National Monument - Arco",
+      "Sun Valley Resort - Ketchum",
+      "Shoshone Falls - Twin Falls",
+      "Sawtooth Mountains - Stanley",
+      "Hells Canyon - Idaho-Oregon border",
+      "Coeur d'Alene Lake - Coeur d'Alene",
+      "Hiawatha Trail - Wallace",
+      "Idaho Potato Drop - Boise",
+      "Boise River Greenbelt - Boise",
+      "City of Rocks National Reserve - Almo"
+    ]
   },
   "Illinois": {
     "capital": "Springfield",
@@ -446,13 +524,39 @@
     "flower": "Violet",
     "motto": "State Sovereignty, National Union",
     "facts": [
-      "Chicago is the 3rd largest city in the U.S.",
-      "Home of Abraham Lincoln - his tomb, home, and presidential library are in Springfield",
-      "The first skyscraper was built in Chicago (1885)",
-      "Route 66 begins in Chicago",
-      "O'Hare Airport is one of the world's busiest"
+      "Chicago is the 3rd largest city in the U.S. with 2.7 million people",
+      "Home of Abraham Lincoln - his tomb, home, and presidential library are all in Springfield",
+      "The first skyscraper was built in Chicago - the Home Insurance Building (1885)",
+      "Route 66 begins in Chicago at Grant Park and stretches 2,448 miles to Santa Monica",
+      "O'Hare International Airport is one of the world's busiest - over 83 million passengers annually",
+      "Until 1969, the official state language was 'American' (not English)",
+      "Chicago reversed the flow of the Chicago River in 1900 - engineering marvel",
+      "The Twinkie was invented in a Chicago bakery in 1930",
+      "Metropolis is the official 'Hometown of Superman' with a 15-foot statue",
+      "The world's first Ferris wheel was built in Chicago for the 1893 World's Fair",
+      "Illinois has produced more U.S. presidents from their home state than any except Virginia",
+      "The nation's first McDonald's museum is in Des Plaines where franchise #1 opened",
+      "Chicago deep-dish pizza was invented at Pizzeria Uno in 1943",
+      "Ronald Reagan, Walt Disney, Ernest Hemingway, and Hillary Clinton are from Illinois",
+      "The Sears Tower (Willis Tower) was the tallest building in the world for 25 years",
+      "Illinois produces more pumpkins than any other state - over 500 million pounds annually",
+      "The ice cream sundae was invented in Evanston when selling ice cream sodas was banned on Sundays",
+      "The first drive-in movie theater opened in Joliet in 1921",
+      "Cahokia Mounds was North America's largest pre-Columbian city north of Mexico",
+      "Chicago's 'L' train system is the 2nd largest public transportation in the U.S."
     ],
-    "landmarks": ["Willis Tower", "Navy Pier", "Lincoln Sites", "Starved Rock State Park", "Millennium Park"]
+    "landmarks": [
+      "Willis Tower (Skydeck) - Chicago",
+      "Navy Pier - Chicago",
+      "Lincoln Home National Historic Site - Springfield",
+      "Starved Rock State Park - Utica",
+      "Millennium Park (Cloud Gate/'The Bean') - Chicago",
+      "Superman Statue - Metropolis",
+      "First McDonald's Museum - Des Plaines",
+      "Cahokia Mounds - Collinsville",
+      "Frank Lloyd Wright Home & Studio - Oak Park",
+      "Garden of the Gods - Herod"
+    ]
   },
   "Indiana": {
     "capital": "Indianapolis",
