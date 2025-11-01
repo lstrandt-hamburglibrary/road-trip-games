@@ -1212,13 +1212,39 @@
     "flower": "Purple Lilac",
     "motto": "Live Free or Die",
     "facts": [
-      "First state to declare independence from England (1776)",
-      "Holds the first presidential primary every four years",
-      "The Old Man of the Mountain was the state symbol until it collapsed in 2003",
-      "No state sales tax or income tax",
-      "Mount Washington has some of the world's worst weather"
+      "First state to declare independence from England on January 5, 1776",
+      "Holds the first-in-the-nation presidential primary every four years since 1920",
+      "The Old Man of the Mountain rock formation was the state symbol until it collapsed in 2003",
+      "No state sales tax or income tax - one of only a few states with neither",
+      "Mount Washington has some of the world's worst weather - wind recorded at 231 mph in 1934",
+      "The state motto 'Live Free or Die' appears on all license plates",
+      "New Hampshire was the 9th state to ratify the Constitution, making it official",
+      "Alan Shepard, first American in space, was from Derry, New Hampshire",
+      "The highest wind speed ever recorded on Earth's surface was on Mt. Washington",
+      "Lake Winnipesaukee has 258 islands and is one of the largest lakes in the U.S.",
+      "The first potato planted in the U.S. was in Londonderry in 1719",
+      "New Hampshire is the only state that doesn't require adults to wear seatbelts",
+      "The state has 18 miles of coastline - the shortest ocean coastline of any state",
+      "Christa McAuliffe, the teacher who died in the Challenger disaster, was from Concord",
+      "The state capital building is the oldest in which the legislature still meets in its original chambers",
+      "Robert Frost, the famous poet, lived and wrote in New Hampshire",
+      "New Hampshire was home to America's first free public library in Peterborough (1833)",
+      "The Kancamagus Highway is one of the most scenic drives in New England",
+      "More than 85% of New Hampshire is covered in forest",
+      "The state has no helmet law for motorcyclists over 18"
     ],
-    "landmarks": ["Mount Washington", "Franconia Notch", "Lake Winnipesaukee", "Portsmouth Harbor", "White Mountains"]
+    "landmarks": [
+      "Mount Washington - White Mountains",
+      "Franconia Notch State Park - Franconia",
+      "Lake Winnipesaukee - Laconia area",
+      "Portsmouth Harbor - Portsmouth",
+      "White Mountain National Forest - Northern NH",
+      "Kancamagus Highway - Conway to Lincoln",
+      "Strawbery Banke Museum - Portsmouth",
+      "Flume Gorge - Franconia Notch",
+      "Mount Washington Cog Railway - Bretton Woods",
+      "Canterbury Shaker Village - Canterbury"
+    ]
   },
   "New Jersey": {
     "capital": "Trenton",
@@ -1229,13 +1255,39 @@
     "flower": "Violet",
     "motto": "Liberty and Prosperity",
     "facts": [
-      "Most densely populated state in the U.S.",
-      "Atlantic City has the longest boardwalk in the world",
-      "Thomas Edison invented the light bulb in Menlo Park",
-      "First organized baseball game was played in Hoboken (1846)",
-      "Home to more diners than any other state"
+      "Most densely populated state in the U.S. with 1,263 people per square mile",
+      "Atlantic City has the longest boardwalk in the world at 5.5 miles",
+      "Thomas Edison invented the light bulb and phonograph in Menlo Park",
+      "First organized baseball game was played in Hoboken in 1846",
+      "Home to more diners than any other state - over 500",
+      "New Jersey is the only state where it's illegal to pump your own gas",
+      "The Campbell Soup Company was founded in Camden in 1869",
+      "Monopoly street names are based on Atlantic City streets",
+      "The first drive-in movie theater opened in Camden in 1933",
+      "Frank Sinatra was born in Hoboken in 1915",
+      "Lucy the Elephant in Margate City is a six-story building shaped like an elephant from 1881",
+      "The jughandle turn was invented in New Jersey for making left turns",
+      "New Jersey produces two-thirds of the world's eggplants",
+      "The Holland Tunnel was the first mechanically ventilated underwater tunnel (1927)",
+      "Grover Cleveland, the only president to serve two non-consecutive terms, was from New Jersey",
+      "The state has the highest percentage of paved roads in the U.S.",
+      "Salt water taffy was invented in Atlantic City in the 1880s",
+      "New Jersey has more shopping malls per square mile than any other state",
+      "The submarine was invented in New Jersey by John P. Holland",
+      "Bruce Springsteen, 'The Boss,' is from Freehold"
     ],
-    "landmarks": ["Atlantic City Boardwalk", "Cape May", "Liberty State Park", "Six Flags Great Adventure"]
+    "landmarks": [
+      "Atlantic City Boardwalk - Atlantic City",
+      "Cape May - Cape May",
+      "Liberty State Park - Jersey City",
+      "Six Flags Great Adventure - Jackson",
+      "Lucy the Elephant - Margate City",
+      "Ellis Island - Jersey City (shared with NY)",
+      "Grounds For Sculpture - Hamilton",
+      "Delaware Water Gap - Northwest NJ",
+      "Princeton University - Princeton",
+      "Thomas Edison National Historical Park - West Orange"
+    ]
   },
   "New Mexico": {
     "capital": "Santa Fe",
@@ -1246,13 +1298,39 @@
     "flower": "Yucca Flower",
     "motto": "It Grows as It Goes",
     "facts": [
-      "Santa Fe is the highest and oldest state capital (7,000 feet, founded 1610)",
-      "Roswell is famous for the alleged 1947 UFO incident",
-      "Home to Carlsbad Caverns, one of the world's largest cave chambers",
-      "White Sands National Park has the world's largest gypsum dune field",
-      "Smokey Bear was based on a real bear rescued from a New Mexico wildfire"
+      "Santa Fe is the highest (7,000 feet) and oldest state capital in the U.S. (founded 1610)",
+      "Roswell is famous for the alleged 1947 UFO incident and alien conspiracy theories",
+      "Carlsbad Caverns has one of the world's largest underground chambers (4,000 feet long)",
+      "White Sands National Park has the world's largest gypsum dune field covering 275 square miles",
+      "Smokey Bear was based on a real bear cub rescued from a 1950 wildfire in New Mexico",
+      "The first atomic bomb was detonated at Trinity Site near Alamogordo in 1945",
+      "Taos Pueblo has been continuously inhabited for over 1,000 years",
+      "The Albuquerque International Balloon Fiesta is the largest hot air balloon event in the world",
+      "New Mexico has the highest foot rotation record - Kelsey Grubb rotated her foot 171.4 degrees",
+      "The state flag features the Zia sun symbol representing perfect friendship",
+      "Breaking Bad and Better Call Saul were filmed in Albuquerque",
+      "Shiprock is a 1,583-foot volcanic rock formation sacred to the Navajo",
+      "New Mexico produces more pecans than any other state",
+      "The Very Large Array radio telescope near Socorro has 27 massive dish antennas",
+      "Spaceport America near Truth or Consequences is the world's first purpose-built commercial spaceport",
+      "Santa Fe has more art galleries per capita than any U.S. city except New York",
+      "The state cookie is the bizcochito, a traditional anise-flavored cookie",
+      "Four Corners is where New Mexico, Arizona, Colorado, and Utah meet",
+      "New Mexico was the last state in the continental U.S. to become a state (1912)",
+      "The International UFO Museum in Roswell attracts hundreds of thousands of visitors annually"
     ],
-    "landmarks": ["Carlsbad Caverns", "White Sands", "Taos Pueblo", "Albuquerque Balloon Fiesta", "Roswell UFO Museum"]
+    "landmarks": [
+      "Carlsbad Caverns National Park - Carlsbad",
+      "White Sands National Park - Alamogordo",
+      "Taos Pueblo - Taos",
+      "Albuquerque International Balloon Fiesta - Albuquerque",
+      "International UFO Museum - Roswell",
+      "Bandelier National Monument - Los Alamos",
+      "Shiprock - Shiprock",
+      "Very Large Array - Socorro",
+      "Spaceport America - Truth or Consequences",
+      "Meow Wolf - Santa Fe"
+    ]
   },
   "New York": {
     "capital": "Albany",
@@ -1263,13 +1341,39 @@
     "flower": "Rose",
     "motto": "Ever Upward",
     "facts": [
-      "New York City is the most populous city in the U.S. (8.3 million)",
-      "The Statue of Liberty was a gift from France in 1886",
-      "Niagara Falls is one of the most powerful waterfalls in the world",
-      "The first pizzeria in America opened in NYC in 1905",
-      "Central Park is larger than the principality of Monaco"
+      "New York City is the most populous city in the U.S. with over 8.3 million people",
+      "The Statue of Liberty was a gift from France in 1886 and stands 305 feet tall",
+      "Niagara Falls produces over 4 million kilowatts of electricity shared with Canada",
+      "Lombardi's, the first pizzeria in America, opened in NYC in 1905",
+      "Central Park (843 acres) is larger than the principality of Monaco (499 acres)",
+      "The Erie Canal, completed in 1825, connected the Great Lakes to the Atlantic Ocean",
+      "Times Square is named after The New York Times, which moved there in 1904",
+      "The Finger Lakes region produces 85% of America's wine grapes",
+      "New York was the U.S. capital from 1785-1790 before Washington D.C.",
+      "The first American chess tournament was held in New York City in 1843",
+      "Cooperstown is the birthplace of baseball and home to the Baseball Hall of Fame",
+      "The state apple is the Apple Muffin (no, it's actually just an apple)",
+      "Toilet paper was invented in New York City by Joseph Gayetty in 1857",
+      "Uncle Sam is based on Samuel Wilson from Troy, who supplied meat to the Army in 1812",
+      "Jell-O was invented in Le Roy, New York in 1897",
+      "Woodstock music festival actually took place in Bethel, not Woodstock",
+      "The NYC subway system has 472 stations - more than any other in the world",
+      "New York produces more cabbage than any other state",
+      "The Yankees have won 27 World Series - more than any other team",
+      "Niagara Falls is actually three waterfalls: American Falls, Bridal Veil Falls, and Horseshoe Falls"
     ],
-    "landmarks": ["Statue of Liberty", "Times Square", "Niagara Falls", "Empire State Building", "Central Park", "Adirondacks"]
+    "landmarks": [
+      "Statue of Liberty - New York Harbor",
+      "Times Square - Manhattan",
+      "Niagara Falls - Niagara Falls",
+      "Empire State Building - Manhattan",
+      "Central Park - Manhattan",
+      "Adirondack Mountains - Upstate NY",
+      "Finger Lakes - Western NY",
+      "Baseball Hall of Fame - Cooperstown",
+      "Corning Museum of Glass - Corning",
+      "Saratoga Springs - Saratoga Springs"
+    ]
   },
   "North Carolina": {
     "capital": "Raleigh",
