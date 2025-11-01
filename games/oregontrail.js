@@ -12,22 +12,22 @@
     const MONTHS = ['March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     const LANDMARKS = [
-        { name: 'Independence, Missouri', distance: 0, isFort: true },
-        { name: 'Kansas River', distance: 102, isFort: false },
-        { name: 'Big Blue River', distance: 184, isFort: false },
-        { name: 'Fort Kearney', distance: 302, isFort: true },
-        { name: 'Chimney Rock', distance: 552, isFort: false },
-        { name: 'Fort Laramie', distance: 638, isFort: true },
-        { name: 'Independence Rock', distance: 828, isFort: false },
-        { name: 'South Pass', distance: 930, isFort: false },
-        { name: 'Fort Bridger', distance: 1112, isFort: true },
-        { name: 'Soda Springs', distance: 1255, isFort: false },
-        { name: 'Fort Hall', distance: 1312, isFort: true },
-        { name: 'Snake River', distance: 1494, isFort: false },
-        { name: 'Fort Boise', distance: 1607, isFort: true },
-        { name: 'Blue Mountains', distance: 1767, isFort: false },
-        { name: 'The Dalles', distance: 1947, isFort: false },
-        { name: 'Willamette Valley, Oregon', distance: 2047, isFort: false }
+        { name: 'Independence, Missouri', distance: 0, isFort: true, isRiver: false },
+        { name: 'Kansas River', distance: 102, isFort: false, isRiver: true },
+        { name: 'Big Blue River', distance: 184, isFort: false, isRiver: true },
+        { name: 'Fort Kearney', distance: 302, isFort: true, isRiver: false },
+        { name: 'Chimney Rock', distance: 552, isFort: false, isRiver: false },
+        { name: 'Fort Laramie', distance: 638, isFort: true, isRiver: false },
+        { name: 'Independence Rock', distance: 828, isFort: false, isRiver: false },
+        { name: 'South Pass', distance: 930, isFort: false, isRiver: false },
+        { name: 'Fort Bridger', distance: 1112, isFort: true, isRiver: false },
+        { name: 'Soda Springs', distance: 1255, isFort: false, isRiver: false },
+        { name: 'Fort Hall', distance: 1312, isFort: true, isRiver: false },
+        { name: 'Snake River', distance: 1494, isFort: false, isRiver: true },
+        { name: 'Fort Boise', distance: 1607, isFort: true, isRiver: false },
+        { name: 'Blue Mountains', distance: 1767, isFort: false, isRiver: false },
+        { name: 'The Dalles', distance: 1947, isFort: false, isRiver: false },
+        { name: 'Willamette Valley, Oregon', distance: 2047, isFort: false, isRiver: false }
     ];
 
     const DISEASES = ['Dysentery', 'Cholera', 'Typhoid', 'Measles', 'Exhaustion'];
@@ -76,6 +76,7 @@
 
         // Game state
         dayOfYear: 60, // March 1st
+        waitingToCrossRiver: false,
         isResting: false,
         restDays: 0,
         currentLandmark: 0,
@@ -313,13 +314,22 @@
 
         addLog(`📍 You have reached ${landmark.name}!`);
 
+        // Check if it's a river crossing
+        if (landmark.isRiver) {
+            gameState.waitingToCrossRiver = true;
+            gameState.screen = 'river';
+            updateDisplay();
+            return;
+        }
+
+        // Move to next landmark
+        gameState.nextLandmark++;
+
         if (gameState.currentLandmark === LANDMARKS.length - 1) {
             // Won the game!
             endGame(true, 'You have reached Oregon!');
             return;
         }
-
-        gameState.nextLandmark++;
     }
 
     function triggerRandomEvent() {
@@ -562,6 +572,8 @@
             showTravelScreen(container);
         } else if (gameState.screen === 'hunting') {
             showHuntingScreen(container);
+        } else if (gameState.screen === 'river') {
+            showRiverCrossingScreen(container);
         } else if (gameState.screen === 'gameover') {
             showGameOverScreen(container);
         }
@@ -1366,6 +1378,177 @@
         addLog(`Hunted and got ${foodGained} lbs of food. Used ${ammoUsed} bullets.`);
         advanceDay(1);
 
+        gameState.screen = 'traveling';
+        updateDisplay();
+    };
+
+    function showRiverCrossingScreen(container) {
+        const landmark = LANDMARKS[gameState.currentLandmark];
+        const riverDepth = Math.random() < 0.5 ? 'shallow' : 'deep';
+        const riverWidth = Math.random() < 0.5 ? 'narrow' : 'wide';
+
+        container.innerHTML = `
+            <div style="
+                background: linear-gradient(180deg, #87CEEB 0%, #4A90E2 50%, #2E5C8A 100%);
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            ">
+                <h2 style="text-align: center; color: white; font-family: Georgia, serif; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                    🌊 ${landmark.name}
+                </h2>
+
+                <div style="
+                    background: rgba(255,255,255,0.95);
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+                    text-align: center;
+                ">
+                    <p style="font-size: 1.2rem; color: #2E5C8A; margin-bottom: 1rem; line-height: 1.6;">
+                        You have reached a river crossing!<br>
+                        The river is <strong>${riverDepth}</strong> and <strong>${riverWidth}</strong>.
+                    </p>
+                    <p style="font-size: 1rem; color: #666; margin-bottom: 0.5rem;">
+                        Weather: <strong>${gameState.weather}</strong>
+                    </p>
+                    <p style="font-size: 1rem; color: #666;">
+                        Choose how to cross:
+                    </p>
+                </div>
+
+                <div style="display: grid; gap: 1rem; margin-bottom: 1.5rem;">
+                    <button onclick="window.crossRiver('ford')" style="
+                        background: linear-gradient(135deg, #3498db 0%, #5DADE2 100%);
+                        color: white;
+                        border: 3px solid #2874A6;
+                        padding: 1.5rem;
+                        cursor: pointer;
+                        border-radius: 10px;
+                        text-align: left;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                    ">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🚶 Ford the River</div>
+                        <div style="font-size: 0.95rem; opacity: 0.9;">
+                            Wade through the water. Free, but risky if river is deep.
+                            <br><strong>Risk:</strong> Loss of supplies, oxen injury, time delay
+                        </div>
+                    </button>
+
+                    <button onclick="window.crossRiver('caulk')" style="
+                        background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+                        color: white;
+                        border: 3px solid #654321;
+                        padding: 1.5rem;
+                        cursor: pointer;
+                        border-radius: 10px;
+                        text-align: left;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                    ">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🛶 Caulk and Float</div>
+                        <div style="font-size: 0.95rem; opacity: 0.9;">
+                            Seal the wagon and float across. Slower but safer.
+                            <br><strong>Cost:</strong> 1-2 days | <strong>Risk:</strong> Tipping in rough water
+                        </div>
+                    </button>
+
+                    <button onclick="window.crossRiver('ferry')" style="
+                        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+                        color: white;
+                        border: 3px solid #1B5E1B;
+                        padding: 1.5rem;
+                        cursor: pointer;
+                        border-radius: 10px;
+                        text-align: left;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                    ">
+                        <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">⛴️ Take the Ferry</div>
+                        <div style="font-size: 0.95rem; opacity: 0.9;">
+                            Pay for professional ferry service. Safest option.
+                            <br><strong>Cost:</strong> $${Math.floor(5 + Math.random() * 10)} | <strong>Time:</strong> 1 day
+                        </div>
+                    </button>
+
+                    <button onclick="window.crossRiver('wait')" style="
+                        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+                        color: white;
+                        border: 3px solid #5D6D7E;
+                        padding: 1rem;
+                        cursor: pointer;
+                        border-radius: 10px;
+                        text-align: center;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                    ">
+                        <div style="font-size: 1.1rem; font-weight: bold;">⏳ Wait for Conditions to Improve (2-5 days)</div>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    window.crossRiver = function(method) {
+        const landmark = LANDMARKS[gameState.currentLandmark];
+        let success = true;
+        let message = '';
+
+        if (method === 'ford') {
+            // Wading through - risky
+            const roll = Math.random();
+            if (roll < 0.3) {
+                // Disaster
+                const foodLost = Math.floor(20 + Math.random() * 40);
+                gameState.food = Math.max(0, gameState.food - foodLost);
+                gameState.clothing = Math.max(0, gameState.clothing - 1);
+                message = `Disaster fording the river! Lost ${foodLost} lbs food and 1 set of clothes.`;
+                advanceDay(1);
+            } else if (roll < 0.6) {
+                // Minor loss
+                const foodLost = Math.floor(5 + Math.random() * 15);
+                gameState.food = Math.max(0, gameState.food - foodLost);
+                message = `Successfully forded but lost ${foodLost} lbs food getting supplies wet.`;
+                advanceDay(1);
+            } else {
+                // Success
+                message = `Successfully forded the river!`;
+                advanceDay(1);
+            }
+        } else if (method === 'caulk') {
+            // Caulking and floating - moderate risk
+            const roll = Math.random();
+            if (roll < 0.15) {
+                // Tipped over
+                const foodLost = Math.floor(30 + Math.random() * 50);
+                gameState.food = Math.max(0, gameState.food - foodLost);
+                message = `Wagon tipped in the water! Lost ${foodLost} lbs food.`;
+                advanceDay(2);
+            } else {
+                // Success
+                message = `Successfully floated across the river!`;
+                advanceDay(2);
+            }
+        } else if (method === 'ferry') {
+            // Ferry - safest but costs money
+            const ferryCost = Math.floor(5 + Math.random() * 10);
+            if (gameState.money >= ferryCost) {
+                gameState.money -= ferryCost;
+                message = `Safely crossed on the ferry. Paid $${ferryCost}.`;
+                advanceDay(1);
+            } else {
+                message = `Not enough money for the ferry! Must choose another option.`;
+                return; // Don't cross
+            }
+        } else if (method === 'wait') {
+            // Wait for better conditions
+            const daysWaited = Math.floor(2 + Math.random() * 4);
+            message = `Waited ${daysWaited} days for better conditions.`;
+            advanceDay(daysWaited);
+        }
+
+        addLog(message);
+
+        // Successfully crossed - move to next landmark
+        gameState.waitingToCrossRiver = false;
+        gameState.nextLandmark++;
         gameState.screen = 'traveling';
         updateDisplay();
     };
