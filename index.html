@@ -2417,13 +2417,18 @@
                                 ${scene.objects.map((obj, idx) => `
                                     <div id="object-${idx}" style="
                                         background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
-                                        padding: 1rem 1.5rem;
+                                        padding: 0.75rem 1.5rem;
                                         border-radius: 10px;
-                                        font-size: 2rem;
+                                        font-size: 1.1rem;
+                                        font-weight: bold;
+                                        color: white;
+                                        text-transform: capitalize;
                                         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
                                         transition: all 0.3s;
+                                        min-width: 120px;
+                                        text-align: center;
                                     ">
-                                        ${obj.emoji}
+                                        ${obj.name}
                                     </div>
                                 `).join('')}
                             </div>
@@ -2448,26 +2453,36 @@
                 // Clear canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Draw background pattern
-                ctx.font = '60px Arial';
-                for (let i = 0; i < 8; i++) {
-                    for (let j = 0; j < 5; j++) {
-                        const bgEmojis = ['🌳', '🌲', '☁️', '🌤️', '🌥️'];
-                        ctx.fillText(bgEmojis[Math.floor(Math.random() * bgEmojis.length)], i * 100 + (j % 2) * 50, j * 100 + 50);
-                    }
+                // Background emojis for each scene
+                const backgroundSets = {
+                    'Park Scene': ['🌳', '🌲', '🌿', '🍃', '🌱', '🌾', '☘️', '🍀', '🌸', '🌼', '🌺', '🌻', '🌷', '☁️', '🌤️'],
+                    'Beach Scene': ['🌊', '🏖️', '⛱️', '🏄‍♂️', '🌅', '☀️', '⛵', '🌴', '🥥', '💧', '🌀', '☁️'],
+                    'City Scene': ['🏢', '🏬', '🏛️', '🏦', '🏙️', '🏗️', '🌆', '☁️', '🚗', '🚙', '🛣️', '🚧', '⛽'],
+                    'Farm Scene': ['🌾', '🚜', '🏡', '🐄', '🌻', '🌽', '🥕', '🍅', '🌿', '🌱', '☘️', '⛅', '☁️']
+                };
+
+                const bgEmojis = backgroundSets[scene.name] || [];
+
+                // Draw dense background pattern with varied sizes
+                for (let i = 0; i < 70; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const size = 20 + Math.random() * 40; // Varied sizes
+                    ctx.font = `${size}px Arial`;
+                    ctx.fillText(bgEmojis[Math.floor(Math.random() * bgEmojis.length)], x, y);
                 }
 
-                // Draw objects
+                // Draw objects (smaller and harder to spot)
                 scene.objects.forEach((obj, idx) => {
                     const x = (obj.x / 100) * canvas.width;
                     const y = (obj.y / 100) * canvas.height;
 
                     if (!foundObjects.includes(idx)) {
-                        ctx.font = '40px Arial';
+                        ctx.font = '28px Arial'; // Smaller than before
                         ctx.fillText(obj.emoji, x, y);
                     } else {
                         // Draw checkmark for found objects
-                        ctx.font = '50px Arial';
+                        ctx.font = '40px Arial';
                         ctx.fillText('✅', x - 5, y);
                     }
                 });
@@ -2504,7 +2519,8 @@
                         const objectDiv = document.getElementById(`object-${idx}`);
                         if (objectDiv) {
                             objectDiv.style.background = 'linear-gradient(135deg, #52c234 0%, #61dd49 100%)';
-                            objectDiv.innerHTML = '✅';
+                            objectDiv.style.fontSize = '2rem';
+                            objectDiv.innerHTML = `${obj.emoji} ✓`;
                         }
 
                         // Redraw
