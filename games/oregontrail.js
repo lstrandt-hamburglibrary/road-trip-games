@@ -926,6 +926,71 @@
                     </div>
                 </div>
 
+                <!-- Visual Wagon -->
+                <div style="
+                    background: rgba(255,255,255,0.95);
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.25rem;
+                    text-align: center;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                ">
+                    <div style="font-size: 3rem; line-height: 1;">
+                        ${gameState.pace === 'grueling' ? '🏃' : gameState.pace === 'strenuous' ? '🚶' : '🧍'}
+                        <span style="font-size: 4rem;">🎪</span>
+                        ${gameState.oxen >= 4 ? '🐂🐂' : gameState.oxen >= 2 ? '🐂' : '❌'}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #5D4E37; margin-top: 0.5rem;">
+                        Pace: <strong>${gameState.pace.charAt(0).toUpperCase() + gameState.pace.slice(1)}</strong> |
+                        Oxen: <strong>${gameState.oxen}</strong>
+                    </div>
+                </div>
+
+                <!-- Progress Map -->
+                <div style="
+                    background: rgba(255,255,255,0.95);
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.25rem;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                ">
+                    <div style="font-weight: bold; margin-bottom: 1rem; color: #5D4E37; font-size: 1.1rem;">
+                        🗺️ Trail Progress
+                    </div>
+                    <div style="position: relative; height: 60px; background: linear-gradient(to right, #8B7355 0%, #A0522D 50%, #228B22 100%); border-radius: 20px; overflow: hidden;">
+                        <!-- Trail line -->
+                        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: #654321; transform: translateY(-50%);"></div>
+
+                        <!-- Landmarks -->
+                        ${LANDMARKS.map((landmark, idx) => {
+                            const progress = (landmark.distance / 2047) * 100;
+                            const isPassed = gameState.milesTraveled >= landmark.distance;
+                            const isCurrent = idx === gameState.currentLandmark;
+                            return `
+                                <div style="
+                                    position: absolute;
+                                    left: ${progress}%;
+                                    top: 50%;
+                                    transform: translate(-50%, -50%);
+                                    font-size: ${isCurrent ? '2rem' : '1.5rem'};
+                                    ${isCurrent ? 'animation: bounce 1s infinite;' : ''}
+                                " title="${landmark.name}">
+                                    ${isCurrent ? '🚂' : isPassed ? (landmark.isFort ? '🏰' : '✅') : (landmark.isFort ? '🏛️' : '⭕')}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.85rem; color: #5D4E37; text-align: center;">
+                        ${Math.round((gameState.milesTraveled / 2047) * 100)}% complete (${gameState.milesTraveled} / 2047 miles)
+                    </div>
+                    <style>
+                        @keyframes bounce {
+                            0%, 100% { transform: translate(-50%, -60%); }
+                            50% { transform: translate(-50%, -40%); }
+                        }
+                    </style>
+                </div>
+
                 <!-- Supplies -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
                     <div style="background: rgba(255,255,255,0.95); padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-weight: bold; color: #5D4E37;">
@@ -1051,18 +1116,258 @@
 
     function showHuntingScreen(container) {
         container.innerHTML = `
-            <div style="padding: 1rem; text-align: center;">
-                <h2>🦌 Hunting</h2>
-                <p style="margin: 1rem 0;">How well did you hunt?</p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                    <button onclick="window.oregonCompleteHunt('excellent')" style="background: #2ecc71; color: white; border: none; padding: 1rem; cursor: pointer; border-radius: 5px;">Excellent<br>(100 lbs)</button>
-                    <button onclick="window.oregonCompleteHunt('good')" style="background: #3498db; color: white; border: none; padding: 1rem; cursor: pointer; border-radius: 5px;">Good<br>(60 lbs)</button>
-                    <button onclick="window.oregonCompleteHunt('fair')" style="background: #f39c12; color: white; border: none; padding: 1rem; cursor: pointer; border-radius: 5px;">Fair<br>(30 lbs)</button>
-                    <button onclick="window.oregonCompleteHunt('poor')" style="background: #e74c3c; color: white; border: none; padding: 1rem; cursor: pointer; border-radius: 5px;">Poor<br>(10 lbs)</button>
+            <div style="
+                background: linear-gradient(180deg, #87CEEB 0%, #90EE90 100%);
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            ">
+                <h2 style="text-align: center; color: #5D4E37; font-family: Georgia, serif; margin-bottom: 1rem;">
+                    🏹 Hunting Mini-Game
+                </h2>
+
+                <div style="
+                    background: rgba(255,255,255,0.9);
+                    padding: 1rem;
+                    border-radius: 10px;
+                    margin-bottom: 1rem;
+                    text-align: center;
+                ">
+                    <div style="font-size: 1.1rem; color: #5D4E37; margin-bottom: 0.5rem;">
+                        🔫 Ammo: <span id="huntAmmo" style="font-weight: bold;">10</span> |
+                        🥩 Food: <span id="huntFood" style="font-weight: bold; color: #228B22;">0</span> lbs |
+                        ⏱️ Time: <span id="huntTime" style="font-weight: bold;">30</span>s
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666;">
+                        Click on animals to shoot them!
+                    </div>
+                </div>
+
+                <canvas id="huntingCanvas" width="600" height="400" style="
+                    display: block;
+                    margin: 0 auto;
+                    background: linear-gradient(180deg, #87CEEB 0%, #90EE90 70%, #8B7355 100%);
+                    border: 4px solid #654321;
+                    border-radius: 10px;
+                    cursor: crosshair;
+                    max-width: 100%;
+                    height: auto;
+                "></canvas>
+
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button id="huntDoneBtn" onclick="window.endHunt()" style="
+                        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+                        color: white;
+                        border: 3px solid #1B5E1B;
+                        padding: 1rem 2rem;
+                        cursor: pointer;
+                        border-radius: 10px;
+                        font-size: 1.1rem;
+                        font-weight: bold;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    ">Done Hunting</button>
                 </div>
             </div>
         `;
+
+        // Start hunting game
+        setTimeout(() => startHuntingGame(), 100);
     }
+
+    let huntingGame = null;
+
+    function startHuntingGame() {
+        const canvas = document.getElementById('huntingCanvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const animals = [];
+        let ammo = 10;
+        let foodGained = 0;
+        let timeLeft = 30;
+        let gameRunning = true;
+
+        // Animal types
+        const animalTypes = [
+            { emoji: '🦌', points: 50, speed: 2, size: 40 },
+            { emoji: '🐰', points: 10, speed: 4, size: 30 },
+            { emoji: '🦆', points: 15, speed: 3, size: 30 },
+            { emoji: '🦬', points: 100, speed: 1, size: 50 }
+        ];
+
+        // Spawn animal
+        function spawnAnimal() {
+            if (!gameRunning) return;
+            const type = animalTypes[Math.floor(Math.random() * animalTypes.length)];
+            const fromLeft = Math.random() > 0.5;
+            animals.push({
+                ...type,
+                x: fromLeft ? -50 : canvas.width + 50,
+                y: 250 + Math.random() * 100,
+                direction: fromLeft ? 1 : -1,
+                alive: true
+            });
+        }
+
+        // Update game
+        function update() {
+            if (!gameRunning) return;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw ground
+            ctx.fillStyle = '#8B7355';
+            ctx.fillRect(0, 350, canvas.width, 50);
+
+            // Draw grass
+            for (let i = 0; i < 20; i++) {
+                ctx.font = '20px Arial';
+                ctx.fillText('🌿', i * 30, 370 + Math.sin(Date.now() / 200 + i) * 5);
+            }
+
+            // Update and draw animals
+            for (let i = animals.length - 1; i >= 0; i--) {
+                const animal = animals[i];
+
+                if (animal.alive) {
+                    animal.x += animal.speed * animal.direction;
+
+                    // Remove if off screen
+                    if (animal.x < -100 || animal.x > canvas.width + 100) {
+                        animals.splice(i, 1);
+                        continue;
+                    }
+
+                    // Draw animal
+                    ctx.font = `${animal.size}px Arial`;
+                    ctx.fillText(animal.emoji, animal.x, animal.y);
+                }
+            }
+
+            // Update UI
+            document.getElementById('huntAmmo').textContent = ammo;
+            document.getElementById('huntFood').textContent = foodGained;
+            document.getElementById('huntTime').textContent = timeLeft;
+
+            if (gameRunning) {
+                requestAnimationFrame(update);
+            }
+        }
+
+        // Handle clicks
+        canvas.addEventListener('click', (e) => {
+            if (!gameRunning || ammo <= 0) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clickX = (e.clientX - rect.left) * scaleX;
+            const clickY = (e.clientY - rect.top) * scaleY;
+
+            ammo--;
+
+            // Check if hit animal
+            for (let animal of animals) {
+                if (!animal.alive) continue;
+
+                const distance = Math.sqrt(
+                    Math.pow(clickX - animal.x, 2) +
+                    Math.pow(clickY - animal.y, 2)
+                );
+
+                if (distance < animal.size) {
+                    animal.alive = false;
+                    foodGained += animal.points;
+
+                    // Show hit effect
+                    ctx.fillStyle = 'red';
+                    ctx.beginPath();
+                    ctx.arc(clickX, clickY, 20, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    break;
+                }
+            }
+
+            // Show shot
+            ctx.fillStyle = 'orange';
+            ctx.beginPath();
+            ctx.arc(clickX, clickY, 5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // Timer
+        const timerInterval = setInterval(() => {
+            if (!gameRunning) {
+                clearInterval(timerInterval);
+                return;
+            }
+
+            timeLeft--;
+            if (timeLeft <= 0 || ammo <= 0) {
+                gameRunning = false;
+                clearInterval(timerInterval);
+                document.getElementById('huntDoneBtn').style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+                document.getElementById('huntDoneBtn').textContent = 'Time Up! Return to Trail';
+            }
+        }, 1000);
+
+        // Spawn animals periodically
+        const spawnInterval = setInterval(() => {
+            if (!gameRunning) {
+                clearInterval(spawnInterval);
+                return;
+            }
+            spawnAnimal();
+        }, 2000);
+
+        // Initial animals
+        spawnAnimal();
+        spawnAnimal();
+
+        // Start game loop
+        update();
+
+        // Store game state
+        huntingGame = {
+            stop: () => {
+                gameRunning = false;
+                clearInterval(timerInterval);
+                clearInterval(spawnInterval);
+            },
+            getFood: () => foodGained,
+            getAmmo: () => ammo
+        };
+    }
+
+    window.endHunt = function() {
+        if (!huntingGame) {
+            completeHunt('poor');
+            return;
+        }
+
+        const foodGained = huntingGame.getFood();
+        const ammoUsed = 10 - huntingGame.getAmmo();
+
+        huntingGame.stop();
+        huntingGame = null;
+
+        // Determine result
+        let result = 'poor';
+        if (foodGained >= 100) result = 'excellent';
+        else if (foodGained >= 60) result = 'good';
+        else if (foodGained >= 30) result = 'fair';
+
+        gameState.ammunition = Math.max(0, gameState.ammunition - ammoUsed);
+        gameState.food = Math.min(985, gameState.food + foodGained);
+
+        addLog(`Hunted and got ${foodGained} lbs of food. Used ${ammoUsed} bullets.`);
+        advanceDay(1);
+
+        gameState.screen = 'traveling';
+        updateDisplay();
+    };
 
     function showGameOverScreen(container) {
         const score = calculateScore();
