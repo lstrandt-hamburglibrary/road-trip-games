@@ -34,7 +34,7 @@
     const INJURIES = ['Broken Arm', 'Broken Leg', 'Snake Bite'];
 
     const RANDOM_EVENTS = [
-        { type: 'wagon_breakdown', text: 'Wagon breaks down. Lose 3 days fixing it.', days: 3, cost: { type: 'part', item: 'wheel' } },
+        { type: 'wagon_breakdown', text: 'Wagon breaks down!', cost: { type: 'part', item: 'wheel' } },
         { type: 'ox_injured', text: 'An ox injures its leg. Slowing down.', effect: 'slow' },
         { type: 'bad_water', text: 'Bad water! You lose time looking for clean source.', days: 2 },
         { type: 'heavy_rain', text: 'Heavy rains slow your progress.', days: 2 },
@@ -344,9 +344,10 @@
         if (event.cost && event.cost.type === 'part') {
             if (gameState.parts[event.cost.item] > 0) {
                 gameState.parts[event.cost.item]--;
-                addLog(`Used a spare ${event.cost.item} to fix the wagon.`);
+                addLog(`Used a spare ${event.cost.item} to fix the wagon. Lost 1 day.`);
+                advanceDay(1);
             } else {
-                addLog(`No spare ${event.cost.item}! Repairs take extra time.`);
+                addLog(`No spare ${event.cost.item}! Making repairs from scratch. Lost 3 days.`);
                 advanceDay(3);
             }
         }
