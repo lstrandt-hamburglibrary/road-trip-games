@@ -202,28 +202,44 @@
             if (gameState.gameOver) return;
 
             if (e.key === 'ArrowUp' && !gameState.keys.up) {
+                e.preventDefault(); // Prevent page scroll
                 gameState.keys.up = true;
                 queueMove('up');
             }
             if (e.key === 'ArrowDown' && !gameState.keys.down) {
+                e.preventDefault(); // Prevent page scroll
                 gameState.keys.down = true;
                 queueMove('down');
             }
             if (e.key === 'ArrowLeft' && !gameState.keys.left) {
+                e.preventDefault(); // Prevent page scroll
                 gameState.keys.left = true;
                 queueMove('left');
             }
             if (e.key === 'ArrowRight' && !gameState.keys.right) {
+                e.preventDefault(); // Prevent page scroll
                 gameState.keys.right = true;
                 queueMove('right');
             }
         });
 
         document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowUp') gameState.keys.up = false;
-            if (e.key === 'ArrowDown') gameState.keys.down = false;
-            if (e.key === 'ArrowLeft') gameState.keys.left = false;
-            if (e.key === 'ArrowRight') gameState.keys.right = false;
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                gameState.keys.up = false;
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                gameState.keys.down = false;
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                gameState.keys.left = false;
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                gameState.keys.right = false;
+            }
         });
     }
 
