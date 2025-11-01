@@ -1857,13 +1857,39 @@
     "flower": "Sego Lily",
     "motto": "Industry",
     "facts": [
-      "Home to the 'Mighty Five' national parks (Zion, Bryce, Arches, Capitol Reef, Canyonlands)",
-      "Has the greatest snow on Earth for skiing",
-      "Salt Lake is the headquarters of the Mormon Church",
-      "Great Salt Lake is saltier than the ocean",
-      "Rainbow Bridge is the world's largest natural bridge"
+      "Only state to have all of its national parks in one region - the 'Mighty Five' (Zion, Bryce, Arches, Capitol Reef, Canyonlands)",
+      "Utah hosts the 'Greatest Snow on Earth' - Park City, Deer Valley, and Alta are world-class ski resorts",
+      "Salt Lake City is the world headquarters of The Church of Jesus Christ of Latter-day Saints (Mormon Church)",
+      "Great Salt Lake is saltier than the ocean (up to 27% salinity vs. 3.5% for oceans)",
+      "Rainbow Bridge is the world's largest natural bridge at 290 feet tall",
+      "Utah hosted the 2002 Winter Olympics in Salt Lake City and Park City",
+      "The state has a higher percentage of people with college degrees than the national average",
+      "Delicate Arch in Arches National Park appears on Utah license plates",
+      "The Bonneville Salt Flats are where many land speed records have been set",
+      "Jell-O is the official state snack - Utah consumes more per capita than any other state",
+      "The Golden Spike at Promontory Summit marks where the transcontinental railroad was completed in 1869",
+      "Utah has the youngest median age in the U.S. (31 years old)",
+      "The Spiral Jetty, a massive earthwork sculpture, sits in the Great Salt Lake",
+      "Bryce Canyon has the largest concentration of hoodoos (rock spires) in the world",
+      "Frisbee golf was invented in Utah in the 1970s at the Steady Ed Memorial Disc Golf Course",
+      "Temple Square in Salt Lake City attracts over 5 million visitors annually",
+      "The state was almost called 'Deseret' which means 'honeybee' in the Book of Mormon",
+      "Utah has more red rock canyons and arches than anywhere else on Earth",
+      "Moab is the mountain biking capital of the world with world-famous Slickrock Trail",
+      "The Sundance Film Festival in Park City is the largest independent film festival in the U.S."
     ],
-    "landmarks": ["Zion National Park", "Bryce Canyon", "Arches National Park", "Great Salt Lake", "Park City Ski Resorts"]
+    "landmarks": [
+      "Zion National Park - Springdale",
+      "Bryce Canyon National Park - Bryce Canyon City",
+      "Arches National Park - Moab",
+      "Canyonlands National Park - Moab",
+      "Capitol Reef National Park - Torrey",
+      "Great Salt Lake - Near Salt Lake City",
+      "Park City Mountain Resort - Park City",
+      "Temple Square - Salt Lake City",
+      "Bonneville Salt Flats - Wendover",
+      "Monument Valley - Mexican Hat/Kayenta"
+    ]
   },
   "Vermont": {
     "capital": "Montpelier",
@@ -1874,13 +1900,39 @@
     "flower": "Red Clover",
     "motto": "Freedom and Unity",
     "facts": [
-      "Produces more maple syrup than any other state",
-      "Montpelier is the smallest state capital by population",
-      "Ben & Jerry's Ice Cream was founded in Burlington",
-      "Covered bridges are a Vermont icon with over 100 still standing",
-      "The Long Trail is America's oldest long-distance hiking trail"
+      "Produces more maple syrup than any other state - over 2 million gallons annually (50% of U.S. production)",
+      "Montpelier is the smallest state capital by population (under 8,000 residents)",
+      "Ben & Jerry's Ice Cream was founded in Burlington in 1978 in a renovated gas station",
+      "Vermont has over 100 covered bridges still standing",
+      "The Long Trail, opened in 1930, is America's oldest long-distance hiking trail (273 miles)",
+      "Vermont was an independent republic from 1777-1791 before joining the U.S.",
+      "The state banned billboards in 1968 - one of only four states to do so",
+      "Vermont is the largest producer of maple syrup in the world",
+      "The state has more artisan cheesemakers per capita than any other state",
+      "Lake Champlain is said to be home to 'Champ,' a lake monster like Loch Ness",
+      "Vermont Teddy Bear Company makes all its bears by hand in Shelburne",
+      "The state capital building in Montpelier has a gold dome covered in real gold leaf",
+      "Vermont was the first state to abolish slavery in its constitution (1777)",
+      "Snowboarding was pioneered in Vermont by Jake Burton Carpenter in the 1970s",
+      "The Von Trapp Family (from The Sound of Music) settled in Stowe and opened a lodge",
+      "Vermont has the highest percentage of second homes in the U.S. (vacation properties)",
+      "The state produces more than 150 million gallons of craft beer annually",
+      "Stowe is known as the 'Ski Capital of the East'",
+      "Vermont Cheddar cheese is world-famous, made in the state since the 1800s",
+      "The state has no Walmart stores inside city limits due to local zoning laws"
     ],
-    "landmarks": ["Ben & Jerry's Factory", "Lake Champlain", "Green Mountains", "Shelburne Museum", "Stowe Ski Resort"]
+    "landmarks": [
+      "Ben & Jerry's Factory - Waterbury",
+      "Lake Champlain - Burlington",
+      "Green Mountains - Statewide",
+      "Shelburne Museum - Shelburne",
+      "Stowe Mountain Resort - Stowe",
+      "Church Street Marketplace - Burlington",
+      "Hildene (Lincoln Family Home) - Manchester",
+      "Quechee Gorge - Quechee",
+      "Rock of Ages Granite Quarry - Graniteville",
+      "Vermont State House - Montpelier"
+    ]
   },
   "Virginia": {
     "capital": "Richmond",
@@ -1891,13 +1943,39 @@
     "flower": "American Dogwood",
     "motto": "Thus Always to Tyrants",
     "facts": [
-      "Eight U.S. Presidents were born in Virginia (most of any state)",
+      "Eight U.S. Presidents were born in Virginia - more than any other state (Washington, Jefferson, Madison, Monroe, Harrison, Tyler, Taylor, Wilson)",
       "Jamestown (1607) was the first permanent English settlement in America",
-      "Pentagon is the world's largest office building",
-      "Virginia Beach is the most populous city in Virginia",
-      "More Civil War battles were fought here than any other state"
+      "The Pentagon is the world's largest office building with 6.5 million square feet",
+      "Virginia Beach is the most populous city in Virginia and the longest pleasure beach in the world",
+      "More Civil War battles were fought in Virginia than any other state - over 2,000 battles and skirmishes",
+      "The first Thanksgiving in America was held at Berkeley Plantation in 1619 (before Plymouth)",
+      "Virginia is for Lovers - the iconic slogan was created in 1969 and is still in use",
+      "Monticello, Thomas Jefferson's home, appears on the nickel",
+      "The Internet was invented in Virginia - the first email was sent from Arlington in 1971",
+      "Chincoteague ponies are wild horses that swim across the channel every July in a famous roundup",
+      "Mount Vernon, George Washington's estate, is the most visited historic home in America",
+      "The state produces more than 8 million cases of wine annually",
+      "Colonial Williamsburg is the world's largest living history museum",
+      "Virginia ham is salt-cured and aged for at least 6 months - a state delicacy since the 1600s",
+      "The CIA headquarters is in Langley, Virginia",
+      "Natural Bridge, a 215-foot limestone arch, was owned by Thomas Jefferson",
+      "Skyline Drive in Shenandoah National Park is one of America's most scenic drives (105 miles)",
+      "The first peanuts grown in the U.S. were in Virginia - the state is the #1 peanut exporter",
+      "Virginia's state motto 'Sic Semper Tyrannis' means 'Thus Always to Tyrants'",
+      "Luray Caverns has the world's largest musical instrument - the Great Stalacpipe Organ"
     ],
-    "landmarks": ["Colonial Williamsburg", "Mount Vernon", "Monticello", "Shenandoah National Park", "Virginia Beach"]
+    "landmarks": [
+      "Colonial Williamsburg - Williamsburg",
+      "Mount Vernon - Mount Vernon",
+      "Monticello - Charlottesville",
+      "Shenandoah National Park - Front Royal/Waynesboro",
+      "Virginia Beach Boardwalk - Virginia Beach",
+      "Arlington National Cemetery - Arlington",
+      "Natural Bridge - Natural Bridge",
+      "Luray Caverns - Luray",
+      "Jamestown Settlement - Jamestown",
+      "Busch Gardens Williamsburg - Williamsburg"
+    ]
   },
   "Washington": {
     "capital": "Olympia",
@@ -1908,13 +1986,39 @@
     "flower": "Coast Rhododendron",
     "motto": "By and By",
     "facts": [
-      "Seattle is home to Microsoft, Amazon, Boeing, and Starbucks",
-      "Mount Rainier is the most glaciated peak in the lower 48 states",
-      "The San Juan Islands are a popular whale-watching destination",
-      "Produces more apples, cherries, and pears than any other state",
-      "Olympic National Park has temperate rainforests, mountains, and coastline"
+      "Seattle is home to Microsoft, Amazon, Boeing, Starbucks, and Costco headquarters",
+      "Mount Rainier is the most glaciated peak in the lower 48 states with 25 named glaciers",
+      "The San Juan Islands are one of the best places in the world to see orcas (killer whales)",
+      "Washington produces more apples than any other state - over 10 billion apples annually",
+      "Olympic National Park has temperate rainforests, mountains, and 73 miles of wild coastline",
+      "The Space Needle was built for the 1962 World's Fair and is 605 feet tall",
+      "Pike Place Market, opened in 1907, is one of the oldest continuously operated public markets in the U.S.",
+      "The state has no income tax",
+      "Washington is the only state named after a U.S. President",
+      "Starbucks opened its first store in Pike Place Market in 1971",
+      "The Cascade Mountain Range divides the state - wet on the west side, dry on the east",
+      "The Hoh Rainforest in Olympic National Park receives up to 170 inches of rain per year",
+      "Microsoft was founded in Albuquerque but moved to Redmond, Washington in 1979",
+      "Mount St. Helens erupted on May 18, 1980, killing 57 people and creating a mile-wide crater",
+      "Washington produces 75% of all hops grown in the U.S. (used for beer brewing)",
+      "The state has more glaciers than the rest of the lower 48 states combined",
+      "Grunge music was born in Seattle with bands like Nirvana, Pearl Jam, and Soundgarden",
+      "Leavenworth is a Bavarian-themed village built in the 1960s to attract tourists",
+      "The Boeing Everett factory is the largest building in the world by volume",
+      "Washington is the birthplace of Jimi Hendrix, Bing Crosby, and Bill Gates"
     ],
-    "landmarks": ["Space Needle", "Mount Rainier", "Olympic National Park", "San Juan Islands", "Pike Place Market"]
+    "landmarks": [
+      "Space Needle - Seattle",
+      "Mount Rainier National Park - Ashford",
+      "Olympic National Park - Port Angeles",
+      "San Juan Islands - Friday Harbor",
+      "Pike Place Market - Seattle",
+      "Mount St. Helens - Skamania County",
+      "North Cascades National Park - Marblemount",
+      "Chihuly Garden and Glass - Seattle",
+      "Snoqualmie Falls - Snoqualmie",
+      "Leavenworth - Leavenworth"
+    ]
   },
   "West Virginia": {
     "capital": "Charleston",
@@ -1925,13 +2029,39 @@
     "flower": "Rhododendron",
     "motto": "Mountaineers Are Always Free",
     "facts": [
-      "Only state to form by seceding from a Confederate state during the Civil War",
-      "New River is actually one of the oldest rivers in the world",
-      "More than 75% of the state is covered in forests",
-      "Harper's Ferry is where John Brown's raid occurred in 1859",
-      "Home to the National Radio Astronomy Observatory"
+      "Only state to form by seceding from a Confederate state during the Civil War (broke from Virginia in 1863)",
+      "New River is one of the oldest rivers in the world - despite its name, it's 10-360 million years old",
+      "More than 75% of the state is covered in forests - one of the most heavily forested states",
+      "Harper's Ferry is where John Brown's raid occurred in 1859, sparking tensions that led to the Civil War",
+      "The National Radio Astronomy Observatory's Green Bank Telescope is the world's largest fully steerable radio telescope",
+      "The New River Gorge Bridge was the world's longest single-span arch bridge when completed in 1977",
+      "West Virginia has the lowest crime rate in the nation",
+      "The Greenbrier Resort has a massive underground bunker built to house Congress during nuclear war",
+      "Mother's Day was founded in Grafton, West Virginia in 1908 by Anna Jarvis",
+      "The state is the leading producer of coal in the U.S.",
+      "Blackwater Falls drops 57 feet and is named for the dark, amber-colored water from tannic acid",
+      "The oldest church in continuous use west of the Alleghenies is Old Stone Church in Lewisburg (1796)",
+      "The world's largest sycamore tree is in Webster Springs - over 100 feet tall",
+      "Pepperoni rolls were invented in West Virginia coal mining towns as portable lunches",
+      "The state has no major league sports teams but is passionate about WVU Mountaineers",
+      "The Hatfield-McCoy feud was a famous family rivalry along the West Virginia-Kentucky border",
+      "West Virginia is the third most rural state in the U.S.",
+      "The first rural free mail delivery began in Charles Town in 1896",
+      "Golden Delicious apples originated in Clay County in 1905",
+      "The state motto 'Montani Semper Liberi' means 'Mountaineers Are Always Free'"
     ],
-    "landmarks": ["New River Gorge", "Harper's Ferry", "Seneca Rocks", "Blackwater Falls", "Greenbrier Resort"]
+    "landmarks": [
+      "New River Gorge National Park - Fayetteville",
+      "Harper's Ferry National Historical Park - Harpers Ferry",
+      "Seneca Rocks - Seneca Rocks",
+      "Blackwater Falls State Park - Davis",
+      "The Greenbrier - White Sulphur Springs",
+      "Cass Scenic Railroad - Cass",
+      "Berkeley Springs State Park - Berkeley Springs",
+      "Lost World Caverns - Lewisburg",
+      "Spruce Knob (highest point) - Judy Gap",
+      "Green Bank Observatory - Green Bank"
+    ]
   },
   "Wisconsin": {
     "capital": "Madison",
@@ -1942,13 +2072,39 @@
     "flower": "Wood Violet",
     "motto": "Forward",
     "facts": [
-      "Produces more cheese than any other state (over 600 varieties)",
-      "Milwaukee is the 'Beer Capital' and home to major breweries",
-      "The Republican Party was founded in Ripon in 1854",
-      "The Ice Age National Scenic Trail runs 1,200 miles through the state",
-      "The Ringling Brothers Circus was founded in Baraboo"
+      "Produces more cheese than any other state - over 3.5 billion pounds annually (600+ varieties)",
+      "Milwaukee is the 'Beer Capital' - home to Miller, Pabst, Schlitz, and over 100 craft breweries",
+      "The Republican Party was founded in Ripon on March 20, 1854",
+      "The Ice Age National Scenic Trail runs 1,200 miles through Wisconsin's glacier-formed landscape",
+      "The Ringling Brothers Circus was founded in Baraboo in 1884",
+      "Wisconsin is the #1 cranberry producer in the U.S. - grows 60% of the nation's cranberries",
+      "The Harley-Davidson motorcycle was invented in Milwaukee in 1903",
+      "Green Bay Packers are the only community-owned major league sports team in the U.S.",
+      "Lambeau Field is the oldest continuously operating NFL stadium (since 1957)",
+      "The typewriter was invented in Milwaukee by Christopher Latham Sholes in 1868",
+      "Wisconsin has more than 15,000 lakes",
+      "The Wisconsin Dells is the 'Waterpark Capital of the World' with the most waterparks per capita",
+      "Door County has more coastline than any other county in the U.S. (300 miles)",
+      "The first ice cream sundae was created in Two Rivers in 1881",
+      "Birthplace of the Progressive political movement led by 'Fighting Bob' La Follette",
+      "The Apostle Islands have 21 islands with historic lighthouses and sea caves",
+      "House on the Rock features the world's largest carousel with 269 animals (none are horses)",
+      "Wisconsin's official state dance is the polka",
+      "Milwaukee hosts the world's largest music festival - Summerfest (11 days, 800+ acts)",
+      "The nickname 'Badger State' comes from 1820s miners who lived in tunnels like badgers"
     ],
-    "landmarks": ["Wisconsin Dells", "Door County", "Apostle Islands", "Lambeau Field", "House on the Rock"]
+    "landmarks": [
+      "Wisconsin Dells - Wisconsin Dells",
+      "Door County - Sturgeon Bay",
+      "Apostle Islands National Lakeshore - Bayfield",
+      "Lambeau Field - Green Bay",
+      "House on the Rock - Spring Green",
+      "Harley-Davidson Museum - Milwaukee",
+      "Taliesin (Frank Lloyd Wright) - Spring Green",
+      "Devil's Lake State Park - Baraboo",
+      "Milwaukee Art Museum - Milwaukee",
+      "Summerfest Grounds - Milwaukee"
+    ]
   },
   "Wyoming": {
     "capital": "Cheyenne",
@@ -1959,12 +2115,38 @@
     "flower": "Indian Paintbrush",
     "motto": "Equal Rights",
     "facts": [
-      "Least populous state in the U.S.",
-      "First state to grant women the right to vote (1869)",
-      "Yellowstone was the world's first national park (1872)",
-      "Devils Tower was America's first national monument",
-      "Grand Teton has some of the most dramatic mountain scenery in America"
+      "Least populous state in the U.S. - fewer than 600,000 residents",
+      "First state to grant women the right to vote (1869) - 50 years before the 19th Amendment",
+      "Yellowstone was the world's first national park, established in 1872",
+      "Devils Tower was America's first national monument, designated by Teddy Roosevelt in 1906",
+      "Grand Teton has some of the most dramatic mountain scenery in America - no foothills, just peaks",
+      "Wyoming has the lowest population density in the lower 48 states - 6 people per square mile",
+      "The state has no personal or corporate income tax",
+      "Old Faithful in Yellowstone erupts approximately every 90 minutes",
+      "Yellowstone sits on a supervolcano - one of the largest active volcanic systems in the world",
+      "Jackson Hole is one of the most expensive zip codes in America",
+      "The JCPenney store chain was founded in Kemmerer in 1902",
+      "Wyoming is nicknamed the 'Equality State' for being first to grant women voting rights",
+      "The Oregon Trail, California Trail, Mormon Trail, and Pony Express all passed through Wyoming",
+      "Wyoming has only two escalators in the entire state (both in Casper banks)",
+      "The state has more antelope than people",
+      "Cheyenne Frontier Days is the world's largest outdoor rodeo - running since 1897",
+      "The Continental Divide runs through Wyoming - water flows to different oceans on each side",
+      "Hot Springs State Park in Thermopolis has the world's largest mineral hot spring",
+      "Wyoming was the first state to have a female governor - Nellie Tayloe Ross in 1925",
+      "The iconic 'bucking horse and rider' on Wyoming license plates symbolizes the cowboy spirit"
     ],
-    "landmarks": ["Yellowstone National Park", "Grand Teton", "Devils Tower", "Jackson Hole", "Hot Springs State Park"]
+    "landmarks": [
+      "Yellowstone National Park - Yellowstone",
+      "Grand Teton National Park - Moose",
+      "Devils Tower National Monument - Devils Tower",
+      "Jackson Hole - Jackson",
+      "Hot Springs State Park - Thermopolis",
+      "Bighorn Canyon - Lovell",
+      "Fort Laramie - Fort Laramie",
+      "Fossil Butte National Monument - Kemmerer",
+      "Wind River Range - Pinedale",
+      "Cheyenne Frontier Days - Cheyenne"
+    ]
   }
 }
