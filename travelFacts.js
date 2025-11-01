@@ -21,10 +21,19 @@
 
     // Show Travel Facts page with state selector
     window.showTravelFacts = async function() {
+        console.log('showTravelFacts called');
         document.getElementById('home').style.display = 'none';
         document.getElementById('travelFacts').style.display = 'block';
 
-        await loadStatesData();
+        // Show loading message
+        document.getElementById('stateSelector').innerHTML = '<p style="text-align: center; font-size: 1.2rem; padding: 2rem;">Loading states data...</p>';
+
+        const data = await loadStatesData();
+
+        if (!data) {
+            document.getElementById('stateSelector').innerHTML = '<p style="text-align: center; color: red; padding: 2rem;">Error loading states data. Please try again.</p>';
+            return;
+        }
 
         // Load last selected state from localStorage
         const lastState = localStorage.getItem('selectedState');
