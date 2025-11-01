@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.96.0';</script>
+    <script>window.APP_VERSION = '1.97.0';</script>
 
     <style>
         * {
@@ -804,6 +804,16 @@
                     <div style="width: 120px;"></div>
                 </div>
                 <div id="wouldYouRatherContent"></div>
+            </div>
+
+            <!-- I Spy Game Section (hidden by default) -->
+            <div id="iSpyGame" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <button onclick="exitISpy()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">← Back</button>
+                    <h2 style="margin: 0;">👀 I Spy</h2>
+                    <div style="width: 120px;"></div>
+                </div>
+                <div id="iSpyContent"></div>
             </div>
 
             <!-- Dots and Boxes Game Section (hidden by default) -->
@@ -2262,6 +2272,268 @@
             if (originalLaunch) originalLaunch();
             setTimeout(checkOrientation, 100);
         };
+    </script>
+
+    <!-- I Spy Game Script -->
+    <script>
+        (function() {
+            'use strict';
+
+            let currentScene = 0;
+            let score = 0;
+            let foundObjects = [];
+
+            // Emoji-based scenes with objects to find
+            const scenes = [
+                {
+                    name: 'Park Scene',
+                    background: '🌳🌲🌳🏞️🌲🌳🌲🌸🌼🌺🌻🌷',
+                    objects: [
+                        { emoji: '🦋', name: 'butterfly', x: 15, y: 20 },
+                        { emoji: '🐿️', name: 'squirrel', x: 65, y: 45 },
+                        { emoji: '🦅', name: 'eagle', x: 80, y: 15 },
+                        { emoji: '🍄', name: 'mushroom', x: 30, y: 70 },
+                        { emoji: '🐝', name: 'bee', x: 45, y: 35 }
+                    ]
+                },
+                {
+                    name: 'Beach Scene',
+                    background: '🌊🏖️🌊⛱️🏄‍♂️🌊🏖️🌊',
+                    objects: [
+                        { emoji: '🐚', name: 'seashell', x: 25, y: 65 },
+                        { emoji: '🦀', name: 'crab', x: 70, y: 75 },
+                        { emoji: '⛵', name: 'sailboat', x: 50, y: 25 },
+                        { emoji: '🐠', name: 'fish', x: 40, y: 55 },
+                        { emoji: '⭐', name: 'starfish', x: 15, y: 80 }
+                    ]
+                },
+                {
+                    name: 'City Scene',
+                    background: '🏙️🏢🏬🏛️🏦🏛️🏢🏙️',
+                    objects: [
+                        { emoji: '🚕', name: 'taxi', x: 60, y: 70 },
+                        { emoji: '🚦', name: 'traffic light', x: 35, y: 50 },
+                        { emoji: '🐕', name: 'dog', x: 20, y: 75 },
+                        { emoji: '🚌', name: 'bus', x: 75, y: 65 },
+                        { emoji: '🎈', name: 'balloon', x: 50, y: 20 }
+                    ]
+                },
+                {
+                    name: 'Farm Scene',
+                    background: '🌾🚜🌾🏡🌾🐄🌾🌻',
+                    objects: [
+                        { emoji: '🐔', name: 'chicken', x: 30, y: 60 },
+                        { emoji: '🐷', name: 'pig', x: 55, y: 70 },
+                        { emoji: '🐴', name: 'horse', x: 70, y: 50 },
+                        { emoji: '🦆', name: 'duck', x: 40, y: 80 },
+                        { emoji: '🐑', name: 'sheep', x: 15, y: 55 }
+                    ]
+                }
+            ];
+
+            window.launchISpy = function() {
+                console.log('Launching I Spy game');
+                document.querySelector('.welcome').style.display = 'none';
+                document.querySelector('.feature-grid').style.display = 'none';
+                document.querySelector('.roadmap').style.display = 'none';
+                document.getElementById('iSpyGame').style.display = 'block';
+
+                currentScene = 0;
+                score = 0;
+                startScene();
+            };
+
+            window.exitISpy = function() {
+                document.getElementById('iSpyGame').style.display = 'none';
+                document.querySelector('.welcome').style.display = 'block';
+                document.querySelector('.feature-grid').style.display = 'grid';
+                document.querySelector('.roadmap').style.display = 'block';
+            };
+
+            function startScene() {
+                foundObjects = [];
+                const scene = scenes[currentScene];
+
+                document.getElementById('iSpyContent').innerHTML = `
+                    <div style="background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); padding: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                        <div style="background: white; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="margin-top: 0; color: #a6c1ee; text-align: center; font-size: 1.8rem;">
+                                ${scene.name}
+                            </h3>
+                            <div style="text-align: center; margin-bottom: 0;">
+                                <span style="font-size: 1.2rem; color: #666;">
+                                    Score: <strong style="color: #a6c1ee;">${score}</strong> |
+                                    Scene: <strong>${currentScene + 1}/${scenes.length}</strong>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Game Canvas -->
+                        <div style="background: linear-gradient(180deg, #87CEEB 0%, #F4E4C1 100%); padding: 2rem; border-radius: 15px; margin-bottom: 2rem; position: relative; min-height: 400px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);">
+                            <canvas id="iSpyCanvas" width="800" height="500" style="
+                                display: block;
+                                margin: 0 auto;
+                                background: transparent;
+                                cursor: pointer;
+                                max-width: 100%;
+                                height: auto;
+                                border-radius: 10px;
+                            "></canvas>
+                        </div>
+
+                        <!-- Objects to Find -->
+                        <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h4 style="margin-top: 0; color: #666; text-align: center;">🔍 Find These Objects:</h4>
+                            <div id="objectsList" style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-top: 1rem;">
+                                ${scene.objects.map((obj, idx) => `
+                                    <div id="object-${idx}" style="
+                                        background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+                                        padding: 1rem 1.5rem;
+                                        border-radius: 10px;
+                                        font-size: 2rem;
+                                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                                        transition: all 0.3s;
+                                    ">
+                                        ${obj.emoji}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Draw the scene
+                setTimeout(() => drawScene(), 100);
+            }
+
+            function drawScene() {
+                const canvas = document.getElementById('iSpyCanvas');
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                const scene = scenes[currentScene];
+
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw background pattern
+                ctx.font = '60px Arial';
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 5; j++) {
+                        const bgEmojis = ['🌳', '🌲', '☁️', '🌤️', '🌥️'];
+                        ctx.fillText(bgEmojis[Math.floor(Math.random() * bgEmojis.length)], i * 100 + (j % 2) * 50, j * 100 + 50);
+                    }
+                }
+
+                // Draw objects
+                scene.objects.forEach((obj, idx) => {
+                    const x = (obj.x / 100) * canvas.width;
+                    const y = (obj.y / 100) * canvas.height;
+
+                    if (!foundObjects.includes(idx)) {
+                        ctx.font = '40px Arial';
+                        ctx.fillText(obj.emoji, x, y);
+                    } else {
+                        // Draw checkmark for found objects
+                        ctx.font = '50px Arial';
+                        ctx.fillText('✅', x - 5, y);
+                    }
+                });
+
+                // Add click handler
+                canvas.onclick = (e) => handleCanvasClick(e);
+            }
+
+            function handleCanvasClick(e) {
+                const canvas = document.getElementById('iSpyCanvas');
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+
+                const scene = scenes[currentScene];
+
+                // Check if clicked on an object
+                scene.objects.forEach((obj, idx) => {
+                    if (foundObjects.includes(idx)) return;
+
+                    const objX = (obj.x / 100) * canvas.width;
+                    const objY = (obj.y / 100) * canvas.height;
+
+                    const distance = Math.sqrt(Math.pow(x - objX, 2) + Math.pow(y - objY, 2));
+
+                    if (distance < 30) {
+                        // Found an object!
+                        foundObjects.push(idx);
+                        score += 10;
+
+                        // Update UI
+                        const objectDiv = document.getElementById(`object-${idx}`);
+                        if (objectDiv) {
+                            objectDiv.style.background = 'linear-gradient(135deg, #52c234 0%, #61dd49 100%)';
+                            objectDiv.innerHTML = '✅';
+                        }
+
+                        // Redraw
+                        drawScene();
+
+                        // Check if all found
+                        if (foundObjects.length === scene.objects.length) {
+                            setTimeout(() => {
+                                if (currentScene < scenes.length - 1) {
+                                    currentScene++;
+                                    startScene();
+                                } else {
+                                    showFinalScore();
+                                }
+                            }, 1000);
+                        }
+                    }
+                });
+            }
+
+            function showFinalScore() {
+                document.getElementById('iSpyContent').innerHTML = `
+                    <div style="background: linear-gradient(135deg, #52c234 0%, #61dd49 100%); padding: 3rem; border-radius: 15px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                        <h2 style="color: white; font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                            🎉 Great Job! 🎉
+                        </h2>
+                        <div style="background: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
+                            <p style="font-size: 2rem; color: #52c234; margin: 0;">
+                                Final Score: <strong>${score}</strong>
+                            </p>
+                            <p style="font-size: 1.2rem; color: #666; margin-top: 1rem;">
+                                You found all the objects in ${scenes.length} scenes!
+                            </p>
+                        </div>
+                        <button onclick="launchISpy()" style="
+                            background: white;
+                            color: #52c234;
+                            border: 3px solid white;
+                            padding: 1rem 2rem;
+                            border-radius: 10px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            margin-right: 1rem;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        ">🔄 Play Again</button>
+                        <button onclick="exitISpy()" style="
+                            background: rgba(255,255,255,0.3);
+                            color: white;
+                            border: 3px solid white;
+                            padding: 1rem 2rem;
+                            border-radius: 10px;
+                            cursor: pointer;
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        ">🏠 Menu</button>
+                    </div>
+                `;
+            }
+        })();
     </script>
 </body>
 </html>
