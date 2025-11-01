@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.97.0';</script>
+    <script>window.APP_VERSION = '1.97.1';</script>
 
     <style>
         * {
@@ -2333,10 +2333,15 @@
 
             window.launchISpy = function() {
                 console.log('Launching I Spy game');
-                document.querySelector('.welcome').style.display = 'none';
-                document.querySelector('.feature-grid').style.display = 'none';
-                document.querySelector('.roadmap').style.display = 'none';
-                document.getElementById('iSpyGame').style.display = 'block';
+                const welcome = document.querySelector('.welcome');
+                const featureGrid = document.querySelector('.feature-grid');
+                const roadmap = document.querySelector('.roadmap');
+                const iSpyGame = document.getElementById('iSpyGame');
+
+                if (welcome) welcome.style.display = 'none';
+                if (featureGrid) featureGrid.style.display = 'none';
+                if (roadmap) roadmap.style.display = 'none';
+                if (iSpyGame) iSpyGame.style.display = 'block';
 
                 currentScene = 0;
                 score = 0;
