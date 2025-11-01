@@ -3,9 +3,9 @@
     'use strict';
 
     // Game constants
-    const CANVAS_WIDTH = 400;
-    const CANVAS_HEIGHT = 520;
-    const TILE_SIZE = 40;
+    const CANVAS_WIDTH = 560;
+    const CANVAS_HEIGHT = 728;
+    const TILE_SIZE = 56;
     const COLS = 10;
     const ROWS = 13;
 
@@ -19,20 +19,20 @@
     // Home positions (lily pads)
     const HOME_POSITIONS = [1, 3, 5, 7, 9]; // Column positions
 
-    // Vehicle types and speeds
+    // Vehicle types and speeds (base speeds - much slower)
     const VEHICLE_TYPES = [
-        { emoji: '🚗', width: 1, speed: 2, color: '#e74c3c' },
-        { emoji: '🚕', width: 1, speed: 2.5, color: '#f39c12' },
-        { emoji: '🚙', width: 1, speed: 1.5, color: '#3498db' },
-        { emoji: '🚚', width: 2, speed: 1, color: '#95a5a6' },
-        { emoji: '🚌', width: 2, speed: 1.2, color: '#9b59b6' }
+        { emoji: '🚗', width: 1, speed: 0.6, color: '#e74c3c' },
+        { emoji: '🚕', width: 1, speed: 0.7, color: '#f39c12' },
+        { emoji: '🚙', width: 1, speed: 0.5, color: '#3498db' },
+        { emoji: '🚚', width: 2, speed: 0.4, color: '#95a5a6' },
+        { emoji: '🚌', width: 2, speed: 0.45, color: '#9b59b6' }
     ];
 
-    // River obstacle types
+    // River obstacle types (base speeds - much slower)
     const LOG_TYPES = [
-        { emoji: '🪵', width: 3, speed: 1.5 },
-        { emoji: '🪵', width: 4, speed: 1 },
-        { emoji: '🪵', width: 2, speed: 2 }
+        { emoji: '🪵', width: 3, speed: 0.5 },
+        { emoji: '🪵', width: 4, speed: 0.4 },
+        { emoji: '🪵', width: 2, speed: 0.6 }
     ];
 
     // Game state
@@ -106,7 +106,7 @@
         ROAD_LANES.forEach((row, index) => {
             const direction = index % 2 === 0 ? 1 : -1; // Alternate directions
             const vehicleType = VEHICLE_TYPES[index % VEHICLE_TYPES.length];
-            const speed = vehicleType.speed * (1 + gameState.level * 0.1) * direction;
+            const speed = vehicleType.speed * (1 + gameState.level * 0.05) * direction; // Reduced from 0.1 to 0.05
             const gap = 3 + Math.random() * 2;
 
             // Create multiple vehicles per lane
@@ -131,7 +131,7 @@
             const direction = index % 2 === 0 ? -1 : 1; // Alternate opposite from road
             const logType = LOG_TYPES[index % LOG_TYPES.length];
             const isTurtle = index % 2 === 1;
-            const speed = logType.speed * (1 + gameState.level * 0.08) * direction;
+            const speed = logType.speed * (1 + gameState.level * 0.04) * direction; // Reduced from 0.08 to 0.04
             const gap = 4 + Math.random() * 2;
 
             // Create multiple obstacles per lane
