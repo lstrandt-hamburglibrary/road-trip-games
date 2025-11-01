@@ -251,7 +251,7 @@
 
     function addLog(message) {
         gameState.eventLog.unshift(message);
-        if (gameState.eventLog.length > 5) {
+        if (gameState.eventLog.length > 3) {
             gameState.eventLog.pop();
         }
     }
