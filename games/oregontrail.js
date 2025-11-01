@@ -568,23 +568,100 @@
 
     function showTitleScreen(container) {
         container.innerHTML = `
-            <div style="text-align: center; padding: 2rem;">
-                <h1 style="font-size: 2rem; margin-bottom: 1rem;">🚂 THE OREGON TRAIL 🏔️</h1>
-                <p style="margin-bottom: 2rem;">A 2,000 mile journey from Independence, Missouri to Oregon's Willamette Valley in 1848.</p>
-                <button onclick="window.startOregonTrail()" style="background: #2ecc71; color: white; border: none; padding: 1rem 2rem; font-size: 1.2rem; cursor: pointer; border-radius: 5px;">Start Your Journey</button>
+            <div style="
+                background: linear-gradient(180deg, #87CEEB 0%, #F4E4C1 50%, #8B7355 100%);
+                padding: 3rem 2rem;
+                text-align: center;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            ">
+                <div style="
+                    background: rgba(255,255,255,0.9);
+                    padding: 2rem;
+                    border-radius: 10px;
+                    margin-bottom: 2rem;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                ">
+                    <h1 style="
+                        font-size: 2.5rem;
+                        margin-bottom: 0.5rem;
+                        color: #5D4E37;
+                        font-family: Georgia, serif;
+                        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+                    ">THE OREGON TRAIL</h1>
+                    <p style="
+                        font-size: 1.1rem;
+                        color: #6B5B45;
+                        margin-top: 1rem;
+                        line-height: 1.6;
+                    ">Journey 2,000 miles from Independence, Missouri<br>to Oregon's Willamette Valley in 1848</p>
+                </div>
+
+                <button onclick="window.startOregonTrail()" style="
+                    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+                    color: white;
+                    border: 3px solid #654321;
+                    padding: 1.25rem 3rem;
+                    font-size: 1.3rem;
+                    font-weight: bold;
+                    cursor: pointer;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)'">
+                    🚂 Start Your Journey
+                </button>
             </div>
         `;
     }
 
     function showSetupScreen(container) {
+        const occupationIcons = { 'Banker': '💰', 'Carpenter': '🔨', 'Farmer': '🌾' };
         container.innerHTML = `
-            <div style="padding: 1rem;">
-                <h2>Choose Your Occupation</h2>
-                <p style="margin: 1rem 0;">Your choice affects starting money and final score:</p>
+            <div style="
+                background: linear-gradient(180deg, #F4E4C1 0%, #E8D4B0 100%);
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            ">
+                <h2 style="
+                    color: #5D4E37;
+                    font-family: Georgia, serif;
+                    font-size: 2rem;
+                    margin-bottom: 1rem;
+                    text-align: center;
+                ">Choose Your Occupation</h2>
+                <p style="
+                    text-align: center;
+                    color: #6B5B45;
+                    margin-bottom: 2rem;
+                    font-size: 1.1rem;
+                ">Your choice affects starting money and final score</p>
                 ${Object.entries(OCCUPATIONS).map(([name, data]) => `
-                    <div style="margin: 0.5rem 0;">
-                        <button onclick="window.oregonSelectOccupation('${name}')" style="background: #3498db; color: white; border: none; padding: 0.75rem 1.5rem; cursor: pointer; border-radius: 5px; width: 100%; text-align: left;">
-                            <strong>${name}</strong> - $${data.money} (Score ×${data.multiplier})
+                    <div style="margin-bottom: 1rem;">
+                        <button onclick="window.oregonSelectOccupation('${name}')" style="
+                            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+                            color: white;
+                            border: 2px solid #654321;
+                            padding: 1.5rem;
+                            cursor: pointer;
+                            border-radius: 10px;
+                            width: 100%;
+                            text-align: left;
+                            font-size: 1.1rem;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                            transition: transform 0.2s, box-shadow 0.2s;
+                        " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 10px rgba(0,0,0,0.2)'">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <span style="font-size: 1.5rem; margin-right: 0.5rem;">${occupationIcons[name]}</span>
+                                    <strong style="font-size: 1.2rem;">${name}</strong>
+                                </div>
+                                <div style="text-align: right; font-size: 0.95rem;">
+                                    <div>$${data.money}</div>
+                                    <div style="opacity: 0.8;">Score ×${data.multiplier}</div>
+                                </div>
+                            </div>
                         </button>
                     </div>
                 `).join('')}
@@ -594,74 +671,220 @@
 
     function showNamingScreen(container) {
         container.innerHTML = `
-            <div style="padding: 1rem;">
-                <h2>Name Your Party</h2>
-                <p style="margin-bottom: 1rem;">You are the wagon leader:</p>
-                <input type="text" id="oregonLeaderName" placeholder="Your name" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;" />
+            <div style="
+                background: linear-gradient(180deg, #F4E4C1 0%, #E8D4B0 100%);
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            ">
+                <h2 style="
+                    color: #5D4E37;
+                    font-family: Georgia, serif;
+                    font-size: 2rem;
+                    margin-bottom: 1.5rem;
+                    text-align: center;
+                ">Name Your Party</h2>
 
-                <p style="margin-bottom: 0.5rem;">Name your companions:</p>
-                <input type="text" id="oregonName1" placeholder="Companion 1" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;" />
-                <input type="text" id="oregonName2" placeholder="Companion 2" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;" />
-                <input type="text" id="oregonName3" placeholder="Companion 3" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;" />
-                <input type="text" id="oregonName4" placeholder="Companion 4" style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;" />
+                <div style="
+                    background: rgba(255,255,255,0.7);
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+                ">
+                    <p style="
+                        color: #6B5B45;
+                        font-weight: bold;
+                        margin-bottom: 0.75rem;
+                        font-size: 1.1rem;
+                    ">👨‍🌾 Wagon Leader:</p>
+                    <input type="text" id="oregonLeaderName" placeholder="Your name" style="
+                        width: 100%;
+                        padding: 0.75rem;
+                        font-size: 1.1rem;
+                        border: 2px solid #8B4513;
+                        border-radius: 8px;
+                        box-sizing: border-box;
+                    " />
+                </div>
 
-                <button onclick="window.oregonStartJourney()" style="background: #2ecc71; color: white; border: none; padding: 1rem 2rem; cursor: pointer; border-radius: 5px; font-size: 1rem; width: 100%;">Continue to General Store</button>
+                <div style="
+                    background: rgba(255,255,255,0.7);
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+                ">
+                    <p style="
+                        color: #6B5B45;
+                        font-weight: bold;
+                        margin-bottom: 0.75rem;
+                        font-size: 1.1rem;
+                    ">👥 Companions:</p>
+                    <input type="text" id="oregonName1" placeholder="Companion 1" style="
+                        width: 100%;
+                        padding: 0.75rem;
+                        margin-bottom: 0.75rem;
+                        font-size: 1rem;
+                        border: 2px solid #A0522D;
+                        border-radius: 8px;
+                        box-sizing: border-box;
+                    " />
+                    <input type="text" id="oregonName2" placeholder="Companion 2" style="
+                        width: 100%;
+                        padding: 0.75rem;
+                        margin-bottom: 0.75rem;
+                        font-size: 1rem;
+                        border: 2px solid #A0522D;
+                        border-radius: 8px;
+                        box-sizing: border-box;
+                    " />
+                    <input type="text" id="oregonName3" placeholder="Companion 3" style="
+                        width: 100%;
+                        padding: 0.75rem;
+                        margin-bottom: 0.75rem;
+                        font-size: 1rem;
+                        border: 2px solid #A0522D;
+                        border-radius: 8px;
+                        box-sizing: border-box;
+                    " />
+                    <input type="text" id="oregonName4" placeholder="Companion 4" style="
+                        width: 100%;
+                        padding: 0.75rem;
+                        font-size: 1rem;
+                        border: 2px solid #A0522D;
+                        border-radius: 8px;
+                        box-sizing: border-box;
+                    " />
+                </div>
+
+                <button onclick="window.oregonStartJourney()" style="
+                    background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+                    color: white;
+                    border: 3px solid #1B5E1B;
+                    padding: 1.25rem 2rem;
+                    cursor: pointer;
+                    border-radius: 10px;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    width: 100%;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    transition: transform 0.2s;
+                " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    🏪 Continue to General Store
+                </button>
             </div>
         `;
     }
 
     function showShoppingScreen(container) {
-        const oxenPrice = getPrice('oxen', 0);
-        const foodPrice = getPrice('food', 0);
-        const ammoPrice = getPrice('ammunition', 0);
-        const clothingPrice = getPrice('clothing', 0);
-        const wheelPrice = getPrice('wheel', 0);
+        const oxenPrice = getPrice('oxen', gameState.currentLandmark);
+        const foodPrice = getPrice('food', gameState.currentLandmark);
+        const ammoPrice = getPrice('ammunition', gameState.currentLandmark);
+        const clothingPrice = getPrice('clothing', gameState.currentLandmark);
+        const wheelPrice = getPrice('wheel', gameState.currentLandmark);
 
         container.innerHTML = `
-            <div style="padding: 1rem;">
-                <h2>Matt's General Store</h2>
-                <p style="margin-bottom: 0.5rem;"><strong>Money: $${gameState.money}</strong></p>
-                <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">You'll need oxen, food, ammunition, clothing, and spare parts.</p>
+            <div style="
+                background: linear-gradient(180deg, #F4E4C1 0%, #E8D4B0 100%);
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            ">
+                <h2 style="
+                    color: #5D4E37;
+                    font-family: Georgia, serif;
+                    font-size: 2rem;
+                    margin-bottom: 0.5rem;
+                    text-align: center;
+                ">🏪 Matt's General Store</h2>
 
-                <div style="background: #f0f0f0; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
-                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
-                        <div><strong>Item</strong></div>
-                        <div><strong>Price</strong></div>
-                        <div><strong>Owned</strong></div>
+                <div style="
+                    background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+                    color: white;
+                    padding: 1rem;
+                    border-radius: 10px;
+                    margin-bottom: 1rem;
+                    text-align: center;
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                ">💰 Money: $${gameState.money}</div>
 
-                        <div>Oxen</div>
-                        <div>$${oxenPrice}</div>
-                        <div>${gameState.oxen}</div>
+                <div style="
+                    background: rgba(255,235,205,0.9);
+                    border: 2px solid #DEB887;
+                    padding: 1rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                ">
+                    <div style="font-weight: bold; color: #5D4E37; margin-bottom: 0.5rem;">💡 Recommended Supplies:</div>
+                    <div><strong>Oxen:</strong> 3-4 (need at least 2 to pull wagon)</div>
+                    <div><strong>Food:</strong> 200-300 lbs (can hunt for more)</div>
+                    <div><strong>Ammunition:</strong> 100-200 bullets (for hunting)</div>
+                    <div><strong>Clothing:</strong> 2-3 sets (for harsh weather)</div>
+                    <div><strong>Spare Parts:</strong> 1-2 wheels, axles, tongues (repairs)</div>
+                </div>
 
-                        <div>Food (lbs)</div>
-                        <div>$${foodPrice.toFixed(2)}</div>
-                        <div>${gameState.food}</div>
+                <div style="
+                    background: rgba(255,255,255,0.9);
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                ">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.75rem; font-size: 1rem;">
+                        <div style="font-weight: bold; color: #5D4E37;">Item</div>
+                        <div style="font-weight: bold; color: #5D4E37; text-align: center;">Price</div>
+                        <div style="font-weight: bold; color: #5D4E37; text-align: center;">Owned</div>
 
-                        <div>Ammunition (box)</div>
-                        <div>$${ammoPrice}</div>
-                        <div>${gameState.ammunition}</div>
+                        <div>🐂 Oxen</div>
+                        <div style="text-align: center;">$${oxenPrice}</div>
+                        <div style="text-align: center; font-weight: bold; color: #228B22;">${gameState.oxen}</div>
 
-                        <div>Clothing (set)</div>
-                        <div>$${clothingPrice}</div>
-                        <div>${gameState.clothing}</div>
+                        <div>🌾 Food (lbs)</div>
+                        <div style="text-align: center;">$${foodPrice.toFixed(2)}</div>
+                        <div style="text-align: center; font-weight: bold; color: #228B22;">${gameState.food}</div>
 
-                        <div>Spare wheel</div>
-                        <div>$${wheelPrice}</div>
-                        <div>${gameState.parts.wheel}</div>
+                        <div>🔫 Ammunition</div>
+                        <div style="text-align: center;">$${ammoPrice}</div>
+                        <div style="text-align: center; font-weight: bold; color: #228B22;">${gameState.ammunition}</div>
+
+                        <div>👕 Clothing</div>
+                        <div style="text-align: center;">$${clothingPrice}</div>
+                        <div style="text-align: center; font-weight: bold; color: #228B22;">${gameState.clothing}</div>
+
+                        <div>⚙️ Spare Wheel</div>
+                        <div style="text-align: center;">$${wheelPrice}</div>
+                        <div style="text-align: center; font-weight: bold; color: #228B22;">${gameState.parts.wheel}</div>
                     </div>
                 </div>
 
-                ${gameState.message ? `<div style="background: #fff3cd; padding: 0.75rem; border-radius: 5px; margin-bottom: 1rem;">${gameState.message}</div>` : ''}
+                ${gameState.message ? `<div style="background: #FFA500; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-weight: bold; text-align: center;">${gameState.message}</div>` : ''}
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                    <button onclick="window.oregonBuy('oxen')" style="background: #3498db; color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 5px;">Buy Oxen</button>
-                    <button onclick="window.oregonBuy('food')" style="background: #3498db; color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 5px;">Buy Food</button>
-                    <button onclick="window.oregonBuy('ammunition')" style="background: #3498db; color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 5px;">Buy Ammo</button>
-                    <button onclick="window.oregonBuy('clothing')" style="background: #3498db; color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 5px;">Buy Clothes</button>
-                    <button onclick="window.oregonBuy('wheel')" style="background: #3498db; color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 5px;">Buy Wheel</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem;">
+                    <button onclick="window.oregonBuy('oxen')" style="background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; border: 2px solid #654321; padding: 0.75rem; cursor: pointer; border-radius: 8px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">🐂 Buy Oxen</button>
+                    <button onclick="window.oregonBuy('food')" style="background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; border: 2px solid #654321; padding: 0.75rem; cursor: pointer; border-radius: 8px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">🌾 Buy Food</button>
+                    <button onclick="window.oregonBuy('ammunition')" style="background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; border: 2px solid #654321; padding: 0.75rem; cursor: pointer; border-radius: 8px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">🔫 Buy Ammo</button>
+                    <button onclick="window.oregonBuy('clothing')" style="background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; border: 2px solid #654321; padding: 0.75rem; cursor: pointer; border-radius: 8px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">👕 Buy Clothes</button>
+                    <button onclick="window.oregonBuy('wheel')" style="background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; border: 2px solid #654321; padding: 0.75rem; cursor: pointer; border-radius: 8px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">⚙️ Buy Wheel</button>
                 </div>
 
-                <button onclick="window.oregonLeaveStore()" style="background: #2ecc71; color: white; border: none; padding: 1rem; cursor: pointer; border-radius: 5px; width: 100%; font-size: 1rem;">Leave Store & Start Journey</button>
+                <button onclick="window.oregonLeaveStore()" style="
+                    background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+                    color: white;
+                    border: 3px solid #1B5E1B;
+                    padding: 1.25rem;
+                    cursor: pointer;
+                    border-radius: 10px;
+                    width: 100%;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    transition: transform 0.2s;
+                " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    🚂 Leave Store & Start Journey
+                </button>
             </div>
         `;
     }
@@ -671,64 +894,155 @@
         const currentLandmark = LANDMARKS[gameState.currentLandmark];
         const distanceToNext = nextLandmark.distance - gameState.milesTraveled;
         const isFort = currentLandmark.isFort;
+        const weatherIcons = { fair: '☀️', rainy: '🌧️', cold: '❄️', hot: '🔥', foggy: '🌫️' };
 
         container.innerHTML = `
-            <div style="padding: 1rem;">
-                <div style="background: #2c3e50; color: white; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
-                    <div style="font-size: 0.9rem;">
-                        📅 ${gameState.month} ${gameState.day} | ☁️ ${gameState.weather}
+            <div style="
+                background: linear-gradient(180deg, #87CEEB 0%, #F4E4C1 50%, #8B7355 100%);
+                padding: 1.5rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            ">
+                <!-- Location & Date Header -->
+                <div style="
+                    background: linear-gradient(135deg, #5D4E37 0%, #8B7355 100%);
+                    color: white;
+                    padding: 1.25rem;
+                    border-radius: 10px;
+                    margin-bottom: 1.25rem;
+                    box-shadow: 0 3px 15px rgba(0,0,0,0.3);
+                ">
+                    <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem;">
+                        📅 ${gameState.month} ${gameState.day} | ${weatherIcons[gameState.weather] || '☁️'} ${gameState.weather.charAt(0).toUpperCase() + gameState.weather.slice(1)}
                     </div>
-                    <div style="font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">
+                    <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;">
                         📍 ${currentLandmark.name}
                     </div>
-                    <div style="font-size: 0.9rem;">
-                        ${gameState.milesTraveled} miles traveled | ${distanceToNext} miles to ${nextLandmark.name}
+                    <div style="font-size: 1rem; opacity: 0.95;">
+                        ${gameState.milesTraveled} miles traveled
+                    </div>
+                    <div style="font-size: 0.95rem; opacity: 0.9; margin-top: 0.25rem;">
+                        ${distanceToNext} miles to ${nextLandmark.name}
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                    <div style="background: #ecf0f1; padding: 0.5rem; border-radius: 3px;">Food: ${gameState.food} lbs</div>
-                    <div style="background: #ecf0f1; padding: 0.5rem; border-radius: 3px;">Ammo: ${gameState.ammunition}</div>
-                    <div style="background: #ecf0f1; padding: 0.5rem; border-radius: 3px;">Clothes: ${gameState.clothing}</div>
-                    <div style="background: #ecf0f1; padding: 0.5rem; border-radius: 3px;">Money: $${gameState.money}</div>
+                <!-- Supplies -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+                    <div style="background: rgba(255,255,255,0.95); padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-weight: bold; color: #5D4E37;">
+                        🌾 Food: <span style="color: ${gameState.food < 50 ? '#e74c3c' : '#228B22'};">${gameState.food} lbs</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.95); padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-weight: bold; color: #5D4E37;">
+                        🔫 Ammo: <span style="color: ${gameState.ammunition < 20 ? '#e74c3c' : '#228B22'};">${gameState.ammunition}</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.95); padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-weight: bold; color: #5D4E37;">
+                        👕 Clothes: <span style="color: ${gameState.clothing < 1 ? '#e74c3c' : '#228B22'};">${gameState.clothing}</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.95); padding: 1rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-weight: bold; color: #5D4E37;">
+                        💰 Money: <span style="color: #228B22;">$${gameState.money}</span>
+                    </div>
                 </div>
 
-                <div style="background: #fff; border: 1px solid #ddd; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
-                    <div style="font-weight: bold; margin-bottom: 0.5rem;">Party Health:</div>
+                <!-- Party Health -->
+                <div style="background: rgba(255,255,255,0.95); padding: 1.25rem; border-radius: 10px; margin-bottom: 1.25rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <div style="font-weight: bold; margin-bottom: 0.75rem; color: #5D4E37; font-size: 1.1rem;">👥 Party Health:</div>
                     ${gameState.partyAlive.map((alive, i) => {
-                        if (!alive) return `<div style="color: #999;">💀 ${getPartyName(i)} - Dead</div>`;
-                        const health = gameState.partyHealth[i];
+                        if (!alive) return `<div style="color: #999; margin-bottom: 0.5rem; font-size: 1rem;">💀 ${getPartyName(i)} - Dead</div>`;
+                        const health = Math.round(gameState.partyHealth[i]);
                         const illness = gameState.partyIllness[i];
+                        const healthColor = health >= 4 ? '#228B22' : health >= 2 ? '#FFA500' : '#e74c3c';
                         const healthBar = '█'.repeat(health) + '░'.repeat(5 - health);
-                        return `<div>${getPartyName(i)}: ${healthBar} ${illness ? `(${illness})` : ''}</div>`;
+                        return `<div style="margin-bottom: 0.5rem; font-size: 1rem;">
+                            <strong>${getPartyName(i)}:</strong>
+                            <span style="color: ${healthColor};">${healthBar}</span>
+                            ${illness ? `<span style="color: #e74c3c; font-weight: bold;">(${illness})</span>` : ''}
+                        </div>`;
                     }).join('')}
                 </div>
 
+                <!-- Event Log -->
                 ${gameState.eventLog.length > 0 ? `
-                    <div style="background: #fffacd; padding: 0.75rem; border-radius: 5px; margin-bottom: 1rem; font-size: 0.9rem;">
-                        ${gameState.eventLog.map(log => `<div>${log}</div>`).join('')}
+                    <div style="background: rgba(255,235,205,0.95); border: 2px solid #DEB887; padding: 1rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                        ${gameState.eventLog.map(log => `<div style="margin-bottom: 0.5rem; line-height: 1.5;">${log}</div>`).join('')}
                     </div>
                 ` : ''}
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
-                    <button onclick="window.oregonContinue()" style="background: #2ecc71; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 5px;">Continue</button>
-                    <button onclick="window.oregonRest()" style="background: #3498db; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 5px;">Rest</button>
-                    <button onclick="window.oregonHunt()" style="background: #e67e22; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 5px;">Hunt</button>
-                    ${isFort ? `<button onclick="window.oregonStore()" style="background: #9b59b6; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 5px;">Store</button>` : ''}
+                <!-- Action Buttons -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem;">
+                    <button onclick="window.oregonContinue()" style="
+                        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+                        color: white;
+                        border: 2px solid #1B5E1B;
+                        padding: 1rem;
+                        cursor: pointer;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        font-size: 1.1rem;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🚂 Continue</button>
+                    <button onclick="window.oregonRest()" style="
+                        background: linear-gradient(135deg, #3498db 0%, #5DADE2 100%);
+                        color: white;
+                        border: 2px solid #2874A6;
+                        padding: 1rem;
+                        cursor: pointer;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        font-size: 1.1rem;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">😴 Rest</button>
+                    <button onclick="window.oregonHunt()" style="
+                        background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+                        color: white;
+                        border: 2px solid #654321;
+                        padding: 1rem;
+                        cursor: pointer;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        font-size: 1.1rem;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🦌 Hunt</button>
+                    ${isFort ? `<button onclick="window.oregonStore()" style="
+                        background: linear-gradient(135deg, #9b59b6 0%, #BB8FCE 100%);
+                        color: white;
+                        border: 2px solid #7D3C98;
+                        padding: 1rem;
+                        cursor: pointer;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        font-size: 1.1rem;
+                        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🏪 Store</button>` : ''}
                 </div>
 
+                <!-- Pace & Rations Settings -->
                 <details style="margin-bottom: 1rem;">
-                    <summary style="cursor: pointer; padding: 0.5rem; background: #ecf0f1; border-radius: 5px;">Change Pace & Rations</summary>
-                    <div style="padding: 0.5rem;">
-                        <div style="margin-bottom: 0.5rem;"><strong>Pace:</strong></div>
-                        <button onclick="window.oregonSetPace('steady')" style="background: ${gameState.pace === 'steady' ? '#2ecc71' : '#95a5a6'}; color: white; border: none; padding: 0.5rem; margin-right: 0.25rem; cursor: pointer; border-radius: 3px;">Steady</button>
-                        <button onclick="window.oregonSetPace('strenuous')" style="background: ${gameState.pace === 'strenuous' ? '#2ecc71' : '#95a5a6'}; color: white; border: none; padding: 0.5rem; margin-right: 0.25rem; cursor: pointer; border-radius: 3px;">Strenuous</button>
-                        <button onclick="window.oregonSetPace('grueling')" style="background: ${gameState.pace === 'grueling' ? '#2ecc71' : '#95a5a6'}; color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 3px;">Grueling</button>
+                    <summary style="
+                        cursor: pointer;
+                        padding: 1rem;
+                        background: rgba(255,255,255,0.95);
+                        border-radius: 8px;
+                        font-weight: bold;
+                        color: #5D4E37;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    ">⚙️ Change Pace & Rations</summary>
+                    <div style="padding: 1rem; background: rgba(255,255,255,0.9); border-radius: 8px; margin-top: 0.5rem;">
+                        <div style="margin-bottom: 0.75rem; font-weight: bold; color: #5D4E37;">Pace:</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                            <button onclick="window.oregonSetPace('steady')" style="background: ${gameState.pace === 'steady' ? 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)' : '#95a5a6'}; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 6px; font-weight: bold;">Steady</button>
+                            <button onclick="window.oregonSetPace('strenuous')" style="background: ${gameState.pace === 'strenuous' ? 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)' : '#95a5a6'}; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 6px; font-weight: bold;">Strenuous</button>
+                            <button onclick="window.oregonSetPace('grueling')" style="background: ${gameState.pace === 'grueling' ? 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)' : '#95a5a6'}; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 6px; font-weight: bold;">Grueling</button>
+                        </div>
 
-                        <div style="margin: 0.75rem 0 0.5rem 0;"><strong>Rations:</strong></div>
-                        <button onclick="window.oregonSetRations('filling')" style="background: ${gameState.rations === 'filling' ? '#2ecc71' : '#95a5a6'}; color: white; border: none; padding: 0.5rem; margin-right: 0.25rem; cursor: pointer; border-radius: 3px;">Filling</button>
-                        <button onclick="window.oregonSetRations('meager')" style="background: ${gameState.rations === 'meager' ? '#2ecc71' : '#95a5a6'}; color: white; border: none; padding: 0.5rem; margin-right: 0.25rem; cursor: pointer; border-radius: 3px;">Meager</button>
-                        <button onclick="window.oregonSetRations('barebones')" style="background: ${gameState.rations === 'barebones' ? '#2ecc71' : '#95a5a6'}; color: white; border: none; padding: 0.5rem; cursor: pointer; border-radius: 3px;">Bare Bones</button>
+                        <div style="margin-bottom: 0.75rem; font-weight: bold; color: #5D4E37;">Rations:</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
+                            <button onclick="window.oregonSetRations('filling')" style="background: ${gameState.rations === 'filling' ? 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)' : '#95a5a6'}; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 6px; font-weight: bold;">Filling</button>
+                            <button onclick="window.oregonSetRations('meager')" style="background: ${gameState.rations === 'meager' ? 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)' : '#95a5a6'}; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 6px; font-weight: bold;">Meager</button>
+                            <button onclick="window.oregonSetRations('barebones')" style="background: ${gameState.rations === 'barebones' ? 'linear-gradient(135deg, #228B22 0%, #32CD32 100%)' : '#95a5a6'}; color: white; border: none; padding: 0.75rem; cursor: pointer; border-radius: 6px; font-weight: bold;">Bare Bones</button>
+                        </div>
                     </div>
                 </details>
             </div>
