@@ -107,13 +107,14 @@
             const direction = index % 2 === 0 ? 1 : -1; // Alternate directions
             const vehicleType = VEHICLE_TYPES[index % VEHICLE_TYPES.length];
             const speed = vehicleType.speed * (1 + gameState.level * 0.05) * direction; // Reduced from 0.1 to 0.05
-            const gap = 3 + Math.random() * 2;
+            const gap = 3.5 + Math.random() * 1.5;
 
-            // Create multiple vehicles per lane
-            for (let i = 0; i < COLS; i += gap) {
+            // Create vehicles across wider area to ensure smooth wrapping
+            const numVehicles = Math.ceil(COLS * 1.5 / gap);
+            for (let i = 0; i < numVehicles; i++) {
                 gameState.vehicles.push({
                     row: row,
-                    col: i + Math.random() * gap,
+                    col: (i * gap) + (Math.random() * gap * 0.3) - COLS * 0.25,
                     type: vehicleType,
                     speed: speed,
                     direction: direction
@@ -132,13 +133,14 @@
             const logType = LOG_TYPES[index % LOG_TYPES.length];
             const isTurtle = index % 2 === 1;
             const speed = logType.speed * (1 + gameState.level * 0.04) * direction; // Reduced from 0.08 to 0.04
-            const gap = 4 + Math.random() * 2;
+            const gap = 4.5 + Math.random() * 1.5;
 
-            // Create multiple obstacles per lane
-            for (let i = 0; i < COLS * 1.5; i += gap) {
+            // Create obstacles across wider area to ensure smooth wrapping
+            const numObstacles = Math.ceil(COLS * 1.8 / gap);
+            for (let i = 0; i < numObstacles; i++) {
                 const obstacle = {
                     row: row,
-                    col: i + Math.random() * gap,
+                    col: (i * gap) + (Math.random() * gap * 0.3) - COLS * 0.3,
                     width: logType.width,
                     speed: speed,
                     direction: direction,
