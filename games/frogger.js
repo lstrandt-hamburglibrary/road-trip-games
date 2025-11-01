@@ -28,11 +28,11 @@
         { emoji: '🚌', width: 2, speed: 0.45, color: '#9b59b6' }
     ];
 
-    // River obstacle types (base speeds - much slower)
+    // River obstacle types (base speeds - much slower, wider for more room)
     const LOG_TYPES = [
-        { emoji: '🪵', width: 3, speed: 0.5 },
-        { emoji: '🪵', width: 4, speed: 0.4 },
-        { emoji: '🪵', width: 2, speed: 0.6 }
+        { emoji: '🪵', width: 5, speed: 0.5 },  // Increased from 3 to 5
+        { emoji: '🪵', width: 6, speed: 0.4 },  // Increased from 4 to 6
+        { emoji: '🪵', width: 4, speed: 0.6 }   // Increased from 2 to 4
     ];
 
     // Game state
