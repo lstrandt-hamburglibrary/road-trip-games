@@ -825,13 +825,39 @@
     "flower": "Black-Eyed Susan",
     "motto": "Manly Deeds, Womanly Words",
     "facts": [
-      "The Star-Spangled Banner was written in Baltimore during the War of 1812",
-      "Home to the U.S. Naval Academy in Annapolis",
-      "Chesapeake Bay produces more blue crabs than anywhere else",
-      "First state to pass workers' compensation laws",
-      "Assateague Island is home to wild horses"
+      "The Star-Spangled Banner was written by Francis Scott Key in Baltimore during the War of 1812",
+      "Home to the U.S. Naval Academy in Annapolis, founded in 1845",
+      "Chesapeake Bay produces more blue crabs than anywhere else - the state crustacean",
+      "First state to pass workers' compensation laws in 1902",
+      "Assateague Island is home to over 300 wild horses",
+      "The Ouija board was invented in Baltimore in 1890",
+      "Maryland's state sport is jousting - the only state with this medieval sport",
+      "The nation's first dental school opened in Baltimore in 1840",
+      "Ocean City has the world's longest fishing pier at 1,026 feet",
+      "Baltimore's National Aquarium houses over 20,000 animals",
+      "The Preakness Stakes, part of the Triple Crown, is held at Pimlico Race Course",
+      "Edgar Allan Poe is buried in Baltimore and died there under mysterious circumstances",
+      "Maryland was the 7th state to ratify the Constitution",
+      "The Chesapeake Bay Bridge is 4.3 miles long and some people are too afraid to drive it",
+      "Old Bay seasoning, invented in Baltimore, is Maryland's unofficial spice",
+      "Babe Ruth was born in Baltimore in 1895",
+      "The Harriet Tubman Underground Railroad National Historical Park honors the freedom fighter",
+      "Annapolis served as the U.S. capital from 1783-1784",
+      "Camp David, the presidential retreat, is in Maryland's Catoctin Mountains",
+      "Maryland is the narrowest state - only 1.8 miles wide at its narrowest point"
     ],
-    "landmarks": ["Fort McHenry", "Chesapeake Bay", "Ocean City", "Antietam Battlefield", "Assateague Island"]
+    "landmarks": [
+      "Fort McHenry - Baltimore",
+      "Chesapeake Bay Bridge - Sandy Point to Kent Island",
+      "Ocean City Boardwalk - Ocean City",
+      "Antietam National Battlefield - Sharpsburg",
+      "Assateague Island National Seashore - Berlin",
+      "U.S. Naval Academy - Annapolis",
+      "National Aquarium - Baltimore",
+      "Edgar Allan Poe's Grave - Baltimore",
+      "Camp David - Catoctin Mountains",
+      "Harriet Tubman Underground Railroad sites - Eastern Shore"
+    ]
   },
   "Massachusetts": {
     "capital": "Boston",
@@ -842,13 +868,39 @@
     "flower": "Mayflower",
     "motto": "By the Sword We Seek Peace, But Peace Only Under Liberty",
     "facts": [
-      "The Pilgrims landed at Plymouth Rock in 1620",
-      "Harvard (1636) is America's oldest university",
-      "Basketball and volleyball were both invented in Massachusetts",
-      "The Boston Tea Party sparked the American Revolution",
-      "Fig Newtons were named after Newton, Massachusetts"
+      "The Pilgrims landed at Plymouth Rock in 1620, establishing the second English colony",
+      "Harvard University (1636) is America's oldest institution of higher learning",
+      "Basketball was invented in Springfield by James Naismith in 1891",
+      "Volleyball was invented in Holyoke by William G. Morgan in 1895",
+      "The Boston Tea Party in 1773 sparked the American Revolution",
+      "Fig Newtons were named after Newton, Massachusetts where they were created",
+      "The first subway system in America opened in Boston in 1897",
+      "The chocolate chip cookie was invented at the Toll House Inn in Whitman in 1938",
+      "Boston is home to the first public park (Boston Common, 1634) and first public school (Boston Latin, 1635)",
+      "Fenway Park, built in 1912, is the oldest Major League Baseball stadium still in use",
+      "Four U.S. presidents were born in Massachusetts - more than any state except Virginia",
+      "The state has more than 80 colleges and universities",
+      "The first Thanksgiving was celebrated in Plymouth in 1621",
+      "Salem witch trials in 1692 resulted in 20 executions",
+      "The telephone was invented in Boston by Alexander Graham Bell in 1876",
+      "Cape Cod has over 550 miles of coastline",
+      "The state official cookie is the chocolate chip cookie",
+      "Nantucket and Martha's Vineyard are famous summer resort islands",
+      "Boston's Freedom Trail is 2.5 miles and passes 16 historical sites",
+      "The first commercial railroad in the U.S. began service in Massachusetts in 1826"
     ],
-    "landmarks": ["Freedom Trail", "Cape Cod", "Plymouth Rock", "Salem Witch Museum", "Fenway Park"]
+    "landmarks": [
+      "Freedom Trail - Boston",
+      "Cape Cod National Seashore - Outer Cape",
+      "Plymouth Rock - Plymouth",
+      "Salem Witch Museum - Salem",
+      "Fenway Park - Boston",
+      "Harvard University - Cambridge",
+      "Basketball Hall of Fame - Springfield",
+      "Martha's Vineyard - Off Cape Cod",
+      "Nantucket Island - Off Cape Cod",
+      "Boston Common - Boston"
+    ]
   },
   "Michigan": {
     "capital": "Lansing",
@@ -859,13 +911,39 @@
     "flower": "Apple Blossom",
     "motto": "If You Seek a Pleasant Peninsula, Look About You",
     "facts": [
-      "Surrounded by four of the five Great Lakes",
-      "Detroit is the 'Motor City' - birthplace of the auto industry",
-      "Has more lighthouses than any other state (over 120)",
+      "Surrounded by four of the five Great Lakes (Superior, Michigan, Huron, Erie)",
+      "Detroit is the 'Motor City' - birthplace of the American auto industry",
+      "Has more lighthouses than any other state - over 120 along its coasts",
       "No point in Michigan is more than 85 miles from a Great Lake",
-      "Mackinac Island doesn't allow cars - only horses and bikes"
+      "Mackinac Island has banned motor vehicles since 1898 - only horses, bikes, and feet",
+      "Michigan has more than 11,000 inland lakes",
+      "The Mackinac Bridge is the longest suspension bridge in the Western Hemisphere (26,372 feet)",
+      "Detroit-style pizza has a thick, crispy crust and cheese to the edges",
+      "Michigan is the only state with two separate peninsulas (Upper and Lower)",
+      "Kellogg's cereal company was founded in Battle Creek in 1906",
+      "The first American traffic light was installed in Detroit in 1915",
+      "Michigan produces more blueberries, tart cherries, and cucumbers for pickles than any state",
+      "Motown Records was founded in Detroit and created 'The Motown Sound'",
+      "The state has 3,288 miles of Great Lakes shoreline - more than any other state",
+      "Vernors ginger ale, created in Detroit in 1866, is America's oldest soft drink",
+      "The University of Michigan's football stadium seats 107,601 - largest in the U.S.",
+      "Hell, Michigan freezes over every winter (yes, it's a real town)",
+      "The Faygo soft drink company has made over 50 flavors since 1907 in Detroit",
+      "Isle Royale National Park is the least visited national park in the lower 48",
+      "The only floating post office in the U.S. delivers mail to ships on the Detroit River"
     ],
-    "landmarks": ["Mackinac Island", "Sleeping Bear Dunes", "Pictured Rocks", "Henry Ford Museum", "Tahquamenon Falls"]
+    "landmarks": [
+      "Mackinac Island - Mackinac Island",
+      "Sleeping Bear Dunes National Lakeshore - Empire",
+      "Pictured Rocks National Lakeshore - Munising",
+      "Henry Ford Museum - Dearborn",
+      "Tahquamenon Falls State Park - Paradise",
+      "Mackinac Bridge - Mackinaw City to St. Ignace",
+      "The Big Mac (Mackinac Bridge) - Straits of Mackinac",
+      "Michigan Stadium - Ann Arbor",
+      "Motown Museum - Detroit",
+      "Isle Royale National Park - Lake Superior"
+    ]
   },
   "Minnesota": {
     "capital": "St. Paul",
