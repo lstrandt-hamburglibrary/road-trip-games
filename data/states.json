@@ -1728,13 +1728,39 @@
     "flower": "Pasque Flower",
     "motto": "Under God the People Rule",
     "facts": [
-      "Mount Rushmore features the faces of four U.S. Presidents carved into granite",
-      "Crazy Horse Memorial, when completed, will be the world's largest sculpture",
-      "Badlands National Park has some of Earth's richest fossil beds",
-      "Sue, the largest and most complete T-Rex skeleton, was found here",
-      "The geographic center of the United States is near Belle Fourche"
+      "Mount Rushmore took 14 years to carve (1927-1941) using dynamite and jackhammers",
+      "Crazy Horse Memorial, when completed, will be the world's largest sculpture - still in progress since 1948",
+      "Sue, the largest and most complete T-Rex skeleton ever found, was discovered near Faith in 1990",
+      "The geographic center of the United States (50 states) is near Belle Fourche",
+      "Deadwood was the hometown of Wild Bill Hickok and Calamity Jane",
+      "The Corn Palace in Mitchell is decorated with 275,000 ears of corn each year",
+      "Wall Drug started in 1931 with free ice water and is now a massive roadside attraction",
+      "South Dakota has no state income tax and no personal property tax",
+      "Badlands National Park has some of Earth's richest fossil beds - 75 million years old",
+      "The state capital Pierre (pronounced 'peer') is the second-smallest state capital by population",
+      "Custer State Park has one of the world's largest publicly owned bison herds - about 1,300 animals",
+      "The Needles Highway has narrow tunnels carved through granite spires",
+      "Hot Springs is home to the Mammoth Site - an active paleontological dig with 61 mammoths found",
+      "South Dakota was the first state to require every county to have a public library",
+      "The Sturgis Motorcycle Rally attracts over 500,000 bikers every August",
+      "Black Elk Peak (formerly Harney Peak) is the highest point east of the Rockies at 7,242 feet",
+      "Wind Cave National Park has the world's sixth-longest cave system and rare boxwork formations",
+      "The state has more miles of shoreline than Florida (due to many lakes and the Missouri River)",
+      "Jewel Cave is the world's third-longest cave at over 200 miles mapped",
+      "South Dakota is one of the few states where you can drive an ATV on public roads in certain areas"
     ],
-    "landmarks": ["Mount Rushmore", "Badlands National Park", "Crazy Horse Memorial", "Custer State Park", "Deadwood"]
+    "landmarks": [
+      "Mount Rushmore National Memorial - Keystone",
+      "Badlands National Park - Interior",
+      "Crazy Horse Memorial - Crazy Horse",
+      "Custer State Park - Custer",
+      "Deadwood Historic District - Deadwood",
+      "Wall Drug - Wall",
+      "Corn Palace - Mitchell",
+      "Wind Cave National Park - Hot Springs",
+      "Mammoth Site - Hot Springs",
+      "Jewel Cave National Monument - Custer"
+    ]
   },
   "Tennessee": {
     "capital": "Nashville",
@@ -1745,13 +1771,39 @@
     "flower": "Iris",
     "motto": "Agriculture and Commerce",
     "facts": [
-      "Nashville is the 'Country Music Capital of the World'",
-      "Memphis is the birthplace of blues, soul, and rock n' roll",
-      "Great Smoky Mountains is the most visited national park in the U.S.",
-      "Jack Daniel's whiskey has been made in Lynchburg since 1866",
-      "Graceland, Elvis Presley's home, attracts 600,000 visitors annually"
+      "Nashville is the 'Country Music Capital of the World' with over 180 live music venues",
+      "Memphis is where Elvis Presley, B.B. King, and Johnny Cash recorded at Sun Studio",
+      "Great Smoky Mountains National Park is the most visited national park in the U.S. - 13 million visitors annually",
+      "Jack Daniel's distillery in Lynchburg is in a dry county where you can't buy liquor",
+      "Graceland, Elvis Presley's mansion, is the second most-visited house in America (after the White House)",
+      "The Grand Ole Opry has been broadcasting country music since 1925",
+      "Tennessee has more than 10,000 documented caves - more than any other state",
+      "The state is bordered by eight other states - tied with Missouri for the most",
+      "Moon Pies were invented in Chattanooga in 1917",
+      "The Tennessee Aquarium in Chattanooga was the world's first major freshwater aquarium",
+      "Dollywood in Pigeon Forge attracts over 3 million visitors per year",
+      "Miniature golf was invented in Lookout Mountain in 1927",
+      "Tennessee has no state income tax on wages",
+      "The Parthenon in Nashville is a full-scale replica of the ancient Greek original",
+      "Ruby Falls in Chattanooga is America's tallest underground waterfall at 145 feet",
+      "Bristol is known as the 'Birthplace of Country Music' where the Bristol Sessions were recorded in 1927",
+      "FedEx, headquartered in Memphis, operates the world's busiest cargo airport",
+      "Davy Crockett was born in Tennessee and represented the state in Congress",
+      "Oak Ridge was a secret city during WWII where uranium was enriched for the atomic bomb",
+      "Memphis-style BBQ is world-famous, especially ribs with dry rub"
     ],
-    "landmarks": ["Great Smoky Mountains", "Graceland", "Grand Ole Opry", "Beale Street", "Dollywood"]
+    "landmarks": [
+      "Great Smoky Mountains National Park - Gatlinburg/Cherokee",
+      "Graceland - Memphis",
+      "Grand Ole Opry - Nashville",
+      "Beale Street - Memphis",
+      "Dollywood - Pigeon Forge",
+      "The Parthenon - Nashville",
+      "Ruby Falls - Chattanooga",
+      "Sun Studio - Memphis",
+      "Jack Daniel's Distillery - Lynchburg",
+      "Lookout Mountain - Chattanooga"
+    ]
   },
   "Texas": {
     "capital": "Austin",
@@ -1762,13 +1814,39 @@
     "flower": "Bluebonnet",
     "motto": "Friendship",
     "facts": [
-      "Second largest state in area and population",
-      "Was an independent nation from 1836-1845 (Republic of Texas)",
-      "The Alamo in San Antonio is the most visited site in Texas",
-      "Six Flags Over Texas refers to the six nations that have ruled Texas",
-      "Austin is the 'Live Music Capital of the World' with over 250 venues"
+      "Second largest state by both area (268,597 sq mi) and population (over 30 million)",
+      "Was an independent nation from 1836-1845 called the Republic of Texas",
+      "Six Flags Over Texas refers to the six nations that have ruled Texas: Spain, France, Mexico, Republic of Texas, Confederate States, and USA",
+      "Austin is the 'Live Music Capital of the World' with over 250 live music venues",
+      "The King Ranch is larger than the state of Rhode Island (825,000 acres)",
+      "Dr Pepper was invented in Waco in 1885 - a year before Coca-Cola",
+      "The world's first frozen margarita machine was invented in Dallas in 1971",
+      "Texas has its own power grid separate from the rest of the U.S.",
+      "The Alamo in San Antonio is the #1 most visited tourist attraction in Texas",
+      "It's illegal to graffiti someone's cow in Texas",
+      "The capitol building in Austin is taller than the U.S. Capitol in Washington D.C.",
+      "Big Tex at the State Fair of Texas is a 55-foot-tall cowboy statue",
+      "NASA's Mission Control in Houston has controlled every U.S. manned space mission since 1965",
+      "Texas has 254 counties - more than any other state",
+      "The world's largest urban bat colony lives under the Congress Avenue Bridge in Austin (1.5 million bats)",
+      "Cadillac Ranch near Amarillo features 10 Cadillacs buried nose-first in the ground",
+      "Texas barbecue is a religion - brisket is the holy grail",
+      "The Texas State Fair is the largest state fair in the U.S. by annual attendance",
+      "Whole Foods Market started in Austin in 1980",
+      "The phrase 'Don't Mess with Texas' was originally an anti-littering campaign slogan"
     ],
-    "landmarks": ["The Alamo", "Space Center Houston", "Big Bend National Park", "Sixth Floor Museum", "River Walk"]
+    "landmarks": [
+      "The Alamo - San Antonio",
+      "Space Center Houston - Houston",
+      "Big Bend National Park - West Texas",
+      "Sixth Floor Museum at Dealey Plaza - Dallas",
+      "San Antonio River Walk - San Antonio",
+      "Cadillac Ranch - Amarillo",
+      "Texas State Capitol - Austin",
+      "Guadalupe Mountains National Park - Salt Flat",
+      "Palo Duro Canyon - Canyon",
+      "Fort Worth Stockyards - Fort Worth"
+    ]
   },
   "Utah": {
     "capital": "Salt Lake City",
