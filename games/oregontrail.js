@@ -288,6 +288,9 @@
 
         gameState.milesTraveled += miles;
 
+        // Random illness (varies by rations and pace) - check BEFORE advancing day
+        checkForIllness();
+
         // Advance 1 day
         advanceDay(1);
 
@@ -300,9 +303,6 @@
         if (Math.random() < 0.15) {
             triggerRandomEvent();
         }
-
-        // Random illness (varies by rations and pace)
-        checkForIllness();
 
         updateDisplay();
     }
