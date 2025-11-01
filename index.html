@@ -378,14 +378,14 @@
                     <p>Track all the state plates you spot on your journey</p>
                 </div>
 
+                <div class="feature-card" onclick="showTravelFacts()">
+                    <h3>📍 Travel Facts</h3>
+                    <p>Learn about each state you're traveling through</p>
+                </div>
+
                 <div class="feature-card" onclick="showGamesMenu()">
                     <h3>🎮 Games</h3>
                     <p>Play fun games to pass the time on long drives</p>
-                </div>
-
-                <div class="feature-card" onclick="alert('GPS Facts - Coming Soon!')">
-                    <h3>📍 GPS Facts</h3>
-                    <p>Learn interesting facts about places you're driving through</p>
                 </div>
 
                 <div class="feature-card" onclick="showTravelBingo()">
@@ -526,6 +526,20 @@
                         <!-- Theme cards will be rendered here -->
                     </div>
                 </div>
+            </div>
+
+            <!-- Travel Facts Section (hidden by default) -->
+            <div id="travelFacts" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>📍 Travel Facts</h2>
+                    <button onclick="exitTravelFacts()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem;">← Back to Home</button>
+                </div>
+
+                <!-- State Selector (shown initially) -->
+                <div id="stateSelector"></div>
+
+                <!-- State Display (shown after selection) -->
+                <div id="stateDisplay"></div>
             </div>
 
             <!-- License Plate Tracker Section (hidden by default) -->
@@ -2200,6 +2214,7 @@
             });
         }
     </script>
+    <script src="travelFacts.js?v=1.0.0"></script>
     <script src="games/battleship.js?v=1.17.0"></script>
     <script src="games/connect4.js?v=1.31.2"></script>
     <script src="games/minesweeper.js?v=1.57.2"></script>
