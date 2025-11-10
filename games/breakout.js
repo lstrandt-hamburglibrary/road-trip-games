@@ -147,6 +147,11 @@
     function setupEventListeners() {
         // Keyboard controls
         document.addEventListener('keydown', (e) => {
+            // Prevent default scrolling for arrow keys and space
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+                e.preventDefault();
+            }
+
             if (e.key === 'ArrowLeft') {
                 gameState.keys.left = true;
                 gameState.useMouseControl = false;
