@@ -40,9 +40,16 @@
 4. Push to GitHub
 5. PWA will detect update and notify users
 
+## Local Development Server
+- **Port**: 8000
+- **Command**: Already running on localhost:8000
+- **URL**: http://localhost:8000
+- To restart: `lsof -ti:8000 | xargs kill` then `python3 -m http.server 8000`
+
 ## Testing Commands
 - No specific test framework currently set up
 - Manual testing in browser/PWA required
+- Use hard refresh (Cmd+Shift+R on Mac, Ctrl+Shift+R on Windows) to clear cache
 
 ## Code Style
 - Modular structure: index.html for app shell, games separated into individual JS files

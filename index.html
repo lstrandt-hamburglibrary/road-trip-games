@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.100.0';</script>
+    <script>window.APP_VERSION = '1.100.1';</script>
 
     <style>
         * {
@@ -1147,13 +1147,22 @@
 
             <!-- Caverns of Mars Game Section (hidden by default) -->
             <div id="cavernsOfMarsGame" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <button onclick="exitCavernsOfMars()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">← Back</button>
                     <h2 style="margin: 0;">🔴 Caverns of Mars</h2>
                     <div style="width: 120px;"></div>
                 </div>
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <div style="background: rgba(255,107,53,0.1); border-left: 4px solid #ff6b35; padding: 1rem; margin: 0 auto; max-width: 600px; text-align: left;">
+                        <strong style="color: #ff6b35;">🎮 Controls:</strong><br>
+                        <strong>Arrow Keys</strong> or <strong>A/D</strong> - Move left/right<br>
+                        <strong>SPACE</strong> or <strong>Click/Tap</strong> - Fire (slows descent but uses fuel!)<br><br>
+                        <strong style="color: #ff6b35;">🎯 Mission:</strong><br>
+                        Descend into Mars, shoot yellow fuel tanks to refill, destroy enemies, plant reactor bomb at bottom, then ESCAPE before it explodes!
+                    </div>
+                </div>
                 <div style="text-align: center;">
-                    <canvas id="cavernsCanvas"></canvas>
+                    <canvas id="cavernsCanvas" style="max-width: 100%; border: 2px solid #ff6b35; border-radius: 10px;"></canvas>
                 </div>
             </div>
 

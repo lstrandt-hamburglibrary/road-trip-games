@@ -9,8 +9,8 @@
     let gameLoopId = null;
 
     // Game constants
-    const GAME_WIDTH = 400;
-    const GAME_HEIGHT = 600;
+    const GAME_WIDTH = 800;
+    const GAME_HEIGHT = 1000;
     const SHIP_WIDTH = 30;
     const SHIP_HEIGHT = 30;
     const CAVE_WIDTH = 300;
@@ -758,15 +758,18 @@
     // Resize canvas
     function resizeCanvas() {
         if (!canvas) return;
-        const container = canvas.parentElement;
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        const scale = Math.min(containerWidth / GAME_WIDTH, containerHeight / GAME_HEIGHT);
 
-        canvas.style.width = (GAME_WIDTH * scale) + 'px';
-        canvas.style.height = (GAME_HEIGHT * scale) + 'px';
+        // Set canvas resolution
         canvas.width = GAME_WIDTH;
         canvas.height = GAME_HEIGHT;
+
+        // Calculate display size (fit to container, maintain aspect ratio)
+        const container = canvas.parentElement;
+        const maxWidth = Math.min(container.clientWidth - 40, 800); // Max 800px width
+        const aspectRatio = GAME_HEIGHT / GAME_WIDTH;
+
+        canvas.style.width = maxWidth + 'px';
+        canvas.style.height = (maxWidth * aspectRatio) + 'px';
     }
 
     function launchCavernsOfMars() {
