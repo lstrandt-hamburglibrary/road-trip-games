@@ -15,9 +15,9 @@
     const SHIP_HEIGHT = 30;
     const CAVE_WIDTH = 300;
     const SCROLL_SPEED = 2;
-    const GRAVITY = 0.5;
-    const MAX_FALL_SPEED = 4;
-    const SHOOT_SLOWDOWN = 0.3;
+    const GRAVITY = 0.3;
+    const MAX_FALL_SPEED = 2.5;
+    const SHOOT_SLOWDOWN = 0.4;
     const FUEL_DRAIN_RATE = 0.1;
     const SHOOT_FUEL_COST = 0.3;
     const FUEL_TANK_VALUE = 30;
@@ -35,7 +35,7 @@
     // Player ship
     let ship = {
         x: GAME_WIDTH / 2,
-        y: GAME_HEIGHT - 100,
+        y: GAME_HEIGHT * 0.4, // Start at 40% from top
         vx: 0,
         vy: 0,
         fuel: 100,
@@ -126,7 +126,7 @@
 
     function resetGame() {
         ship.x = GAME_WIDTH / 2;
-        ship.y = GAME_HEIGHT - 100;
+        ship.y = GAME_HEIGHT * 0.4; // Reset to 40% from top
         ship.vx = 0;
         ship.vy = 0;
         ship.fuel = 100;
@@ -167,12 +167,12 @@
             ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -1);
             ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST);
 
-            // Create bullets
+            // Create bullets (firing downward)
             if (Math.random() < 0.3) {
                 bullets.push({
                     x: ship.x - 10,
                     y: ship.y + SHIP_HEIGHT / 2,
-                    vy: 8,
+                    vy: 8, // Positive = down the screen
                     active: true
                 });
                 bullets.push({
@@ -201,20 +201,23 @@
             gameState.mode = 'gameover';
         }
 
-        // Calculate scroll based on ship position
+        // Keep ship in center of screen, scroll cave instead
         if (gameState.mode === 'descending') {
-            if (ship.y < GAME_HEIGHT / 2) {
-                const scrollAmount = (GAME_HEIGHT / 2 - ship.y) * 0.1;
-                cave.scrollOffset += scrollAmount;
-                ship.y += scrollAmount;
+            const targetY = GAME_HEIGHT * 0.4; // Keep ship at 40% from top
+            if (ship.y < targetY) {
+                ship.y = targetY;
             }
+            // Scroll cave as ship descends
+            const scrollAmount = ship.vy;
+            cave.scrollOffset += scrollAmount;
         } else if (gameState.mode === 'escaping') {
-            // Scroll up when escaping
-            if (ship.y > GAME_HEIGHT / 2) {
-                const scrollAmount = (ship.y - GAME_HEIGHT / 2) * 0.1;
-                cave.scrollOffset -= scrollAmount;
-                ship.y -= scrollAmount;
+            const targetY = GAME_HEIGHT * 0.6; // Keep ship at 60% from top when escaping
+            if (ship.y > targetY) {
+                ship.y = targetY;
             }
+            // Scroll cave up when escaping
+            const scrollAmount = Math.abs(ship.vy);
+            cave.scrollOffset -= scrollAmount;
         }
 
         // Check if reached reactor
