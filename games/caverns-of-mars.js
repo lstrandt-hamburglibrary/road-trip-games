@@ -169,15 +169,17 @@
 
             // Create bullets (firing downward)
             if (Math.random() < 0.3) {
+                // Bullets start at ship position in world coordinates
+                const worldY = ship.y + cave.scrollOffset;
                 bullets.push({
                     x: ship.x - 10,
-                    y: ship.y + SHIP_HEIGHT / 2,
-                    vy: 8, // Positive = down the screen
+                    y: worldY + SHIP_HEIGHT / 2,
+                    vy: 8, // Positive = down in world space
                     active: true
                 });
                 bullets.push({
                     x: ship.x + 10,
-                    y: ship.y + SHIP_HEIGHT / 2,
+                    y: worldY + SHIP_HEIGHT / 2,
                     vy: 8,
                     active: true
                 });
