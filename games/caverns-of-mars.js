@@ -618,6 +618,12 @@
             ctx.font = 'bold 18px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('ESCAPE! REACTOR CRITICAL!', GAME_WIDTH / 2, 30);
+
+            // Show escape progress
+            const escapePercent = Math.max(0, 100 - (cave.scrollOffset / cave.totalDepth * 100)).toFixed(0);
+            ctx.fillStyle = '#ffff00';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText(`ESCAPED: ${escapePercent}%`, GAME_WIDTH / 2, 55);
         }
     }
 
