@@ -166,10 +166,10 @@
         if (ship.shooting && ship.fuel > 0) {
             if (gameState.mode === 'escaping') {
                 // When escaping, shooting propels you upward - accelerate upward each frame
-                ship.vy -= SHOOT_SLOWDOWN * 2; // 2x acceleration when escaping!
-                ship.vy = Math.max(ship.vy, -10); // Much faster cap (was -5)
-                // Less fuel cost when escaping (you need it!)
-                ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST * 0.2);
+                ship.vy -= SHOOT_SLOWDOWN * 3; // 3x acceleration when escaping!
+                ship.vy = Math.max(ship.vy, -15); // Even faster! (was -10)
+                // Almost no fuel cost when escaping!
+                ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST * 0.05);
             } else {
                 // When descending, shooting slows you down
                 ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -1);
