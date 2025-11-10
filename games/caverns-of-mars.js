@@ -194,10 +194,12 @@
                 });
             }
         } else {
-            // Gravity always pulls downward (but not during escape)
+            // Gravity/deceleration when not shooting
             if (gameState.mode === 'escaping') {
-                // During escape, no gravity when not thrusting - maintain speed
-                // This lets you coast upward
+                // During escape, apply drag to slow down when not thrusting
+                ship.vy *= 0.95; // Lose 5% speed per frame
+                // Small gravity pulls you back down
+                ship.vy = Math.min(ship.vy + GRAVITY * dt * 0.3, MAX_FALL_SPEED);
             } else {
                 ship.vy = Math.min(ship.vy + GRAVITY * dt, MAX_FALL_SPEED);
             }
