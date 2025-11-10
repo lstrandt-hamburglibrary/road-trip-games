@@ -164,8 +164,13 @@
 
         // Vertical movement (gravity and shooting)
         if (ship.shooting && ship.fuel > 0) {
-            // Shooting slows descent (or speeds up ascent when escaping)
-            ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -3); // Can go faster upward
+            if (gameState.mode === 'escaping') {
+                // When escaping, shooting propels you upward (negative = up)
+                ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -4);
+            } else {
+                // When descending, shooting slows you down
+                ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -1);
+            }
             ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST);
 
             // Create bullets (firing downward)
@@ -186,7 +191,13 @@
                 });
             }
         } else {
-            ship.vy = Math.min(ship.vy + GRAVITY * dt, MAX_FALL_SPEED);
+            // Gravity always pulls downward
+            if (gameState.mode === 'escaping') {
+                // When escaping, gravity still pulls down but with less force
+                ship.vy = Math.min(ship.vy + GRAVITY * dt * 0.5, MAX_FALL_SPEED);
+            } else {
+                ship.vy = Math.min(ship.vy + GRAVITY * dt, MAX_FALL_SPEED);
+            }
         }
 
         // Update position
@@ -215,11 +226,12 @@
                 ship.y = targetY;
             }
         } else if (gameState.mode === 'escaping') {
-            // Move ship upward
-            ship.y -= Math.abs(ship.vy);
+            // Move ship based on velocity (negative vy = upward)
+            ship.y += ship.vy;
 
-            const targetY = GAME_HEIGHT * 0.6;
+            const targetY = GAME_HEIGHT * 0.5;
             if (ship.y < targetY) {
+                // Ship going too high, scroll cave up
                 const diff = targetY - ship.y;
                 cave.scrollOffset -= diff;
                 ship.y = targetY;
