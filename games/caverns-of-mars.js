@@ -16,8 +16,8 @@
     const CAVE_WIDTH = 300;
     const SCROLL_SPEED = 2;
     const GRAVITY = 0.3;
-    const MAX_FALL_SPEED = 2.5;
-    const SHOOT_SLOWDOWN = 0.4;
+    const MAX_FALL_SPEED = 4; // Increased from 2.5
+    const SHOOT_SLOWDOWN = 1.5; // Increased from 0.4 - much stronger control
     const FUEL_DRAIN_RATE = 0.05; // Reduced from 0.1
     const SHOOT_FUEL_COST = 0.15; // Reduced from 0.3
     const FUEL_TANK_VALUE = 30;
@@ -164,7 +164,8 @@
 
         // Vertical movement (gravity and shooting)
         if (ship.shooting && ship.fuel > 0) {
-            ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -1);
+            // Shooting slows descent (or speeds up ascent when escaping)
+            ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -3); // Can go faster upward
             ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST);
 
             // Create bullets (firing downward)
