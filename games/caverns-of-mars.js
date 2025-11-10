@@ -9,8 +9,8 @@
     let gameLoopId = null;
 
     // Game constants
-    const GAME_WIDTH = 800;
-    const GAME_HEIGHT = 1000;
+    const GAME_WIDTH = 600;
+    const GAME_HEIGHT = 700;
     const SHIP_WIDTH = 30;
     const SHIP_HEIGHT = 30;
     const CAVE_WIDTH = 300;
@@ -689,8 +689,11 @@
 
     // Event handlers
     function handleKeyDown(e) {
+        // Prevent default scrolling for game controls
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'a', 'd', 'w', 's'].includes(e.key)) {
+            e.preventDefault();
+        }
         keys[e.key] = true;
-        if (e.key === ' ') e.preventDefault();
     }
 
     function handleKeyUp(e) {
@@ -765,7 +768,7 @@
 
         // Calculate display size (fit to container, maintain aspect ratio)
         const container = canvas.parentElement;
-        const maxWidth = Math.min(container.clientWidth - 40, 800); // Max 800px width
+        const maxWidth = Math.min(container.clientWidth - 40, 600); // Max 600px width
         const aspectRatio = GAME_HEIGHT / GAME_WIDTH;
 
         canvas.style.width = maxWidth + 'px';
