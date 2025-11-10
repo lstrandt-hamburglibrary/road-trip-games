@@ -18,8 +18,8 @@
     const GRAVITY = 0.3;
     const MAX_FALL_SPEED = 2.5;
     const SHOOT_SLOWDOWN = 0.4;
-    const FUEL_DRAIN_RATE = 0.1;
-    const SHOOT_FUEL_COST = 0.3;
+    const FUEL_DRAIN_RATE = 0.05; // Reduced from 0.1
+    const SHOOT_FUEL_COST = 0.15; // Reduced from 0.3
     const FUEL_TANK_VALUE = 30;
 
     // Game state
@@ -188,7 +188,6 @@
 
         // Update position
         ship.x += ship.vx;
-        ship.y += ship.vy;
 
         // Keep ship on screen horizontally
         ship.x = Math.max(20, Math.min(GAME_WIDTH - 20, ship.x));
@@ -201,23 +200,27 @@
             gameState.mode = 'gameover';
         }
 
-        // Keep ship in center of screen, scroll cave instead
+        // Ship moves down the screen, cave scrolls to keep ship centered
         if (gameState.mode === 'descending') {
-            const targetY = GAME_HEIGHT * 0.4; // Keep ship at 40% from top
-            if (ship.y < targetY) {
-                ship.y = targetY;
-            }
-            // Scroll cave as ship descends
-            const scrollAmount = ship.vy;
-            cave.scrollOffset += scrollAmount;
-        } else if (gameState.mode === 'escaping') {
-            const targetY = GAME_HEIGHT * 0.6; // Keep ship at 60% from top when escaping
+            ship.y += ship.vy;
+
+            // Keep ship roughly centered, scroll cave as needed
+            const targetY = GAME_HEIGHT * 0.4;
             if (ship.y > targetY) {
+                const diff = ship.y - targetY;
+                cave.scrollOffset += diff;
                 ship.y = targetY;
             }
-            // Scroll cave up when escaping
-            const scrollAmount = Math.abs(ship.vy);
-            cave.scrollOffset -= scrollAmount;
+        } else if (gameState.mode === 'escaping') {
+            // Move ship upward
+            ship.y -= Math.abs(ship.vy);
+
+            const targetY = GAME_HEIGHT * 0.6;
+            if (ship.y < targetY) {
+                const diff = targetY - ship.y;
+                cave.scrollOffset -= diff;
+                ship.y = targetY;
+            }
         }
 
         // Check if reached reactor
