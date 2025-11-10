@@ -330,11 +330,25 @@
                 }
             }
 
-            // Check collision with ship
-            if (checkCollision(enemy, {x: ship.x - SHIP_WIDTH/2, y: ship.y - SHIP_HEIGHT/2, width: SHIP_WIDTH, height: SHIP_HEIGHT})) {
+            // Check collision with ship (convert enemy world Y to screen Y)
+            const enemyScreenY = enemy.y - cave.scrollOffset;
+            const shipBox = {
+                x: ship.x - SHIP_WIDTH/2,
+                y: ship.y - SHIP_HEIGHT/2,
+                width: SHIP_WIDTH,
+                height: SHIP_HEIGHT
+            };
+            const enemyBox = {
+                x: enemy.x,
+                y: enemyScreenY,
+                width: enemy.width,
+                height: enemy.height
+            };
+
+            if (checkCollision(enemyBox, shipBox)) {
                 enemy.active = false;
                 ship.health -= 20;
-                createExplosion(enemy.x, enemy.y);
+                createExplosion(enemy.x, enemyScreenY);
 
                 if (ship.health <= 0) {
                     gameState.mode = 'gameover';
