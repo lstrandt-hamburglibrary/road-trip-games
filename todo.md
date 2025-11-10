@@ -49,17 +49,7 @@
 - [x] Themed bingo expansions
   - Travel bingo implemented
 
-## Future Game Ideas
-
-- [ ] Dungeon Crawler
-  - Simple roguelike/dungeon exploration
-  - Turn-based combat
-  - Collect items and level up
-  - Procedurally generated dungeons
-
-## Future Features
-
-- [ ] GPS Facts implementation
+## Working On 🚧
 
 - [ ] I Spy Game Improvements - Make it Actually Challenging
   - [ ] Reduce object size significantly (18-20px instead of 28px)
@@ -71,3 +61,15 @@
     - Example: Multiple butterflies but only one specific position counts
   - [ ] Consider making objects partially obscured by background elements
   - [ ] Maybe add a zoom feature to help search detailed areas
+
+## Future Game Ideas
+
+- [ ] Dungeon Crawler
+  - Simple roguelike/dungeon exploration
+  - Turn-based combat
+  - Collect items and level up
+  - Procedurally generated dungeons
+
+## Future Features
+
+- [ ] GPS Facts implementation
