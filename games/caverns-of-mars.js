@@ -165,13 +165,16 @@
         // Vertical movement (gravity and shooting)
         if (ship.shooting && ship.fuel > 0) {
             if (gameState.mode === 'escaping') {
-                // When escaping, shooting propels you upward (negative = up)
-                ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -4);
+                // When escaping, shooting propels you upward - accelerate upward each frame
+                ship.vy -= SHOOT_SLOWDOWN;
+                ship.vy = Math.max(ship.vy, -5); // Cap at -5 (fast upward)
+                // Less fuel cost when escaping (you need it!)
+                ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST * 0.3);
             } else {
                 // When descending, shooting slows you down
                 ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -1);
+                ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST);
             }
-            ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST);
 
             // Create bullets (firing downward)
             if (Math.random() < 0.3) {
