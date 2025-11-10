@@ -166,18 +166,18 @@
         if (ship.shooting && ship.fuel > 0) {
             if (gameState.mode === 'escaping') {
                 // When escaping, shooting propels you upward - accelerate upward each frame
-                ship.vy -= SHOOT_SLOWDOWN;
-                ship.vy = Math.max(ship.vy, -5); // Cap at -5 (fast upward)
+                ship.vy -= SHOOT_SLOWDOWN * 2; // 2x acceleration when escaping!
+                ship.vy = Math.max(ship.vy, -10); // Much faster cap (was -5)
                 // Less fuel cost when escaping (you need it!)
-                ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST * 0.3);
+                ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST * 0.2);
             } else {
                 // When descending, shooting slows you down
                 ship.vy = Math.max(ship.vy - SHOOT_SLOWDOWN, -1);
                 ship.fuel = Math.max(0, ship.fuel - SHOOT_FUEL_COST);
             }
 
-            // Create bullets (firing downward)
-            if (Math.random() < 0.3) {
+            // Create bullets (firing downward) - but not when escaping!
+            if (gameState.mode !== 'escaping' && Math.random() < 0.3) {
                 // Bullets start at ship position in world coordinates
                 const worldY = ship.y + cave.scrollOffset;
                 bullets.push({
@@ -194,10 +194,10 @@
                 });
             }
         } else {
-            // Gravity always pulls downward
+            // Gravity always pulls downward (but not during escape)
             if (gameState.mode === 'escaping') {
-                // When escaping, gravity still pulls down but with less force
-                ship.vy = Math.min(ship.vy + GRAVITY * dt * 0.5, MAX_FALL_SPEED);
+                // During escape, no gravity when not thrusting - maintain speed
+                // This lets you coast upward
             } else {
                 ship.vy = Math.min(ship.vy + GRAVITY * dt, MAX_FALL_SPEED);
             }
