@@ -60,3 +60,14 @@
 ## Future Features
 
 - [ ] GPS Facts implementation
+
+- [ ] I Spy Game Improvements - Make it Actually Challenging
+  - [ ] Reduce object size significantly (18-20px instead of 28px)
+  - [ ] Add much more visual clutter - many more background emojis
+  - [ ] Use similar-looking emojis in background near hidden objects
+    - Example: If hiding butterfly 🦋, add flowers 🌸🌼 and bees 🐝 nearby
+  - [ ] Randomize object positions each playthrough instead of fixed positions
+  - [ ] Add decoy objects - similar emojis that aren't the actual target
+    - Example: Multiple butterflies but only one specific position counts
+  - [ ] Consider making objects partially obscured by background elements
+  - [ ] Maybe add a zoom feature to help search detailed areas

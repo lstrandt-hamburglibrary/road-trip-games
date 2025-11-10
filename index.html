@@ -17,7 +17,7 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- App Version for automatic updates -->
-    <script>window.APP_VERSION = '1.97.1';</script>
+    <script>window.APP_VERSION = '1.100.0';</script>
 
     <style>
         * {
@@ -717,6 +717,11 @@
                         <h3>🚂 The Oregon Trail</h3>
                         <p>Classic 1971 survival journey - 2,000 miles to Oregon!</p>
                     </div>
+
+                    <div class="feature-card" onclick="launchCavernsOfMars()" style="background: linear-gradient(135deg, #ff6b35 0%, #8B0000 100%);">
+                        <h3>🔴 Caverns of Mars</h3>
+                        <p>Classic 1981 vertical shooter - descend into Mars!</p>
+                    </div>
                 </div>
             </div>
 
@@ -1137,6 +1142,18 @@
                         <button onclick="froggerRestart()" style="background: #27ae60; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold; margin-right: 1rem;">🔄 Play Again</button>
                         <button onclick="exitFrogger()" style="background: #95a5a6; color: white; border: none; padding: 1rem 2rem; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold;">🏠 Menu</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Caverns of Mars Game Section (hidden by default) -->
+            <div id="cavernsOfMarsGame" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <button onclick="exitCavernsOfMars()" style="background: #e74c3c; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold;">← Back</button>
+                    <h2 style="margin: 0;">🔴 Caverns of Mars</h2>
+                    <div style="width: 120px;"></div>
+                </div>
+                <div style="text-align: center;">
+                    <canvas id="cavernsCanvas"></canvas>
                 </div>
             </div>
 
@@ -2250,6 +2267,7 @@
     <script src="games/frogger.js?v=1.0.0"></script>
     <script src="games/oregontrail.js?v=1.85.0"></script>
     <script src="games/pharaoh.js?v=1.61.0"></script>
+    <script src="games/caverns-of-mars.js?v=1.0.0"></script>
 
     <!-- Oregon Trail orientation detection -->
     <script>
